@@ -1,8 +1,0 @@
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/dentrix_editor.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/edit_cache.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/list_install_components.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/install.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/install/local.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/install/strip.dir
-/home/mohamed/dentrix_editor/build/Desktop-Debug/CMakeFiles/dentrix_editor_autogen.dir
