@@ -12,7 +12,8 @@
 #include <glm/trigonometric.hpp>
 
 
-GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {}
+GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {
+}
 
 GLWidget::~GLWidget() {}
 
@@ -59,6 +60,22 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
     model.Draw();
+}
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    std::cout<<__func__<<std::endl;
+}
+
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    std::cout<<__func__<<std::endl;
+
+}
+
+void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    std::cout<<__func__<<std::endl;
 }
 
 

@@ -4,6 +4,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include "model.h"
+#include <QMouseEvent>
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -18,6 +19,9 @@ protected:
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
     void paintGL() override;  // Rendering logic
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     std::string initialFilePath;
