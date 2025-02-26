@@ -14,6 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets OpenGL OpenGLWidg
 # Find Assimp
 find_package(assimp REQUIRED)
 
+
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
@@ -26,6 +27,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         glwidget.h glwidget.cpp
+        model.h
+        model.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET dentrix_editor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -46,6 +49,7 @@ else()
 endif()
 
 target_link_libraries(dentrix_editor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::OpenGLWidgets assimp)
+target_include_directories(dentrix_editor PRIVATE ${CMAKE_SOURCE_DIR}/libs)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

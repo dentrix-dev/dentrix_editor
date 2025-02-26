@@ -3,6 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
+#include "model.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -11,6 +12,7 @@ public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 protected:
+    Model model;
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
     void paintGL() override;  // Rendering logic
