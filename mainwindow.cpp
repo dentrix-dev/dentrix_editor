@@ -22,7 +22,11 @@ void MainWindow::loadModel()
     std::cout<<"load model called"<<std::endl;
     QString filePath = QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
     if (!filePath.isEmpty()) {
-        glWidget = new GLWidget(this, filePath.toStdString());
-        setCentralWidget(glWidget);
+        if (!glWidget){
+            glWidget = new GLWidget(this, filePath.toStdString());
+            setCentralWidget(glWidget);
+        } else {
+            glWidget->loadModel(filePath.toStdString());
+        }
     }
 }

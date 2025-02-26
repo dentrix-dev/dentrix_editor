@@ -9,6 +9,7 @@ GLWidget::~GLWidget() {}
 
 void GLWidget::loadModel(const std::string &path)
 {
+    makeCurrent();
     model = Model(path, this);  // Load the new model
     update();  // Refresh the OpenGL view
 }
