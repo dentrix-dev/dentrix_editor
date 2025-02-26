@@ -3,9 +3,15 @@
 #include "model.h"
 #include "shader.h"
 
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {}
+GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {}
 
 GLWidget::~GLWidget() {}
+
+void GLWidget::loadModel(const std::string &path)
+{
+    model = Model(path, this);  // Load the new model
+    update();  // Refresh the OpenGL view
+}
 
 void GLWidget::initializeGL()
 {
@@ -16,7 +22,7 @@ void GLWidget::initializeGL()
     Shader shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
     shader.use();
     // Load model
-    Model sampleModel("../../models/jaw_upper.obj", this);
+    Model sampleModel(initialFilePath, this);
     model = sampleModel;
 }
 

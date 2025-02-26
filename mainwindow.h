@@ -21,5 +21,8 @@ public:
 private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
+
+private slots:
+    void loadModel();
 };
 #endif // MAINWINDOW_H
