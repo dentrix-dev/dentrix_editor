@@ -22,6 +22,8 @@ private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
 
+    void createToolBar();
+
 private slots:
     void loadModel();
 };
