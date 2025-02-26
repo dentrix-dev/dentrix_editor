@@ -34,8 +34,8 @@ void GLWidget::initializeGL()
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
-        vShaderFile.open("/home/mahmoud/Work/Uni/GP/dentrix_editor/shaders/vertexShader.vs");
-        fShaderFile.open("/home/mahmoud/Work/Uni/GP/dentrix_editor/shaders/fragmentShader.fs");
+        vShaderFile.open("../../shaders/vertexShader.vs");
+        fShaderFile.open("../../shaders/fragmentShader.fs");
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();
@@ -89,7 +89,7 @@ void GLWidget::initializeGL()
     glDeleteShader(fragment);
 
     // Load model
-    Model sampleModel("/home/mahmoud/Work/Uni/GP/dentrix_editor/models/jaw_upper.obj", this);
+    Model sampleModel("../../models/jaw_upper.obj", this);
     model = sampleModel;
 }
 
