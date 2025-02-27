@@ -3,14 +3,11 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <QOpenGLFunctions_3_3_Core>
 
 struct Vertex {
     glm::vec3 Position;
-  glm::vec3 Normal;
+    glm::vec3 Normal;
 
     Vertex(glm::vec3 Position, glm::vec3 Normal);
 };

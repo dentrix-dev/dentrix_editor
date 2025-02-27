@@ -1,11 +1,10 @@
 #include <cstddef>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <assimp/scene.h>
 #include "model.h"
-#include <glm/glm.hpp>
-#include <vector>
 
 // -------------- Vertex ---------------
 Vertex::Vertex(glm::vec3 Position, glm::vec3 Normal) {
