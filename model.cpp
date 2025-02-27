@@ -67,7 +67,7 @@ Model::Model(std::string path, QOpenGLFunctions_3_3_Core* gl) {
 
 void Model::Draw() {
     for (int i=0; i<meshes.size(); i++) {
-        (meshes[i])->Draw();
+        meshes[i].Draw();
     }
 }
 
@@ -86,8 +86,7 @@ void Model::loadModel(std::string path) {
 void Model::processNode(aiNode *node, const aiScene *scene) {
     for (int i=0; i<node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        Mesh* result = processMesh(mesh, scene);
-        meshes.push_back(result);
+        meshes.push_back(processMesh(mesh, scene));
     }
 
     for (int i=0; i<node->mNumChildren; i++) {
@@ -96,7 +95,7 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 }
 
 
-Mesh* Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     float minX = mesh->mVertices[0].x;
@@ -144,8 +143,7 @@ Mesh* Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         indices.push_back(mesh->mFaces[i].mIndices[2]);
     }
 
-    Mesh* result = new Mesh(vertices, indices, center, gl);
-    return result;
+    return Mesh(vertices, indices, center, gl);
 }
 
 

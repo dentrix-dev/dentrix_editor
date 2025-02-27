@@ -42,10 +42,10 @@ class Model {
 
   private:
     // model data
-    std::vector<Mesh*> meshes;
+    std::vector<Mesh> meshes;
     QOpenGLFunctions_3_3_Core* gl;
 
     void loadModel(std::string path);
     void processNode(aiNode *node, const aiScene *scene);
-    Mesh* processMesh(aiMesh *mesh, const aiScene *scene);
+    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 };
