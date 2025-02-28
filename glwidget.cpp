@@ -73,7 +73,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     float offsetX = event->position().x() - mousePosX;
-    float offsetY = mousePosY - event->position().y();
+    float offsetY = event->position().y() - mousePosY;
     camera.processMouse(offsetX, offsetY);
     mousePosX = event->position().x();
     mousePosY = event->position().y();

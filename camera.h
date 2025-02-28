@@ -9,7 +9,7 @@ class Camera {
     float pitch = 0.0f;
     float yaw = -90.0f;
     float speed = 15.0f;
-    float sensitivity = 0.1f;
+    float sensitivity = 0.2f;
 
   public:
     glm::mat4 GetViewMatrix();
