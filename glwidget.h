@@ -5,6 +5,9 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include "model.h"
 #include <QMouseEvent>
+#include "camera.h"
+#include <glm/glm.hpp>
+#include "shader.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -15,7 +18,7 @@ public:
 
     void loadModel(const std::string &path); // Function to load new model
 protected:
-    Model model;
+    Model objectModel;
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
     void paintGL() override;  // Rendering logic
@@ -25,6 +28,13 @@ protected:
 
 private:
     std::string initialFilePath;
+
+    Shader* shader;
+
+    Camera camera;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
 };
 
 #endif // GLWIDGET_H

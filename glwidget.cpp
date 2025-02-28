@@ -20,7 +20,7 @@ GLWidget::~GLWidget() {}
 void GLWidget::loadModel(const std::string &path)
 {
     makeCurrent();
-    model = Model(path, this);  // Load the new model
+    objectModel = Model(path, this);  // Load the new model
     update();  // Refresh the OpenGL view
 }
 
@@ -31,24 +31,21 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
 
     // Shaders
-    Shader shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
-    shader.use();
+    //shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
+    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
+    shader->use();
 
     // Setup projection matrix once as it doesn't change
-    glm::mat4 projection = glm::perspective(
+    projection = glm::perspective(
         glm::radians(45.0f), (float)QWidget::width() / (float)QWidget::height(), 0.1f, 1000.0f);
-    shader.setMatrix4("projection", glm::value_ptr(projection));
+    shader->setMatrix4("projection", glm::value_ptr(projection));
 
-    glm::mat4 view = glm::mat4(1.0f);
-    shader.setMatrix4("view", glm::value_ptr(view));
-
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, -100.0f));
-    shader.setMatrix4("model", glm::value_ptr(modelMatrix));
+    model = glm::mat4(1.0f);
+    shader->setMatrix4("model", glm::value_ptr(model));
 
     // Load model
     Model sampleModel(initialFilePath, this);
-    model = sampleModel;
+    objectModel = sampleModel;
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -59,7 +56,11 @@ void GLWidget::resizeGL(int w, int h)
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
-    model.Draw();
+
+    view = camera.GetViewMatrix();
+    shader->setMatrix4("view", glm::value_ptr(view));
+
+    objectModel.Draw();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -69,8 +70,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    std::cout<<__func__<<std::endl;
-
+    std::cout<<event->position().x()<<std::endl;
+    std::cout<<event->position().y()<<std::endl;
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
