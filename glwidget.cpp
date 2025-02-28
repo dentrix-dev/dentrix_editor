@@ -66,12 +66,18 @@ void GLWidget::paintGL()
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     std::cout<<__func__<<std::endl;
+    mousePosX = event->position().x();
+    mousePosY = event->position().y();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    std::cout<<event->position().x()<<std::endl;
-    std::cout<<event->position().y()<<std::endl;
+    float offsetX = event->position().x() - mousePosX;
+    float offsetY = mousePosY - event->position().y();
+    camera.processMouse(offsetX, offsetY);
+    mousePosX = event->position().x();
+    mousePosY = event->position().y();
+    update();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
