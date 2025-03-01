@@ -85,6 +85,19 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     std::cout<<__func__<<std::endl;
 }
 
+void GLWidget::wheelEvent(QWheelEvent *event) {
+    QPoint numPixels = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
 
+    if (!numPixels.isNull()) {
+        camera.addDistance(numPixels.y());
+    } else if (!numDegrees.isNull()) {
+        QPoint numSteps = numDegrees / 15;
+        camera.addDistance(numSteps.y());
+    }
+
+    update();
+    event->accept();
+}
 
 

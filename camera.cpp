@@ -22,6 +22,16 @@ void Camera::processMouse(float xOffset, float yOffset) {
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    position = glm::normalize(direction) * 100.0f;
+    position = glm::normalize(direction) * distance;
     front = glm::normalize(position * -1.0f);
+}
+
+void Camera::addDistance(float offset) {
+    distance += offset;
+    if (distance < 5.0f)
+        distance = 5.0f;
+    if (distance > 150.0f)
+        distance = 150.0f;
+
+    position = glm::normalize(position) * distance;
 }
