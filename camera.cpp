@@ -27,7 +27,7 @@ void Camera::processMouse(float xOffset, float yOffset) {
 }
 
 void Camera::addDistance(float offset) {
-    distance += offset;
+    distance -= offset;
     if (distance < 5.0f)
         distance = 5.0f;
     if (distance > 150.0f)
