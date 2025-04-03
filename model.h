@@ -33,6 +33,7 @@ class Mesh {
 
 class Model {
   public:
+    glm::vec3 center;
     Model();
     Model(std::string path, QOpenGLFunctions_3_3_Core* gl);
     void Draw();

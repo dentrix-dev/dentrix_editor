@@ -72,7 +72,7 @@ void Model::Draw() {
 
 void Model::loadModel(std::string path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_GenBoundingBoxes);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -80,6 +80,16 @@ void Model::loadModel(std::string path) {
     }
 
     processNode(scene->mRootNode, scene);
+
+    float totalX=0.0;
+    float totalY=0.0;
+    float totalZ=0.0;
+    for (int i=0; i<meshes.size(); i++) {
+        totalX += meshes[i].center.x;
+        totalY += meshes[i].center.y;
+        totalZ += meshes[i].center.z;
+    }
+    center = glm::vec3(totalX / (float)meshes.size(), totalY / (float)meshes.size(), totalZ / (float)meshes.size());
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene) {
@@ -97,41 +107,12 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    float minX = mesh->mVertices[0].x;
-    float minY = mesh->mVertices[0].y;
-    float minZ = mesh->mVertices[0].z;
-    float maxX = mesh->mVertices[0].x;
-    float maxY = mesh->mVertices[0].y;
-    float maxZ = mesh->mVertices[0].z;
 
     for (int i=0; i<mesh->mNumVertices; i++) {
         float x = mesh->mVertices[i].x;
         float y = mesh->mVertices[i].y;
         float z = mesh->mVertices[i].z;
-
-        if (x < minX)
-            minX = x;
-        else if (x > maxX)
-            maxX = x;
-
-        if (y < minY)
-            minY = y;
-        else if (y > maxY)
-            maxY = y;
-
-        if (z < minZ)
-            minZ = z;
-        else if (z > maxZ)
-            maxZ = z;
-    }
-
-    glm::vec3 center = glm::vec3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
-
-    for (int i=0; i<mesh->mNumVertices; i++) {
-        float x = mesh->mVertices[i].x;
-        float y = mesh->mVertices[i].y;
-        float z = mesh->mVertices[i].z;
-        glm::vec3 v(x-center.x, y-center.y, z-center.z);
+        glm::vec3 v(x,y,z);
         glm::vec3 n(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
         vertices.push_back(Vertex(v, n));
     }
@@ -141,6 +122,12 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         indices.push_back(mesh->mFaces[i].mIndices[1]);
         indices.push_back(mesh->mFaces[i].mIndices[2]);
     }
+
+    const aiAABB &aabb = mesh->mAABB;
+    float centerX = (aabb.mMax.x + aabb.mMin.x) / 2.0;
+    float centerY = (aabb.mMax.y + aabb.mMin.y) / 2.0;
+    float centerZ = (aabb.mMax.z + aabb.mMin.z) / 2.0;
+    glm::vec3 center = glm::vec3(centerX, centerY, centerZ);
 
     return Mesh(vertices, indices, center, gl);
 }
