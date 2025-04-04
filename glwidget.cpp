@@ -86,6 +86,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     std::cout<<__func__<<std::endl;
+    float mouseX = event->position().x();
+    float mouseY = event->position().y();
+    glm::vec3 rayOrigin, rayDirection;
+    Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection, rayOrigin, rayDirection);
+    std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
+    std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z << std::endl;
+
+    Mesh* intersectedMesh = nullptr;
+    bool intersection = objectModel.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
+    std::cout << "intersection: " << intersection << std::endl;
+    if (intersection && intersectedMesh != nullptr) {
+        std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
+    } else {
+        std::cout << "nullpointer" << std::endl;
+    }
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event) {
