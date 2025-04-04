@@ -63,7 +63,7 @@ void GLWidget::paintGL()
     // Translate model and its meshes to origin
     model = glm::translate(glm::mat4(1.0f), objectModel.center * -1.0f);
     shader->setMatrix4("model", glm::value_ptr(model));
-    objectModel.Draw();
+    objectModel.Draw(shader, selectedMesh);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -93,14 +93,19 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
     std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z << std::endl;
 
+    // Ray direction Y is flipped for some reason, flip it back
+    rayDirection.y = -1 * rayDirection.y;
+
     Mesh* intersectedMesh = nullptr;
     bool intersection = objectModel.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
     std::cout << "intersection: " << intersection << std::endl;
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
+        selectedMesh = intersectedMesh;
     } else {
         std::cout << "nullpointer" << std::endl;
     }
+    update();
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event) {

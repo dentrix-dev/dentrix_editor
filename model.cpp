@@ -133,8 +133,13 @@ Model::Model(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     loadModel(path);
 }
 
-void Model::Draw() {
+void Model::Draw(Shader* shader, Mesh* selectedMesh) {
     for (int i=0; i<meshes.size(); i++) {
+        if (selectedMesh && meshes[i].name == selectedMesh->name) {
+            shader->setFloat("color", 0.8f);
+        } else {
+            shader->setFloat("color", 0.5f);
+        }
         meshes[i].Draw();
     }
 }

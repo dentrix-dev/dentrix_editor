@@ -3,6 +3,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include <string>
+#include "shader.h"
 #include <QOpenGLFunctions_3_3_Core>
 
 struct Vertex {
@@ -44,7 +45,7 @@ class Model {
     glm::vec3 center;
     Model();
     Model(std::string path, QOpenGLFunctions_3_3_Core* gl);
-    void Draw();
+    void Draw(Shader* shader, Mesh* selectedMesh);
 
     bool Intersect(
         glm::vec3 ray_origin,
