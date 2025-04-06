@@ -63,7 +63,7 @@ void GLWidget::paintGL()
     // Translate model and its meshes to origin
     model = glm::translate(glm::mat4(1.0f), objectModel.center * -1.0f);
     shader->setMatrix4("model", glm::value_ptr(model));
-    objectModel.Draw(shader, selectedMesh);
+    objectModel.Draw(shader, selectedMesh, model);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -102,6 +102,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
         selectedMesh = intersectedMesh;
+        selectedMesh->setScale(3);
     } else {
         std::cout << "nullpointer" << std::endl;
     }
