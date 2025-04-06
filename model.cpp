@@ -5,6 +5,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "model.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // -------------- Vertex ---------------
 Vertex::Vertex(glm::vec3 Position, glm::vec3 Normal) {
@@ -123,6 +125,12 @@ void Mesh::Draw() {
     }
 }
 
+void Mesh::setScale(float scaleFactor)
+{
+    currentScale = scaleFactor;
+    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor));
+}
+
 // ------------------- Model ----------------
 Model::Model() {
 
@@ -133,13 +141,19 @@ Model::Model(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     loadModel(path);
 }
 
-void Model::Draw(Shader* shader, Mesh* selectedMesh) {
+void Model::Draw(Shader* shader, Mesh* selectedMesh, glm::mat4 model) {
     for (int i=0; i<meshes.size(); i++) {
         if (selectedMesh && meshes[i].name == selectedMesh->name) {
             shader->setFloat("color", 0.8f);
         } else {
             shader->setFloat("color", 0.5f);
         }
+
+        glm::mat4 meshfinalTransform = meshes[i].scaleTransform * model ;
+
+        // Send per-mesh model matrix to the shader
+        shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
+
         meshes[i].Draw();
     }
 }

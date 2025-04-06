@@ -23,6 +23,7 @@ class Mesh {
     // Axis Aligned Bounding box
     glm::vec3 aabb_min;
     glm::vec3 aabb_max;
+    glm::mat4 scaleTransform = glm::mat4(1.0f);
 
     static bool drawBoundingBox;
 
@@ -31,10 +32,13 @@ class Mesh {
 
     void Draw();
 
+    void setScale(float scaleFactor);
+
   private:
     unsigned int VAO, VBO, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;
     QOpenGLFunctions_3_3_Core* gl;
+    float currentScale = 1.0f;
 
     void setup();
     void setupBoundingBox();
@@ -45,7 +49,7 @@ class Model {
     glm::vec3 center;
     Model();
     Model(std::string path, QOpenGLFunctions_3_3_Core* gl);
-    void Draw(Shader* shader, Mesh* selectedMesh);
+    void Draw(Shader* shader, Mesh* selectedMesh, glm::mat4 model);
 
     bool Intersect(
         glm::vec3 ray_origin,
