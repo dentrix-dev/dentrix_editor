@@ -5,44 +5,7 @@
 #include <string>
 #include "shader.h"
 #include <QOpenGLFunctions_3_3_Core>
-
-struct Vertex {
-    glm::vec3 Position;
-    glm::vec3 Normal;
-
-    Vertex(glm::vec3 Position, glm::vec3 Normal);
-};
-
-class Mesh {
-  public:
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::string name;
-    // Needed to reset model back to origin
-    glm::vec3 center;
-    // Axis Aligned Bounding box
-    glm::vec3 aabb_min;
-    glm::vec3 aabb_max;
-    glm::mat4 scaleTransform = glm::mat4(1.0f);
-
-    static bool drawBoundingBox;
-
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl);
-    ~Mesh();
-
-    void Draw();
-
-    void setScale(float scaleFactor);
-
-  private:
-    unsigned int VAO, VBO, EBO;
-    unsigned int VAO_BB, VBO_BB, EBO_BB;
-    QOpenGLFunctions_3_3_Core* gl;
-    float currentScale = 1.0f;
-
-    void setup();
-    void setupBoundingBox();
-};
+#include "mesh.h"
 
 class Model {
   public:

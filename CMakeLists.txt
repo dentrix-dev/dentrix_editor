@@ -30,6 +30,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         model.h model.cpp
         shader.cpp shader.h
         camera.h camera.cpp
+        vertex.h vertex.cpp
+        mesh.h mesh.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET dentrix_editor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
