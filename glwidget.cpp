@@ -1,6 +1,6 @@
 #include <iostream>
 #include "glwidget.h"
-#include "model.h"
+#include "scene.h"
 #include "shader.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,7 +20,7 @@ GLWidget::~GLWidget() {}
 void GLWidget::loadModel(const std::string &path)
 {
     makeCurrent();
-    objectModel = Model(path, this);  // Load the new model
+    scene = Scene(path, this);  // Load the new model
     update();  // Refresh the OpenGL view
 }
 
@@ -44,8 +44,8 @@ void GLWidget::initializeGL()
     shader->setMatrix4("model", glm::value_ptr(model));
 
     // Load model
-    Model sampleModel(initialFilePath, this);
-    objectModel = sampleModel;
+    Scene sampleModel(initialFilePath, this);
+    scene = sampleModel;
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -61,9 +61,9 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     // Translate model and its meshes to origin
-    model = glm::translate(glm::mat4(1.0f), objectModel.center * -1.0f);
+    model = glm::translate(glm::mat4(1.0f), scene.center * -1.0f);
     shader->setMatrix4("model", glm::value_ptr(model));
-    objectModel.Draw(shader, selectedMesh, model);
+    scene.Draw(shader, selectedMesh, model);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -97,7 +97,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     rayDirection.y = -1 * rayDirection.y;
 
     Mesh* intersectedMesh = nullptr;
-    bool intersection = objectModel.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
+    bool intersection = scene.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
     std::cout << "intersection: " << intersection << std::endl;
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;

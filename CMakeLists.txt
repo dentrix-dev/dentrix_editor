@@ -27,7 +27,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         glwidget.h glwidget.cpp
-        model.h model.cpp
+        scene.h scene.cpp
         shader.cpp shader.h
         camera.h camera.cpp
         vertex.h vertex.cpp

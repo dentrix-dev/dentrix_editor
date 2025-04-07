@@ -3,7 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
-#include "model.h"
+#include "scene.h"
 #include <QMouseEvent>
 #include "camera.h"
 #include <glm/glm.hpp>
@@ -18,7 +18,7 @@ public:
 
     void loadModel(const std::string &path); // Function to load new model
 protected:
-    Model objectModel;
+    Scene scene;
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
     void paintGL() override;  // Rendering logic
