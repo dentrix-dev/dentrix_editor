@@ -61,7 +61,7 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     // Translate model and its meshes to origin
-    model = glm::translate(glm::mat4(1.0f), scene.center * -1.0f);
+    //model = glm::translate(glm::mat4(1.0f), scene.center * -1.0f);
     shader->setMatrix4("model", glm::value_ptr(model));
     scene.Draw(shader, selectedMesh, model);
 }

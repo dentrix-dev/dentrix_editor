@@ -43,17 +43,23 @@ void Scene::loadScene(std::string path) {
         return;
     }
 
-    processNode(scene->mRootNode, scene);
-
+    // Get scene center
+    unsigned int numMeshes = scene->mNumMeshes;
     float totalX=0.0;
     float totalY=0.0;
     float totalZ=0.0;
-    for (int i=0; i<meshes.size(); i++) {
-        totalX += meshes[i].center.x;
-        totalY += meshes[i].center.y;
-        totalZ += meshes[i].center.z;
+    for (int i=0; i < numMeshes; i++) {
+        const aiAABB &aabb = scene->mMeshes[i]->mAABB;
+        glm::vec3 aabb_min = glm::vec3(aabb.mMin.x,aabb.mMin.y,aabb.mMin.z);
+        glm::vec3 aabb_max = glm::vec3(aabb.mMax.x,aabb.mMax.y,aabb.mMax.z);
+
+        totalX += (aabb_max.x + aabb_min.x) / 2.0;
+        totalY += (aabb_max.y + aabb_min.y) / 2.0;
+        totalZ += (aabb_max.z + aabb_min.z) / 2.0;
     }
-    center = glm::vec3(totalX / (float)meshes.size(), totalY / (float)meshes.size(), totalZ / (float)meshes.size());
+    center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
+
+    processNode(scene->mRootNode, scene);
 }
 
 void Scene::processNode(aiNode *node, const aiScene *scene) {
@@ -73,9 +79,9 @@ Mesh Scene::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<unsigned int> indices;
 
     for (int i=0; i<mesh->mNumVertices; i++) {
-        float x = mesh->mVertices[i].x;
-        float y = mesh->mVertices[i].y;
-        float z = mesh->mVertices[i].z;
+        float x = mesh->mVertices[i].x - center.x;
+        float y = mesh->mVertices[i].y - center.y;
+        float z = mesh->mVertices[i].z - center.z;
         glm::vec3 v(x,y,z);
         glm::vec3 n(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
         vertices.push_back(Vertex(v, n));
@@ -88,8 +94,8 @@ Mesh Scene::processMesh(aiMesh *mesh, const aiScene *scene) {
     }
 
     const aiAABB &aabb = mesh->mAABB;
-    glm::vec3 aabb_min = glm::vec3(aabb.mMin.x,aabb.mMin.y,aabb.mMin.z);
-    glm::vec3 aabb_max = glm::vec3(aabb.mMax.x,aabb.mMax.y,aabb.mMax.z);
+    glm::vec3 aabb_min = glm::vec3(aabb.mMin.x-center.x,aabb.mMin.y-center.y,aabb.mMin.z-center.z);
+    glm::vec3 aabb_max = glm::vec3(aabb.mMax.x-center.x,aabb.mMax.y-center.y,aabb.mMax.z-center.z);
 
     float centerX = (aabb_max.x + aabb_min.x) / 2.0;
     float centerY = (aabb_max.y + aabb_min.y) / 2.0;
