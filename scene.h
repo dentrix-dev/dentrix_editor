@@ -12,7 +12,7 @@ class Scene {
     glm::vec3 center;
     Scene();
     Scene(std::string path, QOpenGLFunctions_3_3_Core* gl);
-    void Draw(Shader* shader, Mesh* selectedMesh, glm::mat4 model);
+    void Draw(Shader* shader, Mesh* selectedMesh);
 
     bool Intersect(
         glm::vec3 ray_origin,
@@ -27,14 +27,14 @@ class Scene {
 
     void loadScene(std::string path);
     void processNode(aiNode *node, const aiScene *scene);
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    Mesh processMesh(aiMesh *mesh);
 
     bool TestRayOBBIntersection(
         glm::vec3 ray_origin,        // Ray origin, in world space
         glm::vec3 ray_direction,     // Ray direction (NOT target position!), in world space. Must be normalize()'d.
         glm::vec3 aabb_min,          // Minimum X,Y,Z coords of the mesh when not transformed at all.
         glm::vec3 aabb_max,          // Maximum X,Y,Z coords. Often aabb_min*-1 if your mesh is centered, but it's not always the case.
-        glm::mat4 SceneMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
+        glm::mat4 ModelMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
         float& intersection_distance // Output : distance between ray_origin and the intersection with the OBB
         );
 };

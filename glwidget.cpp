@@ -31,7 +31,6 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
 
     // Shaders
-    //shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
     shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
     shader->use();
 
@@ -60,10 +59,7 @@ void GLWidget::paintGL()
     view = camera.GetViewMatrix();
     shader->setMatrix4("view", glm::value_ptr(view));
 
-    // Translate model and its meshes to origin
-    //model = glm::translate(glm::mat4(1.0f), scene.center * -1.0f);
-    shader->setMatrix4("model", glm::value_ptr(model));
-    scene.Draw(shader, selectedMesh, model);
+    scene.Draw(shader, selectedMesh);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)

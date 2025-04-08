@@ -17,7 +17,7 @@ Scene::Scene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     loadScene(path);
 }
 
-void Scene::Draw(Shader* shader, Mesh* selectedMesh, glm::mat4 model) {
+void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
     for (int i=0; i<meshes.size(); i++) {
         if (selectedMesh && meshes[i].name == selectedMesh->name) {
             shader->setFloat("color", 0.8f);
@@ -25,7 +25,7 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh, glm::mat4 model) {
             shader->setFloat("color", 0.5f);
         }
 
-        glm::mat4 meshfinalTransform = meshes[i].scaleTransform * model ;
+        glm::mat4 meshfinalTransform = meshes[i].scaleTransform;
 
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
@@ -65,7 +65,7 @@ void Scene::loadScene(std::string path) {
 void Scene::processNode(aiNode *node, const aiScene *scene) {
     for (int i=0; i<node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene));
+        meshes.push_back(processMesh(mesh));
     }
 
     for (int i=0; i<node->mNumChildren; i++) {
@@ -74,7 +74,7 @@ void Scene::processNode(aiNode *node, const aiScene *scene) {
 }
 
 
-Mesh Scene::processMesh(aiMesh *mesh, const aiScene *scene) {
+Mesh Scene::processMesh(aiMesh *mesh) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -110,7 +110,7 @@ bool Scene::TestRayOBBIntersection(
     glm::vec3 ray_direction,     // Ray direction (NOT target position!), in world space. Must be normalize()'d.
     glm::vec3 aabb_min,          // Minimum X,Y,Z coords of the mesh when not transformed at all.
     glm::vec3 aabb_max,          // Maximum X,Y,Z coords. Often aabb_min*-1 if your mesh is centered, but it's not always the case.
-    glm::mat4 SceneMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
+    glm::mat4 ModelMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
     float& intersection_distance // Output : distance between ray_origin and the intersection with the OBB
     ){
 
@@ -119,13 +119,13 @@ bool Scene::TestRayOBBIntersection(
     float tMin = 0.0f;
     float tMax = 100000.0f;
 
-    glm::vec3 OBBposition_worldspace(SceneMatrix[3].x, SceneMatrix[3].y, SceneMatrix[3].z);
+    glm::vec3 OBBposition_worldspace(ModelMatrix[3].x, ModelMatrix[3].y, ModelMatrix[3].z);
 
     glm::vec3 delta = OBBposition_worldspace - ray_origin;
 
     // Test intersection with the 2 planes perpendicular to the OBB's X axis
     {
-        glm::vec3 xaxis(SceneMatrix[0].x, SceneMatrix[0].y, SceneMatrix[0].z);
+        glm::vec3 xaxis(ModelMatrix[0].x, ModelMatrix[0].y, ModelMatrix[0].z);
         float e = glm::dot(xaxis, delta);
         float f = glm::dot(ray_direction, xaxis);
 
@@ -163,7 +163,7 @@ bool Scene::TestRayOBBIntersection(
     // Test intersection with the 2 planes perpendicular to the OBB's Y axis
     // Exactly the same thing than above.
     {
-        glm::vec3 yaxis(SceneMatrix[1].x, SceneMatrix[1].y, SceneMatrix[1].z);
+        glm::vec3 yaxis(ModelMatrix[1].x, ModelMatrix[1].y, ModelMatrix[1].z);
         float e = glm::dot(yaxis, delta);
         float f = glm::dot(ray_direction, yaxis);
 
@@ -190,7 +190,7 @@ bool Scene::TestRayOBBIntersection(
     // Test intersection with the 2 planes perpendicular to the OBB's Z axis
     // Exactly the same thing than above.
     {
-        glm::vec3 zaxis(SceneMatrix[2].x, SceneMatrix[2].y, SceneMatrix[2].z);
+        glm::vec3 zaxis(ModelMatrix[2].x, ModelMatrix[2].y, ModelMatrix[2].z);
         float e = glm::dot(zaxis, delta);
         float f = glm::dot(ray_direction, zaxis);
 
