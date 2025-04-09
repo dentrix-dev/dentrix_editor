@@ -27,6 +27,9 @@ private:
 
     void createToolBar();
 
+    const QString editButtonInactiveStyleSheet = "background-color: gray; color: white; padding: 5px;";
+    const QString editButtonActiveStyleSheet = "background-color: #3498db; color: white; padding: 5px;";
+
 private slots:
     void loadModel();
     void onMeshSelectedInMainScene();

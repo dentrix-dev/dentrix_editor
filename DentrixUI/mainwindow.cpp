@@ -38,7 +38,7 @@ void MainWindow::createToolBar()
     spacerAction->setDefaultWidget(spacer);
     // Create a styled blue "Edit" button
     editButton = new QPushButton("Edit");
-    editButton->setStyleSheet("background-color: gray; color: white; padding: 5px;");
+    editButton->setStyleSheet(editButtonInactiveStyleSheet);
     // Wrap it in a QWidgetAction so it can go in the QToolBar
     QWidgetAction *editAction = new QWidgetAction(this);
     editAction->setDefaultWidget(editButton);
@@ -74,10 +74,10 @@ void MainWindow::loadModel()
 void MainWindow::onMeshSelectedInMainScene()
 {
     std::cout<<__func__<<std::endl;
-    editButton->setStyleSheet("background-color: #3498db; color: white; padding: 5px;");
+    editButton->setStyleSheet(editButtonActiveStyleSheet);
 }
 
 void MainWindow::onMovedToEditScene()
 {
-    editButton->setStyleSheet("background-color: gray; color: white; padding: 5px;");
+    editButton->setStyleSheet(editButtonInactiveStyleSheet);
 }
