@@ -92,16 +92,14 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     std::cout<<__func__<<std::endl;
     float mouseX = event->position().x();
     float mouseY = event->position().y();
-    glm::vec3 rayOrigin, rayDirection;
-    Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection, rayOrigin, rayDirection);
+    glm::vec3 rayDirection;
+    Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection, rayDirection);
+    std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << std::endl;
     std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
     std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z << std::endl;
 
-    // Ray direction Y is flipped for some reason, flip it back
-    rayDirection.y = -1 * rayDirection.y;
-
     Mesh* intersectedMesh = nullptr;
-    bool intersection = currentScene.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
+    bool intersection = currentScene.Intersect(camera.position, rayDirection, model, intersectedMesh);
     std::cout << "intersection: " << intersection << std::endl;
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
