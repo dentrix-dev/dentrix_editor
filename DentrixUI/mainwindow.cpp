@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("Dentrix Editor");
+    resize(QApplication::primaryScreen()->geometry().width(), QApplication::primaryScreen()->geometry().height());
     connect(ui->actionLoad_Model, &QAction::triggered, this, &MainWindow::loadModel);
     createToolBar();
 }
