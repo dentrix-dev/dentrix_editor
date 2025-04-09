@@ -15,23 +15,37 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets OpenGL OpenGLWidg
 find_package(assimp REQUIRED)
 
 
+set(UI_SOURCES
+    DentrixUI/mainwindow.cpp
+    DentrixUI/mainwindow.h
+    DentrixUI/mainwindow.ui
+    DentrixUI/glwidget.cpp
+    DentrixUI/glwidget.h
+)
+
+set(CORE_SOURCES
+    DentrixCore/scene.cpp
+    DentrixCore/scene.h
+    DentrixCore/shader.cpp
+    DentrixCore/shader.h
+    DentrixCore/camera.cpp
+    DentrixCore/camera.h
+    DentrixCore/vertex.cpp
+    DentrixCore/vertex.h
+    DentrixCore/mesh.cpp
+    DentrixCore/mesh.h
+)
+
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+    main.cpp
+    ${UI_SOURCES}
+    ${CORE_SOURCES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(dentrix_editor
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        glwidget.h glwidget.cpp
-        scene.h scene.cpp
-        shader.cpp shader.h
-        camera.h camera.cpp
-        vertex.h vertex.cpp
-        mesh.h mesh.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET dentrix_editor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -52,7 +66,11 @@ else()
 endif()
 
 target_link_libraries(dentrix_editor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::OpenGLWidgets assimp)
-target_include_directories(dentrix_editor PRIVATE ${CMAKE_SOURCE_DIR}/libs)
+target_include_directories(dentrix_editor PRIVATE
+    ${CMAKE_SOURCE_DIR}/DentrixUI
+    ${CMAKE_SOURCE_DIR}/DentrixCore
+    ${CMAKE_SOURCE_DIR}/libs
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
