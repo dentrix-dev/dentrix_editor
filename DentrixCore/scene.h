@@ -13,8 +13,9 @@ class Scene {
     Scene();
     Scene(std::string path, QOpenGLFunctions_3_3_Core* gl);
     Scene(std::vector<Mesh> meshes, QOpenGLFunctions_3_3_Core* gl);
-    void Draw(Shader* shader, Mesh* selectedMesh);
 
+    void updateCenter();
+    void Draw(Shader* shader, Mesh* selectedMesh);
     bool Intersect(
         glm::vec3 ray_origin,
         glm::vec3 ray_direction,

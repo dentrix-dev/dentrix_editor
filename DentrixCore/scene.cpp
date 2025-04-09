@@ -46,11 +46,29 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
         // Translate the mesh to origin using its center, scale it, translate it back
         glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i].center) * meshes[i].scaleTransform * glm::translate(glm::mat4(1.0f), -1.0f * meshes[i].center);
 
+        // Center the scene
+        // In mainScene, this has no effect since the vertices are already centered on first load
+        // In editScene, this centers the new mesh array
+        meshfinalTransform = glm::translate(meshfinalTransform, -1.0f * center);
+
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
 
         meshes[i].Draw();
     }
+}
+
+void Scene::updateCenter() {
+    float totalX=0.0;
+    float totalY=0.0;
+    float totalZ=0.0;
+    int numMeshes = meshes.size();
+    for (int i=0; i < numMeshes; i++) {
+        totalX += (meshes[i].aabb_max.x + meshes[i].aabb_min.x) / 2.0;
+        totalY += (meshes[i].aabb_max.y + meshes[i].aabb_min.y) / 2.0;
+        totalZ += (meshes[i].aabb_max.z + meshes[i].aabb_min.z) / 2.0;
+    }
+    center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 }
 
 void Scene::loadScene(std::string path) {
@@ -79,6 +97,7 @@ void Scene::loadScene(std::string path) {
     center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 
     processNode(scene->mRootNode, scene);
+    updateCenter();
 }
 
 void Scene::processNode(aiNode *node, const aiScene *scene) {

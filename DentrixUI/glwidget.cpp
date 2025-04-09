@@ -73,6 +73,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton && selectedMesh != nullptr) {
         std::vector<Mesh> editMeshes = {*selectedMesh};
         editScene = Scene(editMeshes, this);
+        editScene.updateCenter();
         currentScene = editScene;
     }
 }
