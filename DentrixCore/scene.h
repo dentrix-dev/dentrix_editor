@@ -10,6 +10,7 @@
 class Scene {
   public:
     glm::vec3 center;
+    std::vector<Mesh> meshes;
     Scene();
     Scene(std::string path, QOpenGLFunctions_3_3_Core* gl);
     Scene(std::vector<Mesh> meshes, QOpenGLFunctions_3_3_Core* gl);
@@ -23,8 +24,6 @@ class Scene {
         Mesh*& intersectedMesh
         );
   private:
-    // model data
-    std::vector<Mesh> meshes;
     QOpenGLFunctions_3_3_Core* gl;
 
     void loadScene(std::string path);

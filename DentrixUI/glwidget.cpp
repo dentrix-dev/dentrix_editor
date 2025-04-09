@@ -70,13 +70,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     mousePosX = event->position().x();
     mousePosY = event->position().y();
 
-    // if (event->button() == Qt::RightButton && selectedMesh != nullptr) {
-    //     std::vector<Mesh> editMeshes = {*selectedMesh};
-    //     editScene = Scene(editMeshes, this);
-    //     currentScene = editScene;
-    //     emit movedToEditScene();
-    //     inMainScene = false;
-    // }
+    if (event->button() == Qt::RightButton && !inMainScene) {
+        onSaveEditSceneClicked();
+    }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -128,6 +124,21 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
     update();
     event->accept();
+}
+
+void GLWidget::onSaveEditSceneClicked()
+{
+    // Replace meshes in mainScene with editScene based on name
+    for (int i=0; i<mainScene.meshes.size(); i++) {
+        for (int j=0; j<editScene.meshes.size(); j++) {
+            if (mainScene.meshes[i].name == editScene.meshes[j].name) {
+                mainScene.meshes[i] = editScene.meshes[j];
+            }
+        }
+    }
+    currentScene = mainScene;
+    inMainScene = true;
+    update();
 }
 
 void GLWidget::onEditSceneClicked()
