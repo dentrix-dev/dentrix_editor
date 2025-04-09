@@ -30,7 +30,9 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
             shader->setFloat("color", 0.5f);
         }
 
-        glm::mat4 meshfinalTransform = meshes[i].scaleTransform;
+        // Scaling needs to happen at 0,0
+        // Translate the mesh to origin using its center, scale it, translate it back
+        glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i].center) * meshes[i].scaleTransform * glm::translate(glm::mat4(1.0f), -1.0f * meshes[i].center);
 
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
