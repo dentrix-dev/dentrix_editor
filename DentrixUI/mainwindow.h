@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "glwidget.h"
+#include <QPushButton>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,10 +23,13 @@ public:
 private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
+    QPushButton *editButton;
 
     void createToolBar();
 
 private slots:
     void loadModel();
+    void onMeshSelectedInMainScene();
+    void onMovedToEditScene();
 };
 #endif // MAINWINDOW_H

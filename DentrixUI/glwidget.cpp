@@ -70,12 +70,13 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     mousePosX = event->position().x();
     mousePosY = event->position().y();
 
-    if (event->button() == Qt::RightButton && selectedMesh != nullptr) {
-        std::vector<Mesh> editMeshes = {*selectedMesh};
-        editScene = Scene(editMeshes, this);
-        editScene.updateCenter();
-        currentScene = editScene;
-    }
+    // if (event->button() == Qt::RightButton && selectedMesh != nullptr) {
+    //     std::vector<Mesh> editMeshes = {*selectedMesh};
+    //     editScene = Scene(editMeshes, this);
+    //     currentScene = editScene;
+    //     emit movedToEditScene();
+    //     inMainScene = false;
+    // }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -105,6 +106,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
         selectedMesh = intersectedMesh;
+        if (inMainScene)
+            emit meshSelectedInMainScene();
         // selectedMesh->setScale(1.2);
     } else {
         std::cout << "nullpointer" << std::endl;
@@ -125,6 +128,18 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
     update();
     event->accept();
+}
+
+void GLWidget::onEditSceneClicked()
+{
+    if (selectedMesh != nullptr && inMainScene){
+        std::vector<Mesh> editMeshes = {*selectedMesh};
+        editScene = Scene(editMeshes, this);
+        currentScene = editScene;
+        emit movedToEditScene();
+        inMainScene = false;
+    }
+    update();
 }
 
 

@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <QToolBar>
 #include <QWidgetAction>
-#include <QPushButton>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -37,8 +37,8 @@ void MainWindow::createToolBar()
     QWidgetAction *spacerAction = new QWidgetAction(this);
     spacerAction->setDefaultWidget(spacer);
     // Create a styled blue "Edit" button
-    QPushButton *editButton = new QPushButton("Edit");
-    editButton->setStyleSheet("background-color: #3498db; color: white; padding: 5px;");
+    editButton = new QPushButton("Edit");
+    editButton->setStyleSheet("background-color: gray; color: white; padding: 5px;");
     // Wrap it in a QWidgetAction so it can go in the QToolBar
     QWidgetAction *editAction = new QWidgetAction(this);
     editAction->setDefaultWidget(editButton);
@@ -61,9 +61,23 @@ void MainWindow::loadModel()
     if (!filePath.isEmpty()) {
         if (!glWidget){
             glWidget = new GLWidget(this, filePath.toStdString());
+            connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
+            connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
+            connect(editButton, &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
             setCentralWidget(glWidget);
         } else {
             glWidget->loadModel(filePath.toStdString());
         }
     }
+}
+
+void MainWindow::onMeshSelectedInMainScene()
+{
+    std::cout<<__func__<<std::endl;
+    editButton->setStyleSheet("background-color: #3498db; color: white; padding: 5px;");
+}
+
+void MainWindow::onMovedToEditScene()
+{
+    editButton->setStyleSheet("background-color: gray; color: white; padding: 5px;");
 }

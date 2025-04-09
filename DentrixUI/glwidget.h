@@ -24,6 +24,7 @@ protected:
     Scene editScene;
     // Currently rendered scene
     Scene currentScene;
+    bool inMainScene = true;
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
     void paintGL() override;  // Rendering logic
@@ -45,6 +46,13 @@ private:
     glm::mat4 projection;
 
     Mesh* selectedMesh = nullptr;
+
+signals:
+    void meshSelectedInMainScene();
+    void movedToEditScene();
+
+public slots:
+    void onEditSceneClicked();
 };
 
 #endif // GLWIDGET_H
