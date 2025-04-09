@@ -17,6 +17,11 @@ Scene::Scene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     loadScene(path);
 }
 
+Scene::Scene(std::vector<Mesh> meshes, QOpenGLFunctions_3_3_Core* gl) {
+    this->gl = gl;
+    this->meshes = meshes;
+}
+
 void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
     for (int i=0; i<meshes.size(); i++) {
         if (selectedMesh && meshes[i].name == selectedMesh->name) {

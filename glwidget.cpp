@@ -19,8 +19,9 @@ GLWidget::~GLWidget() {}
 
 void GLWidget::loadModel(const std::string &path)
 {
+    std::cout << __func__ << std::endl;
     makeCurrent();
-    scene = Scene(path, this);  // Load the new model
+    currentScene = Scene(path, this);  // Load the new model
     update();  // Refresh the OpenGL view
 }
 
@@ -44,7 +45,8 @@ void GLWidget::initializeGL()
 
     // Load model
     Scene sampleModel(initialFilePath, this);
-    scene = sampleModel;
+    mainScene = sampleModel;
+    currentScene = sampleModel;
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -59,7 +61,7 @@ void GLWidget::paintGL()
     view = camera.GetViewMatrix();
     shader->setMatrix4("view", glm::value_ptr(view));
 
-    scene.Draw(shader, selectedMesh);
+    currentScene.Draw(shader, selectedMesh);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -67,6 +69,12 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     std::cout<<__func__<<std::endl;
     mousePosX = event->position().x();
     mousePosY = event->position().y();
+
+    if (event->button() == Qt::RightButton && selectedMesh != nullptr) {
+        std::vector<Mesh> editMeshes = {*selectedMesh};
+        editScene = Scene(editMeshes, this);
+        currentScene = editScene;
+    }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -93,7 +101,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     rayDirection.y = -1 * rayDirection.y;
 
     Mesh* intersectedMesh = nullptr;
-    bool intersection = scene.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
+    bool intersection = currentScene.Intersect(rayOrigin, rayDirection, model, intersectedMesh);
     std::cout << "intersection: " << intersection << std::endl;
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;

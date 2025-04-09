@@ -18,7 +18,12 @@ public:
 
     void loadModel(const std::string &path); // Function to load new model
 protected:
-    Scene scene;
+    // Main imported scene
+    Scene mainScene;
+    // Focused scene that contains the selected tooth (and optionally surrounding teeth)
+    Scene editScene;
+    // Currently rendered scene
+    Scene currentScene;
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
     void paintGL() override;  // Rendering logic
