@@ -47,6 +47,7 @@ private:
 
     Mesh* selectedMesh = nullptr;
 
+    void onSaveEditSceneClicked();
 signals:
     void meshSelectedInMainScene();
     void movedToEditScene();
