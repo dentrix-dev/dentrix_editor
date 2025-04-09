@@ -42,49 +42,38 @@ void Camera::ScreenPosToWorldRay(
     int screenWidth, int screenHeight,
     glm::mat4 ViewMatrix,
     glm::mat4 ProjectionMatrix,
-    glm::vec3& out_origin,
     glm::vec3& out_direction
     ){
 
-    // The ray Start and End positions, in Normalized Device Coordinates
-    glm::vec4 lRayStart_NDC(
-        ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f, // [0,1024] -> [-1,1]
-        ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f, // [0, 768] -> [-1,1]
-        -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
-        1.0f
-        );
-    glm::vec4 lRayEnd_NDC(
-        ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f,
-        ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f,
-        0.0,
-        1.0f
-        );
+    // 1. Screen to NDC
+    float ndcX = (2.0f * mouseX) / screenWidth - 1.0f;
+    float ndcY = 1.0f - (2.0f * mouseY) / screenHeight; // Flip Y for OpenGL NDC
+
+    // 2. NDC to Clip Space (using near plane projection in NDC)
+    glm::vec4 ray_clip = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+
+    // 3. Clip Space to View Space
+    glm::mat4 inverseProjection = glm::inverse(ProjectionMatrix);
+    glm::vec4 ray_eye_h = inverseProjection * ray_clip;
+
+    // Check if perspective divide is needed (W might not be 1)
+    if (ray_eye_h.w != 0.0f) {
+        ray_eye_h /= ray_eye_h.w;
+    } else {
+        // Handle potential error or orthographic projection case
+        // For standard perspective, w should not be 0 here.
+        // Maybe set ray_eye_h.w = 1.0f if needed, although the math should work out.
+        std::cout << "ERROR::CAMERA::SCREENPOSTOWORLDRAY::PERSPECTIVE_DIVIDE" << std::endl;
+    }
+    // The resulting ray_eye_h.xyz is now a point on the near plane in View Space.
+    // The direction vector in View Space goes from the origin (camera) to this point.
+    glm::vec3 ray_view_dir = glm::normalize(glm::vec3(ray_eye_h.x, ray_eye_h.y, ray_eye_h.z));
 
 
-    // The Projection matrix goes from Camera Space to NDC.
-    // So inverse(ProjectionMatrix) goes from NDC to Camera Space.
-    glm::mat4 InverseProjectionMatrix = glm::inverse(ProjectionMatrix);
-
-    // The View Matrix goes from World Space to Camera Space.
-    // So inverse(ViewMatrix) goes from Camera Space to World Space.
-    glm::mat4 InverseViewMatrix = glm::inverse(ViewMatrix);
-
-    glm::vec4 lRayStart_camera = InverseProjectionMatrix * lRayStart_NDC;    lRayStart_camera/=lRayStart_camera.w;
-    glm::vec4 lRayStart_world  = InverseViewMatrix       * lRayStart_camera; lRayStart_world /=lRayStart_world .w;
-    glm::vec4 lRayEnd_camera   = InverseProjectionMatrix * lRayEnd_NDC;      lRayEnd_camera  /=lRayEnd_camera  .w;
-    glm::vec4 lRayEnd_world    = InverseViewMatrix       * lRayEnd_camera;   lRayEnd_world   /=lRayEnd_world   .w;
-
-
-    // Faster way (just one inverse)
-    //glm::mat4 M = glm::inverse(ProjectionMatrix * ViewMatrix);
-    //glm::vec4 lRayStart_world = M * lRayStart_NDC; lRayStart_world/=lRayStart_world.w;
-    //glm::vec4 lRayEnd_world   = M * lRayEnd_NDC  ; lRayEnd_world  /=lRayEnd_world.w;
-
-
-    glm::vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
-    lRayDir_world = glm::normalize(lRayDir_world);
-
-
-    out_origin = glm::vec3(lRayStart_world);
-    out_direction = glm::normalize(lRayDir_world);
+    // 4. View Space to World Space
+    glm::mat4 inverseView = glm::inverse(ViewMatrix);
+    // Transform the direction from View Space to World Space
+    // Use w=0 for transforming directions
+    glm::vec4 ray_world_dir_h = inverseView * glm::vec4(ray_view_dir, 0.0f);
+    out_direction = glm::normalize(glm::vec3(ray_world_dir_h));
 }
