@@ -27,7 +27,7 @@ void MainWindow::createToolBar()
     // Create a toolbar
     QToolBar *toolBar = new QToolBar("Side Toolbar", this);
 
-    // Add actions (buttons) to the toolbar
+    // Create actions (buttons) to add to the toolbar
     QAction *openAction = new QAction("tool 1", this);
     QAction *saveAction = new QAction("tool 2", this);
     QAction *exitAction = new QAction("tool 3", this);
@@ -43,11 +43,12 @@ void MainWindow::createToolBar()
     QWidgetAction *editAction = new QWidgetAction(this);
     editAction->setDefaultWidget(editButton);
 
+    // Add the actions to the toolbar
     toolBar->addAction(openAction);
     toolBar->addAction(saveAction);
-    toolBar->addSeparator(); // Adds a separator line
+    toolBar->addSeparator();
     toolBar->addAction(exitAction);
-    toolBar->addAction(spacerAction); // Add it before the edit button
+    toolBar->addAction(spacerAction);
     toolBar->addAction(editAction);
 
     // Add toolbar to the left side
