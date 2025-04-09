@@ -104,7 +104,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     if (intersection && intersectedMesh != nullptr) {
         std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
         selectedMesh = intersectedMesh;
-        selectedMesh->setScale(1.2);
+        // selectedMesh->setScale(1.2);
     } else {
         std::cout << "nullpointer" << std::endl;
     }
