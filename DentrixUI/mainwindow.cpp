@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("Dentrix Editor");
     connect(ui->actionLoad_Model, &QAction::triggered, this, &MainWindow::loadModel);
-
     createToolBar();
 }
 
@@ -28,9 +27,9 @@ void MainWindow::createToolBar()
     QToolBar *toolBar = new QToolBar("Side Toolbar", this);
 
     // Create actions (buttons) to add to the toolbar
-    QAction *openAction = new QAction("tool 1", this);
-    QAction *saveAction = new QAction("tool 2", this);
-    QAction *exitAction = new QAction("tool 3", this);
+    QAction *uniformTranslateAction = new QAction("Uniform Scale", this);
+    QAction *saveAction = new QAction("Directional Scale", this);
+    QAction *exitAction = new QAction("Free Deformation", this);
     // Add a spacer widget to push following widgets to the bottom
     QWidget *spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -44,7 +43,7 @@ void MainWindow::createToolBar()
     editAction->setDefaultWidget(editButton);
 
     // Add the actions to the toolbar
-    toolBar->addAction(openAction);
+    toolBar->addAction(uniformTranslateAction);
     toolBar->addAction(saveAction);
     toolBar->addSeparator();
     toolBar->addAction(exitAction);
