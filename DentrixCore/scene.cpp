@@ -8,6 +8,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
+//toDO: refactor later into a utils class
+static void printMat4(const glm::mat4& mat) {
+    for (int row = 0; row < 4; ++row) {
+        std::cout << "[ ";
+        for (int col = 0; col < 4; ++col) {
+            std::cout << mat[col][row] << " ";
+        }
+        std::cout << "]\n";
+    }
+}
+
 Scene::Scene() {
 
 }
