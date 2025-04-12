@@ -34,5 +34,6 @@ private slots:
     void loadModel();
     void onMeshSelectedInMainScene();
     void onMovedToEditScene();
+    void onMovedToMainScene();
 };
 #endif // MAINWINDOW_H

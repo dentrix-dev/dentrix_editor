@@ -63,6 +63,7 @@ void MainWindow::loadModel()
             glWidget = new GLWidget(this, filePath.toStdString());
             connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
             connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
+            connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
             connect(editButton, &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
             setCentralWidget(glWidget);
         } else {
@@ -79,5 +80,14 @@ void MainWindow::onMeshSelectedInMainScene()
 
 void MainWindow::onMovedToEditScene()
 {
-    editButton->setStyleSheet(editButtonInactiveStyleSheet);
+    // editButton->setStyleSheet(editButtonInactiveStyleSheet);
+    // edit button becomes save and return
+    editButton->setText("Save");
+    editButton->setToolTip("Save and return to main scene");
+}
+
+void MainWindow::onMovedToMainScene()
+{
+    // editButton->setStyleSheet(editButtonInactiveStyleSheet);
+    editButton->setText("Edit");
 }

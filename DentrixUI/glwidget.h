@@ -47,10 +47,11 @@ private:
 
     Mesh* selectedMesh = nullptr;
 
-    void onSaveEditSceneClicked();
+    void saveEditSceneAndReturnToMainScene();
 signals:
     void meshSelectedInMainScene();
     void movedToEditScene();
+    void movedToMainScene();
 
 public slots:
     void onEditSceneClicked();
