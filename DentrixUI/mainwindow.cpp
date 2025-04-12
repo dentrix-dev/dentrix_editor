@@ -6,6 +6,11 @@
 #include <iostream>
 #include <QActionGroup>
 
+bool MainWindow::inUnformScale = false;
+bool MainWindow::inDirectionalScale = false;
+bool MainWindow::inFreeDeformation = false;
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -31,15 +36,16 @@ void MainWindow::createToolBar()
     //Create Transformation Actions Group
     QActionGroup *actionGroup = new QActionGroup(this);
     actionGroup->setExclusive(true);
+    connect(actionGroup, &QActionGroup::triggered, this, &MainWindow::onQActionGroupTriggered);
 
     // Create actions (buttons) to add to the toolbar
-    QAction *uniformTranslateAction = new QAction("Uniform Scale", this);
+    QAction *uniformTranslateAction = new QAction(UNIFORM_SCALE_ACTION_TEXT, this);
     uniformTranslateAction->setCheckable(true);
     actionGroup->addAction(uniformTranslateAction);
-    QAction *saveAction = new QAction("Directional Scale", this);
+    QAction *saveAction = new QAction(DIRECTIONAL_SCALE_ACTION_TEXT, this);
     saveAction->setCheckable(true);
     actionGroup->addAction(saveAction);
-    QAction *exitAction = new QAction("Free Deformation", this);
+    QAction *exitAction = new QAction(FREE_DEFORM_ACTION_TEXT, this);
     exitAction->setCheckable(true);
     actionGroup->addAction(exitAction);
 
@@ -102,4 +108,22 @@ void MainWindow::onMovedToMainScene()
 {
     // editButton->setStyleSheet(editButtonInactiveStyleSheet);
     editButton->setText("Edit");
+}
+
+void MainWindow::onQActionGroupTriggered(QAction *action)
+{
+    QString actionText = action->text();
+    if (actionText == UNIFORM_SCALE_ACTION_TEXT){
+        MainWindow::inUnformScale = true;
+        MainWindow::inDirectionalScale = false;
+        MainWindow::inFreeDeformation = false;
+    } else if (actionText == DIRECTIONAL_SCALE_ACTION_TEXT){
+        MainWindow::inUnformScale = false;
+        MainWindow::inDirectionalScale = true;
+        MainWindow::inFreeDeformation = false;
+    } else if (actionText == FREE_DEFORM_ACTION_TEXT){
+        MainWindow::inUnformScale = false;
+        MainWindow::inDirectionalScale = false;
+        MainWindow::inFreeDeformation = true;
+    }
 }
