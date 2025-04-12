@@ -69,12 +69,16 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     std::cout<<__func__<<std::endl;
     mousePosX = event->position().x();
     mousePosY = event->position().y();
+    isRotating = false;
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     float offsetX = event->position().x() - mousePosX;
     float offsetY = event->position().y() - mousePosY;
+    if (abs(offsetX) > 3 || abs(offsetY) > 3) {
+        isRotating = true;
+    }
     camera.processMouse(offsetX, offsetY);
     mousePosX = event->position().x();
     mousePosY = event->position().y();
@@ -83,28 +87,30 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    std::cout<<__func__<<std::endl;
-    float mouseX = event->position().x();
-    float mouseY = event->position().y();
-    glm::vec3 rayDirection;
-    Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection, rayDirection);
-    std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << std::endl;
-    std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
-    std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z << std::endl;
+    if(!isRotating){
+        std::cout<<__func__<<std::endl;
+        float mouseX = event->position().x();
+        float mouseY = event->position().y();
+        glm::vec3 rayDirection;
+        Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection, rayDirection);
+        std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z << std::endl;
+        std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
+        std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z << std::endl;
 
-    Mesh* intersectedMesh = nullptr;
-    bool intersection = currentScene.Intersect(camera.position, rayDirection, model, intersectedMesh);
-    std::cout << "intersection: " << intersection << std::endl;
-    if (intersection && intersectedMesh != nullptr) {
-        std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
-        selectedMesh = intersectedMesh;
-        if (inMainScene)
-            emit meshSelectedInMainScene();
-        // selectedMesh->setScale(1.2);
-    } else {
-        std::cout << "nullpointer" << std::endl;
+        Mesh* intersectedMesh = nullptr;
+        bool intersection = currentScene.Intersect(camera.position, rayDirection, model, intersectedMesh);
+        std::cout << "intersection: " << intersection << std::endl;
+        if (intersection && intersectedMesh != nullptr) {
+            std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
+            selectedMesh = intersectedMesh;
+            if (inMainScene)
+                emit meshSelectedInMainScene();
+            // selectedMesh->setScale(1.2);
+        } else {
+            std::cout << "nullpointer" << std::endl;
+        }
+        update();
     }
-    update();
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event) {

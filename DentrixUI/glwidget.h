@@ -46,6 +46,7 @@ private:
     glm::mat4 projection;
 
     Mesh* selectedMesh = nullptr;
+    bool isRotating = false;
 
     void saveEditSceneAndReturnToMainScene();
 signals:
