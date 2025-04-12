@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QWidgetAction>
 #include <iostream>
+#include <QActionGroup>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,10 +28,21 @@ void MainWindow::createToolBar()
     // Create a toolbar
     QToolBar *toolBar = new QToolBar("Side Toolbar", this);
 
+    //Create Transformation Actions Group
+    QActionGroup *actionGroup = new QActionGroup(this);
+    actionGroup->setExclusive(true);
+
     // Create actions (buttons) to add to the toolbar
     QAction *uniformTranslateAction = new QAction("Uniform Scale", this);
+    uniformTranslateAction->setCheckable(true);
+    actionGroup->addAction(uniformTranslateAction);
     QAction *saveAction = new QAction("Directional Scale", this);
+    saveAction->setCheckable(true);
+    actionGroup->addAction(saveAction);
     QAction *exitAction = new QAction("Free Deformation", this);
+    exitAction->setCheckable(true);
+    actionGroup->addAction(exitAction);
+
     // Add a spacer widget to push following widgets to the bottom
     QWidget *spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -46,8 +58,8 @@ void MainWindow::createToolBar()
     // Add the actions to the toolbar
     toolBar->addAction(uniformTranslateAction);
     toolBar->addAction(saveAction);
-    toolBar->addSeparator();
     toolBar->addAction(exitAction);
+    toolBar->addSeparator();
     toolBar->addAction(spacerAction);
     toolBar->addAction(editAction);
 
