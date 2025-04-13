@@ -146,7 +146,27 @@ void GLWidget::saveEditSceneAndReturnToMainScene()
 void GLWidget::onEditSceneClicked()
 {
     if (selectedMesh != nullptr && inMainScene){
+        std::string neighbor1Name = "";
+        std::string neighbor2Name = "";
+        Scene::GetNeighboringMeshNames(selectedMesh->name, neighbor1Name, neighbor2Name);
+
         std::vector<Mesh> editMeshes = {*selectedMesh};
+
+        // Add neighboring teeth meshes
+        if (neighbor1Name != "") {
+            for (int i=0; i<mainScene.meshes.size(); i++) {
+                if (mainScene.meshes[i].name == neighbor1Name) {
+                    editMeshes.push_back(mainScene.meshes[i]);
+                }
+            }
+        }
+        if (neighbor2Name != "") {
+            for (int i=0; i<mainScene.meshes.size(); i++) {
+                if (mainScene.meshes[i].name == neighbor2Name)
+                    editMeshes.push_back(mainScene.meshes[i]);
+            }
+        }
+
         editScene = Scene(editMeshes, this);
         editScene.center = selectedMesh->center;
         currentScene = editScene;

@@ -23,6 +23,9 @@ class Scene {
         glm::mat4 SceneMatrix,
         Mesh*& intersectedMesh
         );
+
+    static void GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name, std::string &neighbor2Name);
+
   private:
     QOpenGLFunctions_3_3_Core* gl;
 

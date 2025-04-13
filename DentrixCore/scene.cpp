@@ -286,6 +286,27 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
     return intersectionFound;
 }
 
+void Scene::GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name, std::string &neighbor2Name)
+{
+    // Upper jaw teeth ordering in local mapping (not universal mapping)
+    std::string upperMeshNames[16] = {"tooth16", "tooth15", "tooth14", "tooth13", "tooth12", "tooth11", "tooth10", "tooth9", "tooth1", "tooth2", "tooth3", "tooth4", "tooth5", "tooth6", "tooth7", "tooth8"};
+
+    int upperMeshIndex;
+    for (int i=0; i<16; i++) {
+        if (upperMeshNames[i] == meshName)
+            upperMeshIndex = i;
+    }
+
+    if (upperMeshIndex == 0) {
+        neighbor2Name = upperMeshNames[upperMeshIndex+1];
+    } else if (upperMeshIndex == 15) {
+        neighbor1Name = upperMeshNames[upperMeshIndex-1];
+    } else {
+        neighbor1Name = upperMeshNames[upperMeshIndex-1];
+        neighbor2Name = upperMeshNames[upperMeshIndex+1];
+    }
+}
+
 
 
 
