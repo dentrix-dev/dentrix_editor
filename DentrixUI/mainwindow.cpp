@@ -5,6 +5,10 @@
 #include <QWidgetAction>
 #include <iostream>
 #include <QActionGroup>
+#include <QBoxLayout>
+#include <QLabel>
+#include <QSlider>
+#include <QCheckBox>
 
 bool MainWindow::inUnformScale = false;
 bool MainWindow::inDirectionalScale = false;
@@ -73,6 +77,38 @@ void MainWindow::createToolBar()
     addToolBar(Qt::LeftToolBarArea, toolBar);
 }
 
+void MainWindow::createRightPanelStack()
+{
+    // ==== Right Panel Stack ====
+    rightPanelStack = new QStackedWidget(this);
+
+    // Panel 1: Edit Mode
+    QWidget* editPanel = new QWidget();
+    QVBoxLayout* editLayout = new QVBoxLayout(editPanel);
+    editLayout->addWidget(new QLabel("Uniform Scale"));
+    QSlider *uniformScaleSlider = new QSlider(Qt::Horizontal);
+    connect(uniformScaleSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshScale);
+    editLayout->addWidget(uniformScaleSlider);
+    editLayout->addStretch();
+
+    // Panel 2: View Mode
+    QWidget* viewPanel = new QWidget();
+    QVBoxLayout* viewLayout = new QVBoxLayout(viewPanel);
+    viewLayout->addWidget(new QLabel("Directional Scale"));
+    viewLayout->addWidget(new QSlider(Qt::Horizontal));
+    viewLayout->addWidget(new QCheckBox("X"));
+    viewLayout->addWidget(new QCheckBox("Y"));
+    viewLayout->addWidget(new QCheckBox("Z"));
+    viewLayout->addStretch();
+
+    // Add panels to the stack
+    rightPanelStack->addWidget(editPanel);  // index 0
+    rightPanelStack->addWidget(viewPanel);  // index 1
+
+    rightPanelStack->setFixedWidth(200);
+}
+
+
 void MainWindow::loadModel()
 {
     QString filePath = QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
@@ -83,7 +119,24 @@ void MainWindow::loadModel()
             connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
             connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
             connect(editButton, &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
-            setCentralWidget(glWidget);
+
+            // ... inside the if (!glWidget) section
+            // Create a horizontal layout for the central widget
+            QWidget* centralContainer = new QWidget(this);
+            QHBoxLayout* centralLayout = new QHBoxLayout(centralContainer);
+            centralLayout->setContentsMargins(0, 0, 0, 0);
+
+            // Add the glWidget to the left
+            centralLayout->addWidget(glWidget, 1);
+
+            createRightPanelStack();
+
+            // Add to layout
+            centralLayout->addWidget(rightPanelStack);
+
+            // Set the container as the central widget
+            setCentralWidget(centralContainer);
+
         } else {
             glWidget->loadModel(filePath.toStdString());
         }
@@ -117,10 +170,12 @@ void MainWindow::onQActionGroupTriggered(QAction *action)
         MainWindow::inUnformScale = true;
         MainWindow::inDirectionalScale = false;
         MainWindow::inFreeDeformation = false;
+        rightPanelStack->setCurrentIndex(0);
     } else if (actionText == DIRECTIONAL_SCALE_ACTION_TEXT){
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = true;
         MainWindow::inFreeDeformation = false;
+        rightPanelStack->setCurrentIndex(1);
     } else if (actionText == FREE_DEFORM_ACTION_TEXT){
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = false;

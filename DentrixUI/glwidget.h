@@ -17,6 +17,7 @@ public:
     ~GLWidget();
 
     void loadModel(const std::string &path); // Function to load new model
+
 protected:
     // Main imported scene
     Scene mainScene;
@@ -56,6 +57,8 @@ signals:
 
 public slots:
     void onEditSceneClicked();
+    void setSelectedMeshScale(int scale);
+
 };
 
 #endif // GLWIDGET_H

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "glwidget.h"
 #include <QPushButton>
+#include <QStackedWidget>
 
 
 QT_BEGIN_NAMESPACE
@@ -30,7 +31,10 @@ private:
     GLWidget *glWidget;
     QPushButton *editButton;
 
+    QStackedWidget* rightPanelStack;
+
     void createToolBar();
+    void createRightPanelStack();
 
     const QString editButtonInactiveStyleSheet = "background-color: gray; color: white; padding: 5px;";
     const QString editButtonActiveStyleSheet = "background-color: #3498db; color: white; padding: 5px;";

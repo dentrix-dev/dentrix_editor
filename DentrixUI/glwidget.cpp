@@ -25,6 +25,16 @@ void GLWidget::loadModel(const std::string &path)
     update();  // Refresh the OpenGL view
 }
 
+void GLWidget::setSelectedMeshScale(int scale)
+{
+    scale=scale+1;
+    float scaleF = scale/2.0;
+    if (selectedMesh != nullptr){
+        selectedMesh->setScale(scaleF);
+        update();
+    }
+}
+
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();

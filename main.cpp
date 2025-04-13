@@ -79,6 +79,14 @@ QString styleSheet = R"(
         border: 1px solid black;
         width: 100%;
     }
+
+    QLabel {
+        color: white;
+    }
+
+    QCheckBox {
+        color: white;
+    }
 )";
 
 
