@@ -27,9 +27,9 @@ void GLWidget::loadModel(const std::string &path)
 
 void GLWidget::setSelectedMeshScale(int scale)
 {
-    scale=scale+1;
-    float scaleF = scale/2.0;
-    if (selectedMesh != nullptr){
+    float scaleF = scale/10.0;
+    std::cout<<"scale: "<<scaleF<<std::endl;
+    if (selectedMesh != nullptr) {
         selectedMesh->setScale(scaleF);
         update();
     }

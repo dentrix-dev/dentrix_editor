@@ -87,6 +87,9 @@ void MainWindow::createRightPanelStack()
     QVBoxLayout* editLayout = new QVBoxLayout(editPanel);
     editLayout->addWidget(new QLabel("Uniform Scale"));
     QSlider *uniformScaleSlider = new QSlider(Qt::Horizontal);
+    uniformScaleSlider->setMinimum(5);    // Maps to 0.1
+    uniformScaleSlider->setMaximum(20);   // Maps to 5.0
+    uniformScaleSlider->setValue(10);     // e.g., 1.0
     connect(uniformScaleSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshScale);
     editLayout->addWidget(uniformScaleSlider);
     editLayout->addStretch();
