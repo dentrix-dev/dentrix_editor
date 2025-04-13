@@ -158,7 +158,7 @@ void GLWidget::onEditSceneClicked()
     if (selectedMesh != nullptr && inMainScene){
         std::vector<Mesh> editMeshes = {*selectedMesh};
         editScene = Scene(editMeshes, this);
-        editScene.updateCenter();
+        editScene.center = selectedMesh->center;
         currentScene = editScene;
         emit movedToEditScene();
         inMainScene = false;

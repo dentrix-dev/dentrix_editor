@@ -58,7 +58,7 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
     }
 }
 
-void Scene::updateCenter() {
+glm::vec3 Scene::getMeshesCenter() {
     float totalX=0.0;
     float totalY=0.0;
     float totalZ=0.0;
@@ -68,7 +68,7 @@ void Scene::updateCenter() {
         totalY += (meshes[i].aabb_max.y + meshes[i].aabb_min.y) / 2.0;
         totalZ += (meshes[i].aabb_max.z + meshes[i].aabb_min.z) / 2.0;
     }
-    center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
+    return glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 }
 
 void Scene::loadScene(std::string path) {
@@ -97,7 +97,7 @@ void Scene::loadScene(std::string path) {
     center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 
     processNode(scene->mRootNode, scene);
-    updateCenter();
+    center = getMeshesCenter();
 }
 
 void Scene::processNode(aiNode *node, const aiScene *scene) {
