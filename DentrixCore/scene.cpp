@@ -24,8 +24,7 @@ Scene::Scene() {
 
 }
 
-Scene::Scene(std::vector<Mesh*> meshes, QOpenGLFunctions_3_3_Core* gl) {
-    this->gl = gl;
+Scene::Scene(std::vector<Mesh*> meshes) {
     this->meshes = meshes;
 }
 
@@ -92,6 +91,7 @@ std::vector<Mesh> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* 
 
     std::vector<Mesh> meshes;
     for (int i=0; i<numMeshes; i++) {
+        std::cout << scene->mMeshes[i]->mName.C_Str() << std::endl;
         meshes.push_back(processMesh(scene->mMeshes[i], center, gl));
     }
     return meshes;

@@ -22,7 +22,7 @@ void GLWidget::loadModel(const std::string &path)
     std::cout << __func__ << std::endl;
     makeCurrent();
     meshes = Scene::loadScene(initialFilePath, this);
-    currentScene = Scene(meshes_p, this);
+    currentScene = Scene(meshes_p);
     update();  // Refresh the OpenGL view
 }
 
@@ -56,13 +56,12 @@ void GLWidget::initializeGL()
 
     // Load model
     meshes = Scene::loadScene(initialFilePath, this);
-    std::cout << meshes[1].name << std::endl;
     std::vector<Mesh*> meshes_pointers;
     for (int i=0; i<meshes.size(); i++) {
         meshes_pointers.push_back(&meshes[i]);
     }
     meshes_p = meshes_pointers;
-    Scene sampleModel(meshes_p, this);
+    Scene sampleModel(meshes_p);
     mainScene = sampleModel;
     currentScene = sampleModel;
 }
@@ -185,7 +184,7 @@ void GLWidget::onEditSceneClicked()
             }
         }
 
-        editScene = Scene(editMeshes, this);
+        editScene = Scene(editMeshes);
         editScene.center = selectedMesh->center;
         currentScene = editScene;
         emit movedToEditScene();

@@ -12,7 +12,7 @@ class Scene {
     glm::vec3 center;
     std::vector<Mesh*> meshes;
     Scene();
-    Scene(std::vector<Mesh*> meshes, QOpenGLFunctions_3_3_Core* gl);
+    Scene(std::vector<Mesh*> meshes);
 
     static std::vector<Mesh> loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl);
     glm::vec3 getMeshesCenter();
@@ -27,8 +27,6 @@ class Scene {
     static void GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name, std::string &neighbor2Name);
 
   private:
-    QOpenGLFunctions_3_3_Core* gl;
-
       static Mesh processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
 
     bool TestRayOBBIntersection(
