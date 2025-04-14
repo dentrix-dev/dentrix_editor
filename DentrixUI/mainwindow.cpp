@@ -82,6 +82,13 @@ void MainWindow::createRightPanelStack()
     // ==== Right Panel Stack ====
     rightPanelStack = new QStackedWidget(this);
 
+    // Panel 0: Empty Panel
+    QWidget* emptyPanel = new QWidget();
+    QVBoxLayout* emptyLayout = new QVBoxLayout(emptyPanel);
+    emptyLayout->addWidget(new QLabel("No transformation is selected."));
+    emptyLayout->addStretch();
+
+
     // Panel 1: Edit Mode
     QWidget* editPanel = new QWidget();
     QVBoxLayout* editLayout = new QVBoxLayout(editPanel);
@@ -105,8 +112,9 @@ void MainWindow::createRightPanelStack()
     viewLayout->addStretch();
 
     // Add panels to the stack
-    rightPanelStack->addWidget(editPanel);  // index 0
-    rightPanelStack->addWidget(viewPanel);  // index 1
+    rightPanelStack->addWidget(emptyPanel); // index 0
+    rightPanelStack->addWidget(editPanel);  // index 1
+    rightPanelStack->addWidget(viewPanel);  // index 2
 
     rightPanelStack->setFixedWidth(200);
 }
@@ -173,12 +181,12 @@ void MainWindow::onQActionGroupTriggered(QAction *action)
         MainWindow::inUnformScale = true;
         MainWindow::inDirectionalScale = false;
         MainWindow::inFreeDeformation = false;
-        rightPanelStack->setCurrentIndex(0);
+        rightPanelStack->setCurrentIndex(1);
     } else if (actionText == DIRECTIONAL_SCALE_ACTION_TEXT){
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = true;
         MainWindow::inFreeDeformation = false;
-        rightPanelStack->setCurrentIndex(1);
+        rightPanelStack->setCurrentIndex(2);
     } else if (actionText == FREE_DEFORM_ACTION_TEXT){
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = false;
