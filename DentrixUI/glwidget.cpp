@@ -21,8 +21,16 @@ void GLWidget::loadModel(const std::string &path)
 {
     std::cout << __func__ << std::endl;
     makeCurrent();
-    meshes = Scene::loadScene(initialFilePath, this);
-    currentScene = Scene(meshes_p);
+    meshes = Scene::loadScene(path, this);
+    std::vector<Mesh*> meshes_pointers;
+    for (int i=0; i<meshes.size(); i++) {
+        meshes_pointers.push_back(&meshes[i]);
+    }
+    meshes_p = meshes_pointers;
+    Scene scene(meshes_p);
+    mainScene = scene;
+    currentScene = scene;
+    selectedMesh = nullptr;
     update();  // Refresh the OpenGL view
 }
 
