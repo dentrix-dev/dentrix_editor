@@ -21,7 +21,8 @@ void GLWidget::loadModel(const std::string &path)
 {
     std::cout << __func__ << std::endl;
     makeCurrent();
-    currentScene = Scene(path, this);  // Load the new model
+    meshes = Scene::loadScene(initialFilePath, this);
+    currentScene = Scene(meshes_p, this);
     update();  // Refresh the OpenGL view
 }
 
@@ -54,7 +55,14 @@ void GLWidget::initializeGL()
     shader->setMatrix4("model", glm::value_ptr(model));
 
     // Load model
-    Scene sampleModel(initialFilePath, this);
+    meshes = Scene::loadScene(initialFilePath, this);
+    std::cout << meshes[1].name << std::endl;
+    std::vector<Mesh*> meshes_pointers;
+    for (int i=0; i<meshes.size(); i++) {
+        meshes_pointers.push_back(&meshes[i]);
+    }
+    meshes_p = meshes_pointers;
+    Scene sampleModel(meshes_p, this);
     mainScene = sampleModel;
     currentScene = sampleModel;
 }
@@ -143,7 +151,7 @@ void GLWidget::saveEditSceneAndReturnToMainScene()
     // Replace meshes in mainScene with editScene based on name
     for (int i=0; i<mainScene.meshes.size(); i++) {
         for (int j=0; j<editScene.meshes.size(); j++) {
-            if (mainScene.meshes[i].name == editScene.meshes[j].name) {
+            if (mainScene.meshes[i]->name == editScene.meshes[j]->name) {
                 mainScene.meshes[i] = editScene.meshes[j];
             }
         }
@@ -160,19 +168,19 @@ void GLWidget::onEditSceneClicked()
         std::string neighbor2Name = "";
         Scene::GetNeighboringMeshNames(selectedMesh->name, neighbor1Name, neighbor2Name);
 
-        std::vector<Mesh> editMeshes = {*selectedMesh};
+        std::vector<Mesh*> editMeshes = {selectedMesh};
 
         // Add neighboring teeth meshes
         if (neighbor1Name != "") {
             for (int i=0; i<mainScene.meshes.size(); i++) {
-                if (mainScene.meshes[i].name == neighbor1Name) {
+                if (mainScene.meshes[i]->name == neighbor1Name) {
                     editMeshes.push_back(mainScene.meshes[i]);
                 }
             }
         }
         if (neighbor2Name != "") {
             for (int i=0; i<mainScene.meshes.size(); i++) {
-                if (mainScene.meshes[i].name == neighbor2Name)
+                if (mainScene.meshes[i]->name == neighbor2Name)
                     editMeshes.push_back(mainScene.meshes[i]);
             }
         }

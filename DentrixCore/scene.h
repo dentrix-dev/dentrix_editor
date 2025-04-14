@@ -10,11 +10,11 @@
 class Scene {
   public:
     glm::vec3 center;
-    std::vector<Mesh> meshes;
+    std::vector<Mesh*> meshes;
     Scene();
-    Scene(std::string path, QOpenGLFunctions_3_3_Core* gl);
-    Scene(std::vector<Mesh> meshes, QOpenGLFunctions_3_3_Core* gl);
+    Scene(std::vector<Mesh*> meshes, QOpenGLFunctions_3_3_Core* gl);
 
+    static std::vector<Mesh> loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl);
     glm::vec3 getMeshesCenter();
     void Draw(Shader* shader, Mesh* selectedMesh);
     bool Intersect(
@@ -29,9 +29,7 @@ class Scene {
   private:
     QOpenGLFunctions_3_3_Core* gl;
 
-    void loadScene(std::string path);
-    void processNode(aiNode *node, const aiScene *scene);
-    Mesh processMesh(aiMesh *mesh);
+      static Mesh processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
 
     bool TestRayOBBIntersection(
         glm::vec3 ray_origin,        // Ray origin, in world space

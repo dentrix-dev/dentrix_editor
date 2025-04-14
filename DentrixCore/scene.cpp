@@ -24,19 +24,14 @@ Scene::Scene() {
 
 }
 
-Scene::Scene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
-    this->gl = gl;
-    loadScene(path);
-}
-
-Scene::Scene(std::vector<Mesh> meshes, QOpenGLFunctions_3_3_Core* gl) {
+Scene::Scene(std::vector<Mesh*> meshes, QOpenGLFunctions_3_3_Core* gl) {
     this->gl = gl;
     this->meshes = meshes;
 }
 
 void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
     for (int i=0; i<meshes.size(); i++) {
-        if (selectedMesh && meshes[i].name == selectedMesh->name) {
+        if (selectedMesh && meshes[i]->name == selectedMesh->name) {
             shader->setFloat("color", 0.8f);
         } else {
             shader->setFloat("color", 0.5f);
@@ -44,7 +39,7 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
 
         // Scaling needs to happen at 0,0
         // Translate the mesh to origin using its center, scale it, translate it back
-        glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i].center) * meshes[i].scaleTransform * glm::translate(glm::mat4(1.0f), -1.0f * meshes[i].center);
+        glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i]->center) * meshes[i]->scaleTransform * glm::translate(glm::mat4(1.0f), -1.0f * meshes[i]->center);
 
         // Center the scene
         // In mainScene, this has no effect since the vertices are already centered on first load
@@ -54,7 +49,7 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
 
-        meshes[i].Draw();
+        meshes[i]->Draw();
     }
 }
 
@@ -64,20 +59,19 @@ glm::vec3 Scene::getMeshesCenter() {
     float totalZ=0.0;
     int numMeshes = meshes.size();
     for (int i=0; i < numMeshes; i++) {
-        totalX += (meshes[i].aabb_max.x + meshes[i].aabb_min.x) / 2.0;
-        totalY += (meshes[i].aabb_max.y + meshes[i].aabb_min.y) / 2.0;
-        totalZ += (meshes[i].aabb_max.z + meshes[i].aabb_min.z) / 2.0;
+        totalX += (meshes[i]->aabb_max.x + meshes[i]->aabb_min.x) / 2.0;
+        totalY += (meshes[i]->aabb_max.y + meshes[i]->aabb_min.y) / 2.0;
+        totalZ += (meshes[i]->aabb_max.z + meshes[i]->aabb_min.z) / 2.0;
     }
     return glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 }
 
-void Scene::loadScene(std::string path) {
+std::vector<Mesh> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_GenBoundingBoxes);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-        return;
     }
 
     // Get scene center
@@ -94,25 +88,16 @@ void Scene::loadScene(std::string path) {
         totalY += (aabb_max.y + aabb_min.y) / 2.0;
         totalZ += (aabb_max.z + aabb_min.z) / 2.0;
     }
-    center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
+    glm::vec3 center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 
-    processNode(scene->mRootNode, scene);
-    center = getMeshesCenter();
+    std::vector<Mesh> meshes;
+    for (int i=0; i<numMeshes; i++) {
+        meshes.push_back(processMesh(scene->mMeshes[i], center, gl));
+    }
+    return meshes;
 }
 
-void Scene::processNode(aiNode *node, const aiScene *scene) {
-    for (int i=0; i<node->mNumMeshes; i++) {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh));
-    }
-
-    for (int i=0; i<node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene);
-    }
-}
-
-
-Mesh Scene::processMesh(aiMesh *mesh) {
+Mesh Scene::processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -138,9 +123,9 @@ Mesh Scene::processMesh(aiMesh *mesh) {
     float centerX = (aabb_max.x + aabb_min.x) / 2.0;
     float centerY = (aabb_max.y + aabb_min.y) / 2.0;
     float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
-    glm::vec3 center = glm::vec3(centerX, centerY, centerZ);
+    glm::vec3 m_center = glm::vec3(centerX, centerY, centerZ);
 
-    return Mesh(vertices, indices, mesh->mName.C_Str(), center, aabb_min, aabb_max, gl);
+    return Mesh(vertices, indices, mesh->mName.C_Str(), m_center, aabb_min, aabb_max, gl);
 }
 
 bool Scene::TestRayOBBIntersection(
@@ -263,21 +248,21 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
     float minDistance = 0.0f;
     for (int i=0; i < meshes.size(); i++) {
         // Skip gingiv mesh
-        if (meshes[i].name == "tooth0") {
+        if (meshes[i]->name == "tooth0") {
             continue;
         }
-        if (TestRayOBBIntersection(ray_origin, ray_direction, meshes[i].aabb_min, meshes[i].aabb_max, ModelMatrix, distance)) {
-            std::cout << meshes[i].name << std::endl;
+        if (TestRayOBBIntersection(ray_origin, ray_direction, meshes[i]->aabb_min, meshes[i]->aabb_max, ModelMatrix, distance)) {
+            std::cout << meshes[i]->name << std::endl;
             if (!intersectionFound) { // First intersection found
                 intersectionFound = true;
                 minDistance = distance;
-                meshName = meshes[i].name;
-                intersectedMesh = &(meshes[i]);
+                meshName = meshes[i]->name;
+                intersectedMesh = meshes[i];
             } else { // Check if new intersection is closer
                 if (distance < minDistance) {
                     minDistance = distance;
-                    meshName = meshes[i].name;
-                    intersectedMesh = &(meshes[i]);
+                    meshName = meshes[i]->name;
+                    intersectedMesh = meshes[i];
                 }
             }
         }
