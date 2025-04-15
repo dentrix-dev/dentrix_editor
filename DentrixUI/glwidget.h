@@ -47,7 +47,6 @@ private:
     glm::mat4 projection;
 
     std::vector<Mesh> meshes;
-    std::vector<Mesh*> meshes_p;
     Mesh* selectedMesh = nullptr;
     bool isRotating = false;
 

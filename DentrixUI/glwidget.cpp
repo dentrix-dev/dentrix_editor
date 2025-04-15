@@ -26,8 +26,7 @@ void GLWidget::loadModel(const std::string &path)
     for (int i=0; i<meshes.size(); i++) {
         meshes_pointers.push_back(&meshes[i]);
     }
-    meshes_p = meshes_pointers;
-    Scene scene(meshes_p);
+    Scene scene(meshes_pointers);
     mainScene = scene;
     currentScene = scene;
     selectedMesh = nullptr;
@@ -68,8 +67,7 @@ void GLWidget::initializeGL()
     for (int i=0; i<meshes.size(); i++) {
         meshes_pointers.push_back(&meshes[i]);
     }
-    meshes_p = meshes_pointers;
-    Scene sampleModel(meshes_p);
+    Scene sampleModel(meshes_pointers);
     mainScene = sampleModel;
     currentScene = sampleModel;
 }
@@ -155,14 +153,6 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
 void GLWidget::saveEditSceneAndReturnToMainScene()
 {
-    // Replace meshes in mainScene with editScene based on name
-    for (int i=0; i<mainScene.meshes.size(); i++) {
-        for (int j=0; j<editScene.meshes.size(); j++) {
-            if (mainScene.meshes[i]->name == editScene.meshes[j]->name) {
-                mainScene.meshes[i] = editScene.meshes[j];
-            }
-        }
-    }
     currentScene = mainScene;
     inMainScene = true;
     update();
@@ -179,16 +169,16 @@ void GLWidget::onEditSceneClicked()
 
         // Add neighboring teeth meshes
         if (neighbor1Name != "") {
-            for (int i=0; i<mainScene.meshes.size(); i++) {
-                if (mainScene.meshes[i]->name == neighbor1Name) {
-                    editMeshes.push_back(mainScene.meshes[i]);
+            for (int i=0; i<meshes.size(); i++) {
+                if (meshes[i].name == neighbor1Name) {
+                    editMeshes.push_back(&meshes[i]);
                 }
             }
         }
         if (neighbor2Name != "") {
-            for (int i=0; i<mainScene.meshes.size(); i++) {
-                if (mainScene.meshes[i]->name == neighbor2Name)
-                    editMeshes.push_back(mainScene.meshes[i]);
+            for (int i=0; i<meshes.size(); i++) {
+                if (meshes[i].name == neighbor2Name)
+                    editMeshes.push_back(&meshes[i]);
             }
         }
 
