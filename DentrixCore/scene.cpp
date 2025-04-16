@@ -65,7 +65,7 @@ glm::vec3 Scene::getMeshesCenter() {
     return glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 }
 
-std::vector<Mesh> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
+std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_GenBoundingBoxes);
 
@@ -89,14 +89,14 @@ std::vector<Mesh> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* 
     }
     glm::vec3 center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 
-    std::vector<Mesh> meshes;
+    std::vector<Mesh*> meshes;
     for (int i=0; i<numMeshes; i++) {
         meshes.push_back(processMesh(scene->mMeshes[i], center, gl));
     }
     return meshes;
 }
 
-Mesh Scene::processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl) {
+Mesh* Scene::processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -124,7 +124,7 @@ Mesh Scene::processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Cor
     float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
     glm::vec3 m_center = glm::vec3(centerX, centerY, centerZ);
 
-    return Mesh(vertices, indices, mesh->mName.C_Str(), m_center, aabb_min, aabb_max, gl);
+    return new Mesh(vertices, indices, mesh->mName.C_Str(), m_center, aabb_min, aabb_max, gl);
 }
 
 bool Scene::TestRayOBBIntersection(

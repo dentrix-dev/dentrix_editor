@@ -25,7 +25,7 @@ protected:
     // Focused scene that contains the selected tooth (and optionally surrounding teeth)
     Scene editScene;
     // Currently rendered scene
-    Scene currentScene;
+    Scene* currentScene;
     bool inMainScene = true;
     void initializeGL() override;  // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
@@ -47,7 +47,7 @@ private:
     glm::mat4 view;
     glm::mat4 projection;
 
-    std::vector<Mesh> meshes;
+    std::vector<Mesh*> meshes;
     Mesh* selectedMesh = nullptr;
     bool isRotating = false;
 

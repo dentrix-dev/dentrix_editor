@@ -14,7 +14,7 @@ class Scene {
     Scene();
     Scene(std::vector<Mesh*> meshes);
 
-    static std::vector<Mesh> loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl);
+    static std::vector<Mesh*> loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl);
     glm::vec3 getMeshesCenter();
     void Draw(Shader* shader, Mesh* selectedMesh);
     bool Intersect(
@@ -27,7 +27,7 @@ class Scene {
     static void GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name, std::string &neighbor2Name);
 
   private:
-      static Mesh processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
+      static Mesh* processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
 
     bool TestRayOBBIntersection(
         glm::vec3 ray_origin,        // Ray origin, in world space

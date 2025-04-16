@@ -21,26 +21,17 @@ void GLWidget::loadModel(const std::string &path)
 {
     std::cout << __func__ << std::endl;
     makeCurrent();
+
+    // Delete references to previous meshes
+    for (int i=0; i<meshes.size(); i++)
+        delete meshes[i];
+
     meshes = Scene::loadScene(path, this);
-    std::vector<Mesh*> meshes_pointers;
-    for (int i=0; i<meshes.size(); i++) {
-        meshes_pointers.push_back(&meshes[i]);
-    }
-    Scene scene(meshes_pointers);
-    mainScene = scene;
-    currentScene = scene;
+
+    mainScene = Scene(meshes);
+    currentScene = &mainScene;
     selectedMesh = nullptr;
     update();  // Refresh the OpenGL view
-}
-
-void GLWidget::setSelectedMeshScale(int scale)
-{
-    float scaleF = scale/10.0;
-    std::cout<<"scale: "<<scaleF<<std::endl;
-    if (selectedMesh != nullptr) {
-        selectedMesh->setScale(scaleF);
-        update();
-    }
 }
 
 void GLWidget::initializeGL()
@@ -63,13 +54,10 @@ void GLWidget::initializeGL()
 
     // Load model
     meshes = Scene::loadScene(initialFilePath, this);
-    std::vector<Mesh*> meshes_pointers;
-    for (int i=0; i<meshes.size(); i++) {
-        meshes_pointers.push_back(&meshes[i]);
-    }
-    Scene sampleModel(meshes_pointers);
-    mainScene = sampleModel;
-    currentScene = sampleModel;
+
+    mainScene = Scene(meshes);
+    currentScene = &mainScene;
+    update();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -84,7 +72,7 @@ void GLWidget::paintGL()
     view = camera.GetViewMatrix();
     shader->setMatrix4("view", glm::value_ptr(view));
 
-    currentScene.Draw(shader, selectedMesh);
+    currentScene->Draw(shader, selectedMesh);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -121,7 +109,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z << std::endl;
 
         Mesh* intersectedMesh = nullptr;
-        bool intersection = currentScene.Intersect(camera.position, rayDirection, model, intersectedMesh);
+        bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
         std::cout << "intersection: " << intersection << std::endl;
         if (intersection && intersectedMesh != nullptr) {
             std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
@@ -153,7 +141,7 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
 void GLWidget::saveEditSceneAndReturnToMainScene()
 {
-    currentScene = mainScene;
+    currentScene = &mainScene;
     inMainScene = true;
     update();
 }
@@ -190,21 +178,21 @@ void GLWidget::onEditSceneClicked()
         // Add neighboring teeth meshes
         if (neighbor1Name != "") {
             for (int i=0; i<meshes.size(); i++) {
-                if (meshes[i].name == neighbor1Name) {
-                    editMeshes.push_back(&meshes[i]);
+                if (meshes[i]->name == neighbor1Name) {
+                    editMeshes.push_back(meshes[i]);
                 }
             }
         }
         if (neighbor2Name != "") {
             for (int i=0; i<meshes.size(); i++) {
-                if (meshes[i].name == neighbor2Name)
-                    editMeshes.push_back(&meshes[i]);
+                if (meshes[i]->name == neighbor2Name)
+                    editMeshes.push_back(meshes[i]);
             }
         }
 
         editScene = Scene(editMeshes);
         editScene.center = selectedMesh->center;
-        currentScene = editScene;
+        currentScene = &editScene;
         emit movedToEditScene();
         inMainScene = false;
     } else if (!inMainScene) {
@@ -212,6 +200,16 @@ void GLWidget::onEditSceneClicked()
         emit movedToMainScene();
     }
     update();
+}
+
+void GLWidget::setSelectedMeshScale(int scale)
+{
+    float scaleF = scale/10.0;
+    // std::cout<<"scale: "<<scaleF<<std::endl;
+    if (selectedMesh != nullptr) {
+        selectedMesh->setScale(scaleF);
+        update();
+    }
 }
 
 
