@@ -112,5 +112,5 @@ void Mesh::Draw() {
 void Mesh::setScale(float scaleFactor)
 {
     currentScale = scaleFactor;
-    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor));
+    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
 }
