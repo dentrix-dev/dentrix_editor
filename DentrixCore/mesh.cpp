@@ -114,3 +114,8 @@ void Mesh::setScale(float scaleFactor)
     currentScale = scaleFactor;
     scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
 }
+
+void Mesh::setScaleDirectional(float x, float y, float z)
+{
+    directionalScaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, z));
+}

@@ -19,6 +19,7 @@ class Mesh {
     glm::vec3 aabb_min;
     glm::vec3 aabb_max;
     glm::mat4 scaleTransform = glm::mat4(1.0f);
+    glm::mat4 directionalScaleTransform = glm::mat4(1.0f);
 
     static bool drawBoundingBox;
 
@@ -28,6 +29,7 @@ class Mesh {
     void Draw();
 
     void setScale(float scaleFactor);
+    void setScaleDirectional(float x, float y, float z);
 
   private:
     unsigned int VAO, VBO, EBO;

@@ -17,6 +17,7 @@ public:
     ~GLWidget();
 
     void loadModel(const std::string &path); // Function to load new model
+    void setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive);
 
 protected:
     // Main imported scene

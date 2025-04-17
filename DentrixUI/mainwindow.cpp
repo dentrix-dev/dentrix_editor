@@ -105,10 +105,24 @@ void MainWindow::createRightPanelStack()
     QWidget* viewPanel = new QWidget();
     QVBoxLayout* viewLayout = new QVBoxLayout(viewPanel);
     viewLayout->addWidget(new QLabel("Directional Scale"));
-    viewLayout->addWidget(new QSlider(Qt::Horizontal));
-    viewLayout->addWidget(new QCheckBox("X"));
-    viewLayout->addWidget(new QCheckBox("Y"));
-    viewLayout->addWidget(new QCheckBox("Z"));
+    QSlider *directionalScaleSlider = new QSlider(Qt::Horizontal);
+    directionalScaleSlider->setMinimum(5);    // Maps to 0.1
+    directionalScaleSlider->setMaximum(20);   // Maps to 5.0
+    directionalScaleSlider->setValue(10);     // e.g., 1.0
+    viewLayout->addWidget(directionalScaleSlider);
+    QCheckBox* xCheckBox = new QCheckBox("X");
+    QCheckBox* yCheckBox = new QCheckBox("Y");
+    QCheckBox* zCheckBox = new QCheckBox("Z");
+    viewLayout->addWidget(xCheckBox);
+    viewLayout->addWidget(yCheckBox);
+    viewLayout->addWidget(zCheckBox);
+    connect(directionalScaleSlider, &QSlider::sliderMoved, this, [=](int value) {
+        bool xEnabled = xCheckBox->isChecked();
+        bool yEnabled = yCheckBox->isChecked();
+        bool zEnabled = zCheckBox->isChecked();
+
+        glWidget->setSelectedMeshDirectionalScale(value, xEnabled, yEnabled, zEnabled);
+    });
     viewLayout->addStretch();
 
     // Add panels to the stack

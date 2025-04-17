@@ -158,6 +158,26 @@ void GLWidget::saveEditSceneAndReturnToMainScene()
     update();
 }
 
+void GLWidget::setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive)
+{
+    std::cout<<__func__;
+    float scaleF = val/10.0;
+    std::cout<<"scale: "<<scaleF<<std::endl;
+    if (selectedMesh != nullptr) {
+        float x = 1.0f;
+        float y = 1.0f;
+        float z = 1.0f;
+        if (xActive)
+            x = val/10.0;
+        if (yActive)
+            y = val/10.0f;
+        if (zActive)
+            z = val/10.0f;
+        selectedMesh->setScaleDirectional(x, y, z);
+        update();
+    }
+}
+
 void GLWidget::onEditSceneClicked()
 {
     if (selectedMesh != nullptr && inMainScene){
