@@ -43,7 +43,7 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
         // Center the scene
         // In mainScene, this has no effect since the vertices are already centered on first load
         // In editScene, this centers the new mesh array
-        meshfinalTransform = glm::translate(meshfinalTransform, -1.0f * center);
+        // meshfinalTransform = glm::translate(meshfinalTransform, -1.0f * center);
 
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
