@@ -9,7 +9,7 @@
 
 class Scene {
   public:
-    glm::vec3 center;
+    glm::vec3 center = glm::vec3(0.0f);
     std::vector<Mesh*> meshes;
     Scene();
     Scene(std::vector<Mesh*> meshes);

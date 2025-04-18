@@ -29,7 +29,6 @@ void GLWidget::loadModel(const std::string &path)
     meshes = Scene::loadScene(path, this);
 
     mainScene = Scene(meshes);
-    mainScene.center = glm::vec3(0.0f);
     currentScene = &mainScene;
     selectedMesh = nullptr;
     update();  // Refresh the OpenGL view
@@ -56,7 +55,6 @@ void GLWidget::initializeGL()
     meshes = Scene::loadScene(initialFilePath, this);
 
     mainScene = Scene(meshes);
-    mainScene.center = glm::vec3(0.0f);
     currentScene = &mainScene;
     update();
 }
