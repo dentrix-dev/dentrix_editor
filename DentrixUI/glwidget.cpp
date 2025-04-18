@@ -83,6 +83,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     mousePosX = event->position().x();
     mousePosY = event->position().y();
     isRotating = false;
+
+    glm::vec3 rayDirection;
+    Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection, rayDirection);
+
+    Mesh* hitMesh = nullptr;
+    unsigned int hitVertexIndex;
+    glm::vec3 intersectionPoint;
+    currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex, intersectionPoint);
+
+    std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
+    std::cout << "Vertex index: " << hitVertexIndex << std::endl;
+    std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z << std::endl;
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
