@@ -8,6 +8,7 @@
 #include "camera.h"
 #include <glm/glm.hpp>
 #include "shader.h"
+#include <QPainter>
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -18,6 +19,10 @@ public:
 
     void loadModel(const std::string &path); // Function to load new model
     void setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive);
+    void setFreeDeformAddMode(bool isAdd);
+    void setDeformationStrength(int value);
+    void setBrushSize(int value);
+    void updateCursor();
 
 protected:
     // Main imported scene
@@ -52,6 +57,14 @@ private:
     bool isRotating = false;
 
     void saveEditSceneAndReturnToMainScene();
+    bool freeDeformAddMode = true;
+    QCursor addCursor;
+    QCursor removeCursor;
+    QCursor defaultCursor;
+    void initializeCursors();
+    QCursor createAddCursor();
+    QCursor createRemoveCursor();
+
 signals:
     void meshSelectedInMainScene();
     void movedToEditScene();

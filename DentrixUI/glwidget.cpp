@@ -1,5 +1,6 @@
 #include <iostream>
 #include "glwidget.h"
+#include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
 #include <glm/glm.hpp>
@@ -13,6 +14,7 @@
 
 
 GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {
+    initializeCursors();
 }
 
 GLWidget::~GLWidget() {}
@@ -41,7 +43,7 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
 
     // Shaders
-    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
+    shader = new Shader("../shaders/vertexShader.vs", "../shaders/fragmentShader.fs", this);
     shader->use();
 
     // Setup projection matrix
@@ -223,6 +225,65 @@ void GLWidget::setSelectedMeshScale(int scale)
         selectedMesh->setScale(scaleF);
         update();
     }
+}
+
+
+void GLWidget::setFreeDeformAddMode(bool isAdd) {
+    freeDeformAddMode = isAdd;
+    updateCursor();
+    update();
+    std::cout << "[FreeDeform] Mode:" << (isAdd ? "Add" : "Remove") << std::endl;
+}
+
+void GLWidget::setDeformationStrength(int value) {
+    std::cout << "[FreeDeform] Strength set to:" << value << std::endl;
+}
+
+void GLWidget::setBrushSize(int value) {
+    std::cout << "[FreeDeform] Brush size set to:" << value << std::endl;
+}
+
+void GLWidget::updateCursor() {
+    if (MainWindow::inFreeDeformation) {
+        if (freeDeformAddMode) {
+            setCursor(addCursor);
+        } else {
+            setCursor(removeCursor);
+        }
+    } else {
+        setCursor(defaultCursor);
+    }
+}
+
+
+void GLWidget::initializeCursors() {
+    defaultCursor = cursor();
+    addCursor = createAddCursor();
+    removeCursor = createRemoveCursor();
+    setCursor(defaultCursor);
+}
+
+QCursor GLWidget::createAddCursor() {
+    QPixmap pixmap(32, 32);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(QPen(Qt::green, 2));
+    painter.drawEllipse(4, 4, 24, 24);
+    painter.drawLine(16, 8, 16, 24);
+    painter.drawLine(8, 16, 24, 16);
+    return QCursor(pixmap, 16, 16);
+}
+
+QCursor GLWidget::createRemoveCursor() {
+    QPixmap pixmap(32, 32);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(QPen(Qt::red, 2));
+    painter.drawEllipse(4, 4, 24, 24);
+    painter.drawLine(8, 16, 24, 16);
+    return QCursor(pixmap, 16, 16);
 }
 
 
