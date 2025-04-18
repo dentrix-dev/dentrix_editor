@@ -45,9 +45,8 @@ void GLWidget::initializeGL()
     shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
     shader->use();
 
-    // Setup projection matrix once as it doesn't change
-    projection = glm::perspective(
-        glm::radians(45.0f), (float)QWidget::width() / (float)QWidget::height(), 0.1f, 1000.0f);
+    // Setup projection matrix
+    projection = glm::perspective(glm::radians(45.0f), (float)QWidget::width() / QWidget::height(), 0.1f, 1000.0f);
     shader->setMatrix4("projection", glm::value_ptr(projection));
 
     model = glm::mat4(1.0f);
@@ -64,6 +63,8 @@ void GLWidget::initializeGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
+    projection = glm::perspective(glm::radians(45.0f), (float)w / h, 0.1f, 1000.0f);
+    shader->setMatrix4("projection", glm::value_ptr(projection));
     glViewport(0, 0, w, h); // adjust viewport to new size
 }
 
