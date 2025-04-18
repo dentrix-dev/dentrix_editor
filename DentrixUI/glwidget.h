@@ -62,8 +62,9 @@ private:
     QCursor removeCursor;
     QCursor defaultCursor;
     void initializeCursors();
-    QCursor createAddCursor();
-    QCursor createRemoveCursor();
+    QCursor createAddCursor(int size);
+    QCursor createRemoveCursor(int size);
+    int brushSize = 15;
 
 signals:
     void meshSelectedInMainScene();

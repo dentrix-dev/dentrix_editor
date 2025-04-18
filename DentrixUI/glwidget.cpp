@@ -14,7 +14,6 @@
 
 
 GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {
-    initializeCursors();
 }
 
 GLWidget::~GLWidget() {}
@@ -240,50 +239,53 @@ void GLWidget::setDeformationStrength(int value) {
 }
 
 void GLWidget::setBrushSize(int value) {
+    brushSize = value;
     std::cout << "[FreeDeform] Brush size set to:" << value << std::endl;
+    updateCursor();
 }
 
 void GLWidget::updateCursor() {
     if (MainWindow::inFreeDeformation) {
         if (freeDeformAddMode) {
-            setCursor(addCursor);
+            setCursor(createAddCursor(brushSize));
         } else {
-            setCursor(removeCursor);
+            setCursor(createRemoveCursor(brushSize));
         }
     } else {
         setCursor(defaultCursor);
     }
 }
 
-
-void GLWidget::initializeCursors() {
-    defaultCursor = cursor();
-    addCursor = createAddCursor();
-    removeCursor = createRemoveCursor();
-    setCursor(defaultCursor);
-}
-
-QCursor GLWidget::createAddCursor() {
-    QPixmap pixmap(32, 32);
+QCursor GLWidget::createAddCursor(int size) {
+    int cursorSize = std::min(64, std::max(8, size * 2));
+    QPixmap pixmap(cursorSize, cursorSize);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(Qt::green, 2));
-    painter.drawEllipse(4, 4, 24, 24);
-    painter.drawLine(16, 8, 16, 24);
-    painter.drawLine(8, 16, 24, 16);
-    return QCursor(pixmap, 16, 16);
+    int padding = cursorSize / 8;
+    painter.drawEllipse(padding, padding, cursorSize - padding*2, cursorSize - padding*2);
+    int centerX = cursorSize / 2;
+    int centerY = cursorSize / 2;
+    int lineLength = cursorSize / 2;
+    painter.drawLine(centerX, centerY - lineLength/2, centerX, centerY + lineLength/2);
+    painter.drawLine(centerX - lineLength/2, centerY, centerX + lineLength/2, centerY);
+    return QCursor(pixmap, centerX, centerY);
 }
 
-QCursor GLWidget::createRemoveCursor() {
-    QPixmap pixmap(32, 32);
+QCursor GLWidget::createRemoveCursor(int size) {
+    int cursorSize = std::min(64, std::max(8, size * 2));
+    QPixmap pixmap(cursorSize, cursorSize);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(Qt::red, 2));
-    painter.drawEllipse(4, 4, 24, 24);
-    painter.drawLine(8, 16, 24, 16);
-    return QCursor(pixmap, 16, 16);
+    int padding = cursorSize / 8;
+    painter.drawEllipse(padding, padding, cursorSize - padding*2, cursorSize - padding*2);
+    int centerX = cursorSize / 2;
+    int centerY = cursorSize / 2;
+    int lineLength = cursorSize / 2;
+    painter.drawLine(centerX - lineLength/2, centerY, centerX + lineLength/2, centerY);
+    return QCursor(pixmap, centerX, centerY);
 }
-
 
