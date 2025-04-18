@@ -43,7 +43,7 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
 
     // Shaders
-    shader = new Shader("../shaders/vertexShader.vs", "../shaders/fragmentShader.fs", this);
+    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
     shader->use();
 
     // Setup projection matrix
