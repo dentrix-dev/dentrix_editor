@@ -5,6 +5,7 @@
 #include "glwidget.h"
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QButtonGroup>
 
 
 QT_BEGIN_NAMESPACE

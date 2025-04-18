@@ -125,10 +125,58 @@ void MainWindow::createRightPanelStack()
     });
     viewLayout->addStretch();
 
+    // Panel 3: Free Deformation Panel
+    QWidget* deformationPanel = new QWidget();
+    QVBoxLayout* deformationLayout = new QVBoxLayout(deformationPanel);
+    QLabel* modeLabel = new QLabel("Mode");
+    QPushButton* addButton = new QPushButton("Add");
+    QPushButton* removeButton = new QPushButton("Remove");
+
+    // add-remove
+    addButton->setCheckable(true);
+    removeButton->setCheckable(true);
+    addButton->setChecked(true);  // Default state
+    QButtonGroup* modeGroup = new QButtonGroup(this);
+    modeGroup->setExclusive(true);
+    modeGroup->addButton(addButton, 0);
+    modeGroup->addButton(removeButton, 1);
+    QHBoxLayout* modeButtonLayout = new QHBoxLayout();
+    modeButtonLayout->addWidget(addButton);
+    modeButtonLayout->addWidget(removeButton);
+    deformationLayout->addWidget(modeLabel);
+    deformationLayout->addLayout(modeButtonLayout);
+    connect(modeGroup, &QButtonGroup::idClicked, this, [=](int id){
+        bool isAdd = (id == 0);
+        glWidget->setFreeDeformAddMode(isAdd);
+    });
+
+    // Strength slider
+    QLabel* strengthLabel = new QLabel("Strength");
+    QSlider* strengthSlider = new QSlider(Qt::Horizontal);
+    strengthSlider->setMinimum(5);
+    strengthSlider->setMaximum(20);
+    strengthSlider->setValue(10);
+    deformationLayout->addWidget(strengthLabel);
+    deformationLayout->addWidget(strengthSlider);
+    connect(strengthSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setDeformationStrength);
+
+    // Brush size slider
+    QLabel* sizeLabel = new QLabel("Brush Size");
+    QSlider* sizeSlider = new QSlider(Qt::Horizontal);
+    sizeSlider->setMinimum(5);
+    sizeSlider->setMaximum(20);
+    sizeSlider->setValue(10);
+    deformationLayout->addWidget(sizeLabel);
+    deformationLayout->addWidget(sizeSlider);
+    connect(sizeSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setBrushSize);
+    deformationLayout->addStretch();
+
+
     // Add panels to the stack
     rightPanelStack->addWidget(emptyPanel); // index 0
     rightPanelStack->addWidget(editPanel);  // index 1
     rightPanelStack->addWidget(viewPanel);  // index 2
+    rightPanelStack->addWidget(deformationPanel);  // index 3
 
     rightPanelStack->setFixedWidth(200);
 }
@@ -205,5 +253,9 @@ void MainWindow::onQActionGroupTriggered(QAction *action)
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = false;
         MainWindow::inFreeDeformation = true;
+        rightPanelStack->setCurrentIndex(3);
+    }
+    if (glWidget) {
+        glWidget->updateCursor();
     }
 }
