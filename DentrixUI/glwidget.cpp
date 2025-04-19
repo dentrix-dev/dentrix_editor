@@ -90,11 +90,13 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     Mesh* hitMesh = nullptr;
     unsigned int hitVertexIndex;
     glm::vec3 intersectionPoint;
-    currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex, intersectionPoint);
+    bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex, intersectionPoint);
 
-    std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
-    std::cout << "Vertex index: " << hitVertexIndex << std::endl;
-    std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z << std::endl;
+    if (intersection) {
+        std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
+        std::cout << "Vertex index: " << hitVertexIndex << std::endl;
+        std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z << std::endl;
+    }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
