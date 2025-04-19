@@ -90,8 +90,8 @@ void MainWindow::createRightPanelStack()
 
 
     // Panel 1: Edit Mode
-    QWidget* editPanel = new QWidget();
-    QVBoxLayout* editLayout = new QVBoxLayout(editPanel);
+    QWidget* uniformScalePanel = new QWidget();
+    QVBoxLayout* editLayout = new QVBoxLayout(uniformScalePanel);
     editLayout->addWidget(new QLabel("Uniform Scale"));
     QSlider *uniformScaleSlider = new QSlider(Qt::Horizontal);
     uniformScaleSlider->setMinimum(5);    // Maps to 0.1
@@ -102,8 +102,8 @@ void MainWindow::createRightPanelStack()
     editLayout->addStretch();
 
     // Panel 2: View Mode
-    QWidget* viewPanel = new QWidget();
-    QVBoxLayout* viewLayout = new QVBoxLayout(viewPanel);
+    QWidget* directionalScalePanel = new QWidget();
+    QVBoxLayout* viewLayout = new QVBoxLayout(directionalScalePanel);
     viewLayout->addWidget(new QLabel("Directional Scale"));
     QSlider *directionalScaleSlider = new QSlider(Qt::Horizontal);
     directionalScaleSlider->setMinimum(5);    // Maps to 0.1
@@ -174,8 +174,8 @@ void MainWindow::createRightPanelStack()
 
     // Add panels to the stack
     rightPanelStack->addWidget(emptyPanel); // index 0
-    rightPanelStack->addWidget(editPanel);  // index 1
-    rightPanelStack->addWidget(viewPanel);  // index 2
+    rightPanelStack->addWidget(uniformScalePanel);  // index 1
+    rightPanelStack->addWidget(directionalScalePanel);  // index 2
     rightPanelStack->addWidget(deformationPanel);  // index 3
 
     rightPanelStack->setFixedWidth(200);
