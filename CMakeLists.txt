@@ -75,7 +75,15 @@ else()
     endif()
 endif()
 
-target_link_libraries(dentrix_editor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::OpenGLWidgets assimp)
+target_link_libraries(dentrix_editor
+    PRIVATE 
+        Qt${QT_VERSION_MAJOR}::Widgets 
+        Qt${QT_VERSION_MAJOR}::OpenGL
+        Qt${QT_VERSION_MAJOR}::OpenGLWidgets 
+        assimp
+        mcg
+)
+
 target_include_directories(dentrix_editor PRIVATE
     ${CMAKE_SOURCE_DIR}/DentrixUI
     ${CMAKE_SOURCE_DIR}/DentrixCore
