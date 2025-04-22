@@ -9,6 +9,16 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(cmake/CPM.cmake)
+
+# Adding external deps
+
+CPMAddPackage(
+    NAME mcg
+    GIT_REPOSITORY git@github.com:dentrix-dev/mcg.git
+    GIT_TAG master
+)
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets OpenGL OpenGLWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets OpenGL OpenGLWidgets)
 # Find Assimp
