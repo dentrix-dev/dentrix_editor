@@ -163,6 +163,44 @@ void Mesh::Draw() {
     }
 }
 
+void Mesh::updateBuffers() {
+    // Get properties from the mesh
+    auto vpos = mesh.get_vertex_property<pmp::Point>("v:point");
+    auto vnormals = mesh.get_vertex_property<pmp::Normal>("v:normal");
+
+    // Update OpenGL buffers
+    vertices.clear();
+    normals.clear();
+    vertices.reserve(mesh.n_vertices() * 3);
+    normals.reserve(mesh.n_vertices() * 3);
+
+    // Loop over all vertices in the mesh to update positions and normals
+    for (auto v : mesh.vertices()) {
+        // Update positions in OpenGL
+        const auto& p = vpos[v];
+        vertices.push_back(p[0]);
+        vertices.push_back(p[1]);
+        vertices.push_back(p[2]);
+
+        // Update normals in OpenGL
+        const auto& n = vnormals[v];
+        normals.push_back(n[0]);
+        normals.push_back(n[1]);
+        normals.push_back(n[2]);
+    }
+
+    // Update position buffer
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
+
+    // Update normal buffer
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
+    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, normals.size() * sizeof(float), normals.data());
+
+    // Unbind buffers
+    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Mesh::setScale(float scaleFactor)
 {
     currentScale = scaleFactor;
