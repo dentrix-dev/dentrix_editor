@@ -53,16 +53,12 @@ void Scene::Draw(Shader* shader, Mesh* selectedMesh) {
 }
 
 glm::vec3 Scene::getMeshesCenter() {
-    float totalX=0.0;
-    float totalY=0.0;
-    float totalZ=0.0;
     int numMeshes = meshes.size();
+    glm::vec3 center(0.0f);
     for (int i=0; i < numMeshes; i++) {
-        totalX += (meshes[i]->aabb_max.x + meshes[i]->aabb_min.x) / 2.0;
-        totalY += (meshes[i]->aabb_max.y + meshes[i]->aabb_min.y) / 2.0;
-        totalZ += (meshes[i]->aabb_max.z + meshes[i]->aabb_min.z) / 2.0;
+        center += 0.5f * (meshes[i]->aabb_max + meshes[i]->aabb_min);
     }
-    return glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
+    return center / (float)numMeshes;
 }
 
 // PMP doesn't support loading multiple separate objects from .obj files
@@ -77,19 +73,14 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
 
     // Get scene center
     unsigned int numMeshes = scene->mNumMeshes;
-    float totalX=0.0;
-    float totalY=0.0;
-    float totalZ=0.0;
+    glm::vec3 center(0.0f);
     for (int i=0; i < numMeshes; i++) {
         const aiAABB &aabb = scene->mMeshes[i]->mAABB;
         glm::vec3 aabb_min = glm::vec3(aabb.mMin.x,aabb.mMin.y,aabb.mMin.z);
         glm::vec3 aabb_max = glm::vec3(aabb.mMax.x,aabb.mMax.y,aabb.mMax.z);
-
-        totalX += (aabb_max.x + aabb_min.x) / 2.0;
-        totalY += (aabb_max.y + aabb_min.y) / 2.0;
-        totalZ += (aabb_max.z + aabb_min.z) / 2.0;
+        center += 0.5f * (aabb_min + aabb_max);
     }
-    glm::vec3 center = glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
+    center = center / (float)numMeshes;
 
     std::vector<Mesh*> meshes;
     for (int i=0; i<numMeshes; i++) {
