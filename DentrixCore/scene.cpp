@@ -134,35 +134,16 @@ Mesh* Scene::processMesh(aiMesh *aimesh, glm::vec3 center, QOpenGLFunctions_3_3_
         }
     }
 
+    const aiAABB &aabb = aimesh->mAABB;
+    glm::vec3 aabb_min = glm::vec3(aabb.mMin.x-center.x,aabb.mMin.y-center.y,aabb.mMin.z-center.z);
+    glm::vec3 aabb_max = glm::vec3(aabb.mMax.x-center.x,aabb.mMax.y-center.y,aabb.mMax.z-center.z);
 
-    // std::vector<Vertex> vertices;
-    // std::vector<unsigned int> indices;
+    float centerX = (aabb_max.x + aabb_min.x) / 2.0;
+    float centerY = (aabb_max.y + aabb_min.y) / 2.0;
+    float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
+    glm::vec3 m_center = glm::vec3(centerX, centerY, centerZ);
 
-    // for (int i=0; i<mesh->mNumVertices; i++) {
-    //     float x = mesh->mVertices[i].x - center.x;
-    //     float y = mesh->mVertices[i].y - center.y;
-    //     float z = mesh->mVertices[i].z - center.z;
-    //     glm::vec3 v(x,y,z);
-    //     glm::vec3 n(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-    //     vertices.push_back(Vertex(v, n));
-    // }
-
-    // for (int i=0; i<mesh->mNumFaces; i++) {
-    //     indices.push_back(mesh->mFaces[i].mIndices[0]);
-    //     indices.push_back(mesh->mFaces[i].mIndices[1]);
-    //     indices.push_back(mesh->mFaces[i].mIndices[2]);
-    // }
-
-    // const aiAABB &aabb = mesh->mAABB;
-    // glm::vec3 aabb_min = glm::vec3(aabb.mMin.x-center.x,aabb.mMin.y-center.y,aabb.mMin.z-center.z);
-    // glm::vec3 aabb_max = glm::vec3(aabb.mMax.x-center.x,aabb.mMax.y-center.y,aabb.mMax.z-center.z);
-
-    // float centerX = (aabb_max.x + aabb_min.x) / 2.0;
-    // float centerY = (aabb_max.y + aabb_min.y) / 2.0;
-    // float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
-    // glm::vec3 m_center = glm::vec3(centerX, centerY, centerZ);
-
-    return new Mesh(mesh, aimesh->mName.C_Str(), glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f), gl);
+    return new Mesh(mesh, aimesh->mName.C_Str(), m_center, aabb_min, aabb_max, gl);
 }
 
 bool Scene::TestRayOBBIntersection(
