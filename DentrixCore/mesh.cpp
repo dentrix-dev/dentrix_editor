@@ -6,47 +6,58 @@ Mesh::Mesh(aiMesh *aimesh, glm::vec3 scene_center, QOpenGLFunctions_3_3_Core* gl
     this->gl = gl;
 
     // Create a PMP vertex property for position
-    auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+    mesh.vertex_property<pmp::Point>("v:point");
     auto vnormals = mesh.vertex_property<pmp::Normal>("v:normal");
 
     // Map to keep track of added vertices
     std::vector<pmp::Vertex> vertexHandles;
+    vertexHandles.reserve(aimesh->mNumVertices);
+    vertices.reserve(aimesh->mNumVertices * 3);
+    normals.reserve(aimesh->mNumVertices * 3);
 
     // 1. Add all vertices
     for (unsigned int i = 0; i < aimesh->mNumVertices; ++i) {
         aiVector3D v = aimesh->mVertices[i];
-        pmp::Vertex vh = mesh.add_vertex(pmp::Point(v.x-scene_center.x, v.y-scene_center.y, v.z-scene_center.z));
+        pmp::Point pos(v.x - scene_center.x, v.y - scene_center.y, v.z - scene_center.z);
+        pmp::Vertex vh = mesh.add_vertex(pos);
         vertexHandles.push_back(vh);
 
+        vertices.push_back(pos[0]);
+        vertices.push_back(pos[1]);
+        vertices.push_back(pos[2]);
+
+        // Handle normals
+        pmp::Normal n(0, 0, 0);
         if (aimesh->HasNormals()) {
-            aiVector3D n = aimesh->mNormals[i];
-            vnormals[vh] = pmp::Normal(n.x, n.y, n.z);
-        } else {
-            vnormals[vh] = pmp::Normal(0, 0, 0); // fallback
+            aiVector3D aiN = aimesh->mNormals[i];
+            n = pmp::Normal(aiN.x, aiN.y, aiN.z);
         }
+        vnormals[vh] = n;
+
+        normals.push_back(n[0]);
+        normals.push_back(n[1]);
+        normals.push_back(n[2]);
     }
 
-    // 2. Add all faces
+    indices.reserve(aimesh->mNumFaces * 3);
+
     for (unsigned int i = 0; i < aimesh->mNumFaces; ++i) {
         const aiFace& face = aimesh->mFaces[i];
         if (face.mNumIndices == 3) {
-            std::vector<pmp::Vertex> faceVertices;
+            std::vector<pmp::Vertex> faceVerts;
             for (unsigned int j = 0; j < 3; ++j) {
-                faceVertices.push_back(vertexHandles[face.mIndices[j]]);
+                unsigned int idx = face.mIndices[j];
+                faceVerts.push_back(vertexHandles[idx]);
+                indices.push_back(idx); // OpenGL index buffer
             }
-            mesh.add_face(faceVertices);
+            mesh.add_face(faceVerts);
         }
     }
 
     const aiAABB &aabb = aimesh->mAABB;
     aabb_min = glm::vec3(aabb.mMin.x-scene_center.x,aabb.mMin.y-scene_center.y,aabb.mMin.z-scene_center.z);
     aabb_max = glm::vec3(aabb.mMax.x-scene_center.x,aabb.mMax.y-scene_center.y,aabb.mMax.z-scene_center.z);
-
-    float centerX = (aabb_max.x + aabb_min.x) / 2.0;
-    float centerY = (aabb_max.y + aabb_min.y) / 2.0;
-    float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
-    center = glm::vec3(centerX, centerY, centerZ);
-
+    center = 0.5f * (aabb_min + aabb_max);
     name = aimesh->mName.C_Str();
 
     setup();
@@ -58,32 +69,6 @@ Mesh::~Mesh() {
 }
 
 void Mesh::setup() {
-    auto vpos = mesh.get_vertex_property<pmp::Point>("v:point");
-    auto vnormals = mesh.get_vertex_property<pmp::Normal>("v:normal");
-
-    for (auto v : mesh.vertices()) {
-        auto p = vpos[v];
-        auto n = vnormals[v];
-
-        vertices.push_back(p[0]);
-        vertices.push_back(p[1]);
-        vertices.push_back(p[2]);
-
-        normals.push_back(n[0]);
-        normals.push_back(n[1]);
-        normals.push_back(n[2]);
-    }
-
-    for (const auto f : mesh.faces()) {
-        std::vector<unsigned int> faceIndices;
-        for (auto v : mesh.vertices(f)) {
-            faceIndices.push_back(v.idx());
-        }
-        if (faceIndices.size() == 3) {
-            indices.insert(indices.end(), faceIndices.begin(), faceIndices.end());
-        }
-    }
-
     gl->glGenVertexArrays(1, &VAO);
     gl->glGenBuffers(1, &VBO_pos);
     gl->glGenBuffers(1, &VBO_norm);
