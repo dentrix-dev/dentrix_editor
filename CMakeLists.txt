@@ -15,7 +15,7 @@ include(cmake/CPM.cmake)
 
 CPMAddPackage(
     NAME mcg
-    GIT_REPOSITORY git@github.com:dentrix-dev/mcg.git
+    GIT_REPOSITORY https://github.com/dentrix-dev/mcg.git
     GIT_TAG master
 )
 
