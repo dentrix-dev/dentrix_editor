@@ -7,6 +7,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <vector>
 #include <pmp/surface_mesh.h>
+#include <assimp/scene.h>
 
 class Mesh {
   public:
@@ -25,7 +26,7 @@ class Mesh {
 
     static bool drawBoundingBox;
 
-    Mesh(pmp::SurfaceMesh mesh, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl);
+    Mesh(aiMesh* aimesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
     ~Mesh();
 
     void Draw();
