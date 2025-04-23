@@ -40,8 +40,6 @@ set(CORE_SOURCES
     DentrixCore/shader.h
     DentrixCore/camera.cpp
     DentrixCore/camera.h
-    DentrixCore/vertex.cpp
-    DentrixCore/vertex.h
     DentrixCore/mesh.cpp
     DentrixCore/mesh.h
 )

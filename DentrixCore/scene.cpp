@@ -65,6 +65,8 @@ glm::vec3 Scene::getMeshesCenter() {
     return glm::vec3(totalX/numMeshes, totalY/numMeshes, totalZ/numMeshes);
 }
 
+// PMP doesn't support loading multiple separate objects from .obj files
+// Objects are loaded using Assimp and PMP meshes are constructed manually
 std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_GenBoundingBoxes);
@@ -96,35 +98,71 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
     return meshes;
 }
 
-Mesh* Scene::processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl) {
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
+Mesh* Scene::processMesh(aiMesh *aimesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl) {
+    pmp::SurfaceMesh mesh;
 
-    for (int i=0; i<mesh->mNumVertices; i++) {
-        float x = mesh->mVertices[i].x - center.x;
-        float y = mesh->mVertices[i].y - center.y;
-        float z = mesh->mVertices[i].z - center.z;
-        glm::vec3 v(x,y,z);
-        glm::vec3 n(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-        vertices.push_back(Vertex(v, n));
+    // Create a PMP vertex property for position
+    auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+    auto vnormals = mesh.vertex_property<pmp::Normal>("v:normal");
+
+    // Map to keep track of added vertices
+    std::vector<pmp::Vertex> vertexHandles;
+
+    // 1. Add all vertices
+    for (unsigned int i = 0; i < aimesh->mNumVertices; ++i) {
+        aiVector3D v = aimesh->mVertices[i];
+        pmp::Vertex vh = mesh.add_vertex(pmp::Point(v.x-center.x, v.y-center.y, v.z-center.z));
+        vertexHandles.push_back(vh);
+
+        if (aimesh->HasNormals()) {
+            aiVector3D n = aimesh->mNormals[i];
+            vnormals[vh] = pmp::Normal(n.x, n.y, n.z);
+        } else {
+            vnormals[vh] = pmp::Normal(0, 0, 0); // fallback
+        }
     }
 
-    for (int i=0; i<mesh->mNumFaces; i++) {
-        indices.push_back(mesh->mFaces[i].mIndices[0]);
-        indices.push_back(mesh->mFaces[i].mIndices[1]);
-        indices.push_back(mesh->mFaces[i].mIndices[2]);
+    // 2. Add all faces
+    for (unsigned int i = 0; i < aimesh->mNumFaces; ++i) {
+        const aiFace& face = aimesh->mFaces[i];
+        if (face.mNumIndices == 3) {
+            std::vector<pmp::Vertex> faceVertices;
+            for (unsigned int j = 0; j < 3; ++j) {
+                faceVertices.push_back(vertexHandles[face.mIndices[j]]);
+            }
+            mesh.add_face(faceVertices);
+        }
     }
 
-    const aiAABB &aabb = mesh->mAABB;
-    glm::vec3 aabb_min = glm::vec3(aabb.mMin.x-center.x,aabb.mMin.y-center.y,aabb.mMin.z-center.z);
-    glm::vec3 aabb_max = glm::vec3(aabb.mMax.x-center.x,aabb.mMax.y-center.y,aabb.mMax.z-center.z);
 
-    float centerX = (aabb_max.x + aabb_min.x) / 2.0;
-    float centerY = (aabb_max.y + aabb_min.y) / 2.0;
-    float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
-    glm::vec3 m_center = glm::vec3(centerX, centerY, centerZ);
+    // std::vector<Vertex> vertices;
+    // std::vector<unsigned int> indices;
 
-    return new Mesh(vertices, indices, mesh->mName.C_Str(), m_center, aabb_min, aabb_max, gl);
+    // for (int i=0; i<mesh->mNumVertices; i++) {
+    //     float x = mesh->mVertices[i].x - center.x;
+    //     float y = mesh->mVertices[i].y - center.y;
+    //     float z = mesh->mVertices[i].z - center.z;
+    //     glm::vec3 v(x,y,z);
+    //     glm::vec3 n(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+    //     vertices.push_back(Vertex(v, n));
+    // }
+
+    // for (int i=0; i<mesh->mNumFaces; i++) {
+    //     indices.push_back(mesh->mFaces[i].mIndices[0]);
+    //     indices.push_back(mesh->mFaces[i].mIndices[1]);
+    //     indices.push_back(mesh->mFaces[i].mIndices[2]);
+    // }
+
+    // const aiAABB &aabb = mesh->mAABB;
+    // glm::vec3 aabb_min = glm::vec3(aabb.mMin.x-center.x,aabb.mMin.y-center.y,aabb.mMin.z-center.z);
+    // glm::vec3 aabb_max = glm::vec3(aabb.mMax.x-center.x,aabb.mMax.y-center.y,aabb.mMax.z-center.z);
+
+    // float centerX = (aabb_max.x + aabb_min.x) / 2.0;
+    // float centerY = (aabb_max.y + aabb_min.y) / 2.0;
+    // float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
+    // glm::vec3 m_center = glm::vec3(centerX, centerY, centerZ);
+
+    return new Mesh(mesh, aimesh->mName.C_Str(), glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f), gl);
 }
 
 bool Scene::TestRayOBBIntersection(
@@ -359,9 +397,9 @@ bool Scene::IntersectTriangles(
             unsigned int idx1 = mesh->indices[i + 1];
             unsigned int idx2 = mesh->indices[i + 2];
 
-            const glm::vec3& v0 = mesh->vertices[idx0].Position;
-            const glm::vec3& v1 = mesh->vertices[idx1].Position;
-            const glm::vec3& v2 = mesh->vertices[idx2].Position;
+            const glm::vec3 v0 = glm::vec3(mesh->vertices[idx0], mesh->vertices[idx0+1], mesh->vertices[idx0+2]);
+            const glm::vec3 v1 = glm::vec3(mesh->vertices[idx1], mesh->vertices[idx1+1], mesh->vertices[idx1+2]);
+            const glm::vec3 v2 = glm::vec3(mesh->vertices[idx2], mesh->vertices[idx2+1], mesh->vertices[idx2+2]);
 
             float t;
             // Use the MODEL SPACE ray and vertices

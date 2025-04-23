@@ -2,9 +2,8 @@
 
 bool Mesh::drawBoundingBox = true;
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl) {
-    this->vertices = vertices;
-    this->indices = indices;
+Mesh::Mesh(pmp::SurfaceMesh mesh, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl) {
+    this->mesh = mesh;
     this->name = name;
     this->center = center;
     this->aabb_min = aabb_min;
@@ -20,23 +19,54 @@ Mesh::~Mesh() {
 }
 
 void Mesh::setup() {
+    auto vpos = mesh.get_vertex_property<pmp::Point>("v:point");
+    auto vnormals = mesh.get_vertex_property<pmp::Normal>("v:normal");
+
+    for (auto v : mesh.vertices()) {
+        auto p = vpos[v];
+        auto n = vnormals[v];
+
+        vertices.push_back(p[0]);
+        vertices.push_back(p[1]);
+        vertices.push_back(p[2]);
+
+        normals.push_back(n[0]);
+        normals.push_back(n[1]);
+        normals.push_back(n[2]);
+    }
+
+    for (const auto f : mesh.faces()) {
+        std::vector<unsigned int> faceIndices;
+        for (auto v : mesh.vertices(f)) {
+            faceIndices.push_back(v.idx());
+        }
+        if (faceIndices.size() == 3) {
+            indices.insert(indices.end(), faceIndices.begin(), faceIndices.end());
+        }
+    }
+
     gl->glGenVertexArrays(1, &VAO);
-    gl->glGenBuffers(1, &VBO);
+    gl->glGenBuffers(1, &VBO_pos);
+    gl->glGenBuffers(1, &VBO_norm);
     gl->glGenBuffers(1, &EBO);
 
     gl->glBindVertexArray(VAO);
 
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
+    // --- Position VBO (location = 0)
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     gl->glEnableVertexAttribArray(0);
-    gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
+    // --- Normal VBO (location = 1)
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
+    gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+    gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     gl->glEnableVertexAttribArray(1);
-    gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+    // --- Element Buffer
+    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     gl->glBindVertexArray(0);
 }
