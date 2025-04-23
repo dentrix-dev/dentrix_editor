@@ -36,8 +36,6 @@ class Scene {
     static void GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name, std::string &neighbor2Name);
 
   private:
-      static Mesh* processMesh(aiMesh *mesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
-
     bool TestRayOBBIntersection(
         glm::vec3 ray_origin,        // Ray origin, in world space
         glm::vec3 ray_direction,     // Ray direction (NOT target position!), in world space. Must be normalize()'d.

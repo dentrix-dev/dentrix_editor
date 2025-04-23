@@ -2,13 +2,52 @@
 
 bool Mesh::drawBoundingBox = true;
 
-Mesh::Mesh(pmp::SurfaceMesh mesh, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl) {
-    this->mesh = mesh;
-    this->name = name;
-    this->center = center;
-    this->aabb_min = aabb_min;
-    this->aabb_max = aabb_max;
+Mesh::Mesh(aiMesh *aimesh, glm::vec3 scene_center, QOpenGLFunctions_3_3_Core* gl) {
     this->gl = gl;
+
+    // Create a PMP vertex property for position
+    auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+    auto vnormals = mesh.vertex_property<pmp::Normal>("v:normal");
+
+    // Map to keep track of added vertices
+    std::vector<pmp::Vertex> vertexHandles;
+
+    // 1. Add all vertices
+    for (unsigned int i = 0; i < aimesh->mNumVertices; ++i) {
+        aiVector3D v = aimesh->mVertices[i];
+        pmp::Vertex vh = mesh.add_vertex(pmp::Point(v.x-scene_center.x, v.y-scene_center.y, v.z-scene_center.z));
+        vertexHandles.push_back(vh);
+
+        if (aimesh->HasNormals()) {
+            aiVector3D n = aimesh->mNormals[i];
+            vnormals[vh] = pmp::Normal(n.x, n.y, n.z);
+        } else {
+            vnormals[vh] = pmp::Normal(0, 0, 0); // fallback
+        }
+    }
+
+    // 2. Add all faces
+    for (unsigned int i = 0; i < aimesh->mNumFaces; ++i) {
+        const aiFace& face = aimesh->mFaces[i];
+        if (face.mNumIndices == 3) {
+            std::vector<pmp::Vertex> faceVertices;
+            for (unsigned int j = 0; j < 3; ++j) {
+                faceVertices.push_back(vertexHandles[face.mIndices[j]]);
+            }
+            mesh.add_face(faceVertices);
+        }
+    }
+
+    const aiAABB &aabb = aimesh->mAABB;
+    aabb_min = glm::vec3(aabb.mMin.x-scene_center.x,aabb.mMin.y-scene_center.y,aabb.mMin.z-scene_center.z);
+    aabb_max = glm::vec3(aabb.mMax.x-scene_center.x,aabb.mMax.y-scene_center.y,aabb.mMax.z-scene_center.z);
+
+    float centerX = (aabb_max.x + aabb_min.x) / 2.0;
+    float centerY = (aabb_max.y + aabb_min.y) / 2.0;
+    float centerZ = (aabb_max.z + aabb_min.z) / 2.0;
+    center = glm::vec3(centerX, centerY, centerZ);
+
+    name = aimesh->mName.C_Str();
 
     setup();
     setupBoundingBox();
