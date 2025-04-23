@@ -6,12 +6,13 @@
 #include <string>
 #include <QOpenGLFunctions_3_3_Core>
 #include <vector>
-#include "vertex.h"
+#include <pmp/surface_mesh.h>
 
 class Mesh {
   public:
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<float> vertices = {};
+    std::vector<float> normals = {};
+    std::vector<unsigned int> indices = {};
     std::string name;
     // Needed to reset model back to origin
     glm::vec3 center;
@@ -23,7 +24,7 @@ class Mesh {
 
     static bool drawBoundingBox;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl);
+    Mesh(pmp::SurfaceMesh mesh, std::string name, glm::vec3 center, glm::vec3 aabb_min, glm::vec3 aabb_max, QOpenGLFunctions_3_3_Core* gl);
     ~Mesh();
 
     void Draw();
@@ -32,7 +33,9 @@ class Mesh {
     void setScaleDirectional(float x, float y, float z);
 
   private:
-    unsigned int VAO, VBO, EBO;
+    pmp::SurfaceMesh mesh;
+
+    unsigned int VAO, VBO_pos, VBO_norm, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;
     QOpenGLFunctions_3_3_Core* gl;
     float currentScale = 1.0f;

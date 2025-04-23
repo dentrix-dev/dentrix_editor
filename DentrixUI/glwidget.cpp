@@ -11,6 +11,8 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/trigonometric.hpp>
+#include <pmp/surface_mesh.h>
+#include <pmp/io/io.h>
 
 
 GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {
