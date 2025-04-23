@@ -30,6 +30,7 @@ class Mesh {
     ~Mesh();
 
     void Draw();
+    void updateBuffers();
 
     void setScale(float scaleFactor);
     void setScaleDirectional(float x, float y, float z);
