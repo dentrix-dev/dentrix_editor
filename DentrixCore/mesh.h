@@ -10,6 +10,7 @@
 
 class Mesh {
   public:
+    pmp::SurfaceMesh mesh;
     std::vector<float> vertices = {};
     std::vector<float> normals = {};
     std::vector<unsigned int> indices = {};
@@ -33,8 +34,6 @@ class Mesh {
     void setScaleDirectional(float x, float y, float z);
 
   private:
-    pmp::SurfaceMesh mesh;
-
     unsigned int VAO, VBO_pos, VBO_norm, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;
     QOpenGLFunctions_3_3_Core* gl;
