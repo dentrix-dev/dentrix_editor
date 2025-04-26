@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include <pmp/surface_mesh.h>
 #include <pmp/algorithms/differential_geometry.h>
+#include <pmp/algorithms/normals.h>
 
 bool Mesh::drawBoundingBox = true;
 
@@ -224,6 +225,8 @@ void Mesh::updateMeshScale()
         p = center + (p - center) * currentScale;
         mesh.position(v) = p;
     }
+    pmp::face_normals(mesh);
+    pmp::vertex_normals(mesh);
     scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     updateBuffers();
 }

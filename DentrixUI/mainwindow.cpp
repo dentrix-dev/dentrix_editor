@@ -77,112 +77,6 @@ void MainWindow::createToolBar()
     addToolBar(Qt::LeftToolBarArea, toolBar);
 }
 
-void MainWindow::createRightPanelStack()
-{
-    // ==== Right Panel Stack ====
-    rightPanelStack = new QStackedWidget(this);
-
-    // Panel 0: Empty Panel
-    QWidget* emptyPanel = new QWidget();
-    QVBoxLayout* emptyLayout = new QVBoxLayout(emptyPanel);
-    emptyLayout->addWidget(new QLabel("No transformation is selected."));
-    emptyLayout->addStretch();
-
-
-    // Panel 1: Edit Mode
-    QWidget* uniformScalePanel = new QWidget();
-    QVBoxLayout* editLayout = new QVBoxLayout(uniformScalePanel);
-    editLayout->addWidget(new QLabel("Uniform Scale"));
-    QSlider *uniformScaleSlider = new QSlider(Qt::Horizontal);
-    uniformScaleSlider->setMinimum(5);    // Maps to 0.1
-    uniformScaleSlider->setMaximum(20);   // Maps to 5.0
-    uniformScaleSlider->setValue(10);     // e.g., 1.0
-    connect(uniformScaleSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshScale);
-    connect(uniformScaleSlider, &QSlider::sliderReleased, glWidget, &GLWidget::updateMeshScale);
-    editLayout->addWidget(uniformScaleSlider);
-    editLayout->addStretch();
-
-    // Panel 2: View Mode
-    QWidget* directionalScalePanel = new QWidget();
-    QVBoxLayout* viewLayout = new QVBoxLayout(directionalScalePanel);
-    viewLayout->addWidget(new QLabel("Directional Scale"));
-    QSlider *directionalScaleSlider = new QSlider(Qt::Horizontal);
-    directionalScaleSlider->setMinimum(5);    // Maps to 0.1
-    directionalScaleSlider->setMaximum(20);   // Maps to 5.0
-    directionalScaleSlider->setValue(10);     // e.g., 1.0
-    viewLayout->addWidget(directionalScaleSlider);
-    QCheckBox* xCheckBox = new QCheckBox("X");
-    QCheckBox* yCheckBox = new QCheckBox("Y");
-    QCheckBox* zCheckBox = new QCheckBox("Z");
-    viewLayout->addWidget(xCheckBox);
-    viewLayout->addWidget(yCheckBox);
-    viewLayout->addWidget(zCheckBox);
-    connect(directionalScaleSlider, &QSlider::sliderMoved, this, [=](int value) {
-        bool xEnabled = xCheckBox->isChecked();
-        bool yEnabled = yCheckBox->isChecked();
-        bool zEnabled = zCheckBox->isChecked();
-
-        glWidget->setSelectedMeshDirectionalScale(value, xEnabled, yEnabled, zEnabled);
-    });
-    viewLayout->addStretch();
-
-    // Panel 3: Free Deformation Panel
-    QWidget* deformationPanel = new QWidget();
-    QVBoxLayout* deformationLayout = new QVBoxLayout(deformationPanel);
-    QLabel* modeLabel = new QLabel("Mode");
-    QPushButton* addButton = new QPushButton("Add");
-    QPushButton* removeButton = new QPushButton("Remove");
-
-    // add-remove
-    addButton->setCheckable(true);
-    removeButton->setCheckable(true);
-    addButton->setChecked(true);  // Default state
-    QButtonGroup* modeGroup = new QButtonGroup(this);
-    modeGroup->setExclusive(true);
-    modeGroup->addButton(addButton, 0);
-    modeGroup->addButton(removeButton, 1);
-    QHBoxLayout* modeButtonLayout = new QHBoxLayout();
-    modeButtonLayout->addWidget(addButton);
-    modeButtonLayout->addWidget(removeButton);
-    deformationLayout->addWidget(modeLabel);
-    deformationLayout->addLayout(modeButtonLayout);
-    connect(modeGroup, &QButtonGroup::idClicked, this, [=](int id){
-        bool isAdd = (id == 0);
-        glWidget->setFreeDeformAddMode(isAdd);
-    });
-
-    // Strength slider
-    QLabel* strengthLabel = new QLabel("Strength");
-    QSlider* strengthSlider = new QSlider(Qt::Horizontal);
-    strengthSlider->setMinimum(5);
-    strengthSlider->setMaximum(20);
-    strengthSlider->setValue(10);
-    deformationLayout->addWidget(strengthLabel);
-    deformationLayout->addWidget(strengthSlider);
-    connect(strengthSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setDeformationStrength);
-
-    // Brush size slider
-    QLabel* sizeLabel = new QLabel("Brush Size");
-    QSlider* sizeSlider = new QSlider(Qt::Horizontal);
-    sizeSlider->setMinimum(5);
-    sizeSlider->setMaximum(20);
-    sizeSlider->setValue(10);
-    deformationLayout->addWidget(sizeLabel);
-    deformationLayout->addWidget(sizeSlider);
-    connect(sizeSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setBrushSize);
-    deformationLayout->addStretch();
-
-
-    // Add panels to the stack
-    rightPanelStack->addWidget(emptyPanel); // index 0
-    rightPanelStack->addWidget(uniformScalePanel);  // index 1
-    rightPanelStack->addWidget(directionalScalePanel);  // index 2
-    rightPanelStack->addWidget(deformationPanel);  // index 3
-
-    rightPanelStack->setFixedWidth(200);
-}
-
-
 void MainWindow::loadModel()
 {
     QString filePath = QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
@@ -203,7 +97,7 @@ void MainWindow::loadModel()
             // Add the glWidget to the left
             centralLayout->addWidget(glWidget, 1);
 
-            createRightPanelStack();
+            rightPanelStack = new RightPanelStackedWidget(glWidget);
 
             // Add to layout
             centralLayout->addWidget(rightPanelStack);
