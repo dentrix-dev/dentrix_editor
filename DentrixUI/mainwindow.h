@@ -7,6 +7,7 @@
 #include <QStackedWidget>
 #include <QButtonGroup>
 #include "Widgets/rightpanelstackedwidget.h"
+#include "Widgets/toolbarwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,17 +31,11 @@ public:
 private:
     Ui::MainWindow *ui;
     GLWidget *glWidget;
-    QPushButton *editButton;
 
+    ToolBarWidget* toolbar;
     RightPanelStackedWidget* rightPanelStack;
 
     void createToolBar();
-
-    const QString editButtonInactiveStyleSheet = "background-color: gray; color: white; padding: 5px;";
-    const QString editButtonActiveStyleSheet = "background-color: #3498db; color: white; padding: 5px;";
-    const QString UNIFORM_SCALE_ACTION_TEXT = "Uniform Scale";
-    const QString DIRECTIONAL_SCALE_ACTION_TEXT = "Directional Scale";
-    const QString FREE_DEFORM_ACTION_TEXT  = "Free Deformation";
 
 private slots:
     void loadModel();
