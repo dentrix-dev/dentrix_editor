@@ -325,9 +325,9 @@ bool Scene::IntersectTriangles(
             unsigned int idx1 = mesh->indices[i + 1];
             unsigned int idx2 = mesh->indices[i + 2];
 
-            const glm::vec3 v0 = glm::vec3(mesh->vertices[idx0], mesh->vertices[idx0+1], mesh->vertices[idx0+2]);
-            const glm::vec3 v1 = glm::vec3(mesh->vertices[idx1], mesh->vertices[idx1+1], mesh->vertices[idx1+2]);
-            const glm::vec3 v2 = glm::vec3(mesh->vertices[idx2], mesh->vertices[idx2+1], mesh->vertices[idx2+2]);
+            const glm::vec3 v0 = glm::vec3(mesh->vertices[idx0*3], mesh->vertices[idx0*3+1], mesh->vertices[idx0*3+2]);
+            const glm::vec3 v1 = glm::vec3(mesh->vertices[idx1*3], mesh->vertices[idx1*3+1], mesh->vertices[idx1*3+2]);
+            const glm::vec3 v2 = glm::vec3(mesh->vertices[idx2*3], mesh->vertices[idx2*3+1], mesh->vertices[idx2*3+2]);
 
             float t;
             // Use the MODEL SPACE ray and vertices
