@@ -285,6 +285,10 @@ bool Scene::IntersectTriangles(
     ray_direction_world = glm::normalize(ray_direction_world);
 
     for (Mesh* mesh : meshes) {
+        if (mesh->name == "tooth0") {
+            continue;
+        }
+
         // --- Construct the full Model Matrix for this mesh ---
         // This depends on how you handle transformations.
         // Example: Base scene transform * mesh-specific transforms
