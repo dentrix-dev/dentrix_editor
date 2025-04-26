@@ -35,6 +35,8 @@ class Mesh {
     void setScale(float scaleFactor);
     void setScaleDirectional(float x, float y, float z);
 
+    void updateMeshScale();
+
   private:
     unsigned int VAO, VBO_pos, VBO_norm, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;

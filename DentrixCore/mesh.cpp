@@ -1,4 +1,6 @@
 #include "mesh.h"
+#include <pmp/surface_mesh.h>
+#include <pmp/algorithms/differential_geometry.h>
 
 bool Mesh::drawBoundingBox = true;
 
@@ -210,4 +212,18 @@ void Mesh::setScale(float scaleFactor)
 void Mesh::setScaleDirectional(float x, float y, float z)
 {
     directionalScaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, z));
+}
+
+void Mesh::updateMeshScale()
+{
+    pmp::Point center = pmp::centroid(mesh);
+    // Scale vertices around center
+    for (auto v : mesh.vertices())
+    {
+        pmp::Point p = mesh.position(v);
+        p = center + (p - center) * currentScale;
+        mesh.position(v) = p;
+    }
+    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    updateBuffers();
 }

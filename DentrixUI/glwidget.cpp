@@ -230,6 +230,14 @@ void GLWidget::setSelectedMeshScale(int scale)
     }
 }
 
+void GLWidget::updateMeshScale()
+{
+    if (selectedMesh != nullptr) {
+        selectedMesh->updateMeshScale();
+        update();
+    }
+}
+
 
 void GLWidget::setFreeDeformAddMode(bool isAdd) {
     freeDeformAddMode = isAdd;

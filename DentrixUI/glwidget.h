@@ -74,6 +74,7 @@ signals:
 public slots:
     void onEditSceneClicked();
     void setSelectedMeshScale(int scale);
+    void updateMeshScale();
 
 };
 
