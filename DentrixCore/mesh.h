@@ -29,12 +29,17 @@ class Mesh {
     Mesh(aiMesh* aimesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
     ~Mesh();
 
-    void Draw();
-    void updateBuffers();
-
     void setScale(float scaleFactor);
     void setScaleDirectional(float x, float y, float z);
 
+    bool testRayOBBIntersection(
+        glm::vec3 ray_origin,        // Ray origin, in world space
+        glm::vec3 ray_direction,     // Ray direction (NOT target position!), in world space. Must be normalize()'d.
+        glm::mat4 ModelMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
+        float& intersection_distance // Output : distance between ray_origin and the intersection with the OBB
+    );
+    void draw();
+    void updateBuffers();
     void updateMeshScale();
 
   private:
