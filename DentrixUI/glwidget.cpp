@@ -42,6 +42,7 @@ void GLWidget::initializeGL()
     initializeOpenGLFunctions();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);// set background color
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     // Shaders
     shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
@@ -60,6 +61,11 @@ void GLWidget::initializeGL()
     mainScene = Scene(meshes);
     currentScene = &mainScene;
     update();
+    std::cout << "mesh loaded" << std::endl;
+    std::cout << currentScene->meshes[0]->mesh.n_vertices() << std::endl;
+    std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
+    std::cout << currentScene->meshes[0]->normals.size() << std::endl;
+    std::cout << currentScene->meshes[0]->indices.size() << std::endl;
 }
 
 void GLWidget::resizeGL(int w, int h)

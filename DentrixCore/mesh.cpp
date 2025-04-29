@@ -2,6 +2,8 @@
 #include <pmp/surface_mesh.h>
 #include <pmp/algorithms/differential_geometry.h>
 #include <pmp/algorithms/normals.h>
+#include <pmp/algorithms/utilities.h>
+#include <pmp/bounding_box.h>
 #include <utils.h>
 
 bool Mesh::drawBoundingBox = true;
@@ -64,6 +66,56 @@ Mesh::Mesh(aiMesh *aimesh, glm::vec3 scene_center, QOpenGLFunctions_3_3_Core* gl
     center = 0.5f * (aabb_min + aabb_max);
     name = aimesh->mName.C_Str();
 
+    setup();
+    setupBoundingBox();
+}
+
+Mesh::Mesh(pmp::SurfaceMesh& input_mesh, QOpenGLFunctions_3_3_Core* gl) {
+    this->gl = gl;
+    mesh = input_mesh;
+    name = "tooth0";
+
+    pmp::face_normals(mesh);
+    pmp::BoundingBox aabb = pmp::bounds(mesh);
+    aabb_min = Utils::pmpPointToGlm(aabb.min());
+    aabb_max = Utils::pmpPointToGlm(aabb.max());
+    center = 0.5f * (aabb_min + aabb_max);
+
+    auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+    auto fnormal = mesh.face_property<pmp::Normal>("f:normal");
+
+    vertices.clear();
+    normals.clear();
+    indices.clear();
+
+    unsigned int index = 0;
+    for (auto f : mesh.faces()) {
+        pmp::Normal n = fnormal[f];
+        std::vector<unsigned int> faceIndices;
+
+        for (auto v : mesh.vertices(f)) {
+            pmp::Point p = vpos[v];
+
+            vertices.push_back(p[0] - center.x);
+            vertices.push_back(p[1] - center.y);
+            vertices.push_back(p[2] - center.z);
+
+            normals.push_back(n[0]);
+            normals.push_back(n[1]);
+            normals.push_back(n[2]);
+
+            faceIndices.push_back(index++);
+        }
+
+        if (faceIndices.size() == 3) {
+            indices.push_back(faceIndices[0]);
+            indices.push_back(faceIndices[1]);
+            indices.push_back(faceIndices[2]);
+        }
+        else {
+            qWarning() << "Non-triangular face detected!";
+        }
+    }
     setup();
     setupBoundingBox();
 }
