@@ -8,10 +8,10 @@
 
 bool Mesh::drawBoundingBox = true;
 
-Mesh::Mesh(pmp::SurfaceMesh& input_mesh, QOpenGLFunctions_3_3_Core* gl) {
+Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name, QOpenGLFunctions_3_3_Core* gl) {
     this->gl = gl;
+    this->name = name;
     mesh = input_mesh;
-    name = "tooth0";
 
     // Calculate per-face normals for vertices
     // (vertex has a normal for each face it's a part of)

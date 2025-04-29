@@ -23,7 +23,7 @@ class Mesh {
 
     static bool drawBoundingBox;
 
-    Mesh(pmp::SurfaceMesh& mesh, QOpenGLFunctions_3_3_Core* gl);
+    Mesh(pmp::SurfaceMesh& mesh, std::string name, QOpenGLFunctions_3_3_Core* gl);
     ~Mesh();
 
     void setScale(float scaleFactor);

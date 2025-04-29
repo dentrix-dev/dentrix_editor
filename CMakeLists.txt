@@ -44,6 +44,8 @@ set(CORE_SOURCES
     DentrixCore/mesh.h
     DentrixCore/utils.cpp
     DentrixCore/utils.h
+    DentrixCore/filehandler.cpp
+    DentrixCore/filehandler.h
 )
 
 set(PROJECT_SOURCES
