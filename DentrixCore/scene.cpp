@@ -167,130 +167,130 @@ bool Scene::IntersectTriangles(
     unsigned int& outHitVertexIndex,
     glm::vec3& outIntersectionPointWorld
     ) {
-    float closest_t = std::numeric_limits<float>::max();
-    outHitMesh = nullptr;
-    Mesh* closest_mesh = nullptr;
-    unsigned int closest_vertex_index = 0; // Store the index within the mesh->vertices array
-    glm::vec3 closest_intersection_point_world;
+    // float closest_t = std::numeric_limits<float>::max();
+    // outHitMesh = nullptr;
+    // Mesh* closest_mesh = nullptr;
+    // unsigned int closest_vertex_index = 0; // Store the index within the mesh->vertices array
+    // glm::vec3 closest_intersection_point_world;
 
-    // Ensure ray direction is normalized
-    ray_direction_world = glm::normalize(ray_direction_world);
+    // // Ensure ray direction is normalized
+    // ray_direction_world = glm::normalize(ray_direction_world);
 
-    for (Mesh* mesh : meshes) {
-        if (mesh->name == "tooth0") {
-            continue;
-        }
+    // for (Mesh* mesh : meshes) {
+    //     if (mesh->name == "tooth0") {
+    //         continue;
+    //     }
 
-        // --- Construct the full Model Matrix for this mesh ---
-        // This depends on how you handle transformations.
-        // Example: Base scene transform * mesh-specific transforms
-        // Adjust this according to your transformation hierarchy!
-        glm::mat4 modelMatrix = sceneMatrix * mesh->directionalScaleTransform * mesh->scaleTransform; // Example order
+    //     // --- Construct the full Model Matrix for this mesh ---
+    //     // This depends on how you handle transformations.
+    //     // Example: Base scene transform * mesh-specific transforms
+    //     // Adjust this according to your transformation hierarchy!
+    //     glm::mat4 modelMatrix = sceneMatrix * mesh->directionalScaleTransform * mesh->scaleTransform; // Example order
 
-        // --- 1. Optional but recommended: Coarse Bounding Box Check ---
-        float obb_intersection_distance;
-        if (!mesh->testRayOBBIntersection(ray_origin_world, ray_direction_world, modelMatrix, obb_intersection_distance)) {
-            continue; // Skip this mesh if ray doesn't hit its OBB
-        }
-        // Optional refinement: If obb_intersection_distance > closest_t, we can also skip.
-        // Be careful if the ray origin is inside the OBB. TestRayOBBIntersection might need adjustment.
-
-
-        // --- 2. Transform Ray into Model Space ---
-        glm::mat4 invModelMatrix = glm::inverse(modelMatrix);
-        glm::vec4 ray_origin_model_h = invModelMatrix * glm::vec4(ray_origin_world, 1.0f);
-        glm::vec4 ray_direction_model_h = invModelMatrix * glm::vec4(ray_direction_world, 0.0f); // Direction needs 0.0
-
-        glm::vec3 ray_origin_model = glm::vec3(ray_origin_model_h);
-        // IMPORTANT: Re-normalize direction after non-uniform scaling/shear in inverse transform
-        glm::vec3 ray_direction_model = glm::normalize(glm::vec3(ray_direction_model_h));
+    //     // --- 1. Optional but recommended: Coarse Bounding Box Check ---
+    //     float obb_intersection_distance;
+    //     if (!mesh->testRayOBBIntersection(ray_origin_world, ray_direction_world, modelMatrix, obb_intersection_distance)) {
+    //         continue; // Skip this mesh if ray doesn't hit its OBB
+    //     }
+    //     // Optional refinement: If obb_intersection_distance > closest_t, we can also skip.
+    //     // Be careful if the ray origin is inside the OBB. TestRayOBBIntersection might need adjustment.
 
 
-        // --- 3. Iterate through Triangles ---
-        bool mesh_hit = false;
-        float mesh_closest_t = std::numeric_limits<float>::max();
-        unsigned int mesh_hit_v0_idx = 0, mesh_hit_v1_idx = 0, mesh_hit_v2_idx = 0;
-        glm::vec3 hit_v0, hit_v1, hit_v2; // Keep track of hit triangle vertices
+    //     // --- 2. Transform Ray into Model Space ---
+    //     glm::mat4 invModelMatrix = glm::inverse(modelMatrix);
+    //     glm::vec4 ray_origin_model_h = invModelMatrix * glm::vec4(ray_origin_world, 1.0f);
+    //     glm::vec4 ray_direction_model_h = invModelMatrix * glm::vec4(ray_direction_world, 0.0f); // Direction needs 0.0
 
-        for (size_t i = 0; i < mesh->indices.size(); i += 3) {
-            unsigned int idx0 = mesh->indices[i];
-            unsigned int idx1 = mesh->indices[i + 1];
-            unsigned int idx2 = mesh->indices[i + 2];
+    //     glm::vec3 ray_origin_model = glm::vec3(ray_origin_model_h);
+    //     // IMPORTANT: Re-normalize direction after non-uniform scaling/shear in inverse transform
+    //     glm::vec3 ray_direction_model = glm::normalize(glm::vec3(ray_direction_model_h));
 
-            const glm::vec3 v0 = glm::vec3(mesh->vertices[idx0*3], mesh->vertices[idx0*3+1], mesh->vertices[idx0*3+2]);
-            const glm::vec3 v1 = glm::vec3(mesh->vertices[idx1*3], mesh->vertices[idx1*3+1], mesh->vertices[idx1*3+2]);
-            const glm::vec3 v2 = glm::vec3(mesh->vertices[idx2*3], mesh->vertices[idx2*3+1], mesh->vertices[idx2*3+2]);
 
-            float t;
-            // Use the MODEL SPACE ray and vertices
-            if (RayTriangleIntersect(ray_origin_model, ray_direction_model, v0, v1, v2, t)) {
-                // We need the distance 't' relative to the *original world ray* to compare across different meshes
-                // Transform the intersection point found in model space back to world space
-                glm::vec3 intersectionPointModel = ray_origin_model + ray_direction_model * t;
-                glm::vec3 intersectionPointWorldTemp = glm::vec3(modelMatrix * glm::vec4(intersectionPointModel, 1.0f));
+    //     // --- 3. Iterate through Triangles ---
+    //     bool mesh_hit = false;
+    //     float mesh_closest_t = std::numeric_limits<float>::max();
+    //     unsigned int mesh_hit_v0_idx = 0, mesh_hit_v1_idx = 0, mesh_hit_v2_idx = 0;
+    //     glm::vec3 hit_v0, hit_v1, hit_v2; // Keep track of hit triangle vertices
 
-                // Calculate distance from the world ray origin
-                // Use distance squared for comparison to avoid sqrt, only do sqrt at the end if needed
-                // Or more simply, recalculate 't' in world space (though less robust if model matrix has non-uniform scale)
-                // A simpler approximation (often good enough if transforms are rigid or uniform scale): Use model-space 't' for comparison.
-                // Let's recalculate world distance for accuracy:
-                float world_t = glm::distance(ray_origin_world, intersectionPointWorldTemp);
+    //     for (size_t i = 0; i < mesh->indices.size(); i += 3) {
+    //         unsigned int idx0 = mesh->indices[i];
+    //         unsigned int idx1 = mesh->indices[i + 1];
+    //         unsigned int idx2 = mesh->indices[i + 2];
 
-                // Check if this intersection is closer than previous hits *for this mesh*
-                // and closer than the overall closest hit found so far
-                if (world_t < closest_t) { // Found a new overall closest hit
-                    closest_t = world_t;
-                    closest_mesh = mesh;
-                    // Store the vertices and indices of this triangle
-                    mesh_hit_v0_idx = idx0;
-                    mesh_hit_v1_idx = idx1;
-                    mesh_hit_v2_idx = idx2;
-                    hit_v0 = v0; // Model space vertices
-                    hit_v1 = v1;
-                    hit_v2 = v2;
-                    closest_intersection_point_world = intersectionPointWorldTemp; // Store the exact world intersection point
-                    mesh_hit = true; // Mark that this mesh was hit
-                }
-            }
-        } // End triangle loop
+    //         const glm::vec3 v0 = glm::vec3(mesh->vertices[idx0*3], mesh->vertices[idx0*3+1], mesh->vertices[idx0*3+2]);
+    //         const glm::vec3 v1 = glm::vec3(mesh->vertices[idx1*3], mesh->vertices[idx1*3+1], mesh->vertices[idx1*3+2]);
+    //         const glm::vec3 v2 = glm::vec3(mesh->vertices[idx2*3], mesh->vertices[idx2*3+1], mesh->vertices[idx2*3+2]);
 
-        // --- 4. If this mesh contained the closest hit so far, find the closest vertex ---
-        if (mesh_hit && closest_mesh == mesh) {
-            // We already stored closest_intersection_point_world when updating closest_t
+    //         float t;
+    //         // Use the MODEL SPACE ray and vertices
+    //         if (RayTriangleIntersect(ray_origin_model, ray_direction_model, v0, v1, v2, t)) {
+    //             // We need the distance 't' relative to the *original world ray* to compare across different meshes
+    //             // Transform the intersection point found in model space back to world space
+    //             glm::vec3 intersectionPointModel = ray_origin_model + ray_direction_model * t;
+    //             glm::vec3 intersectionPointWorldTemp = glm::vec3(modelMatrix * glm::vec4(intersectionPointModel, 1.0f));
 
-            // Transform the vertices of the *hit triangle* to world space
-            glm::vec3 world_v0 = glm::vec3(modelMatrix * glm::vec4(hit_v0, 1.0f));
-            glm::vec3 world_v1 = glm::vec3(modelMatrix * glm::vec4(hit_v1, 1.0f));
-            glm::vec3 world_v2 = glm::vec3(modelMatrix * glm::vec4(hit_v2, 1.0f));
+    //             // Calculate distance from the world ray origin
+    //             // Use distance squared for comparison to avoid sqrt, only do sqrt at the end if needed
+    //             // Or more simply, recalculate 't' in world space (though less robust if model matrix has non-uniform scale)
+    //             // A simpler approximation (often good enough if transforms are rigid or uniform scale): Use model-space 't' for comparison.
+    //             // Let's recalculate world distance for accuracy:
+    //             float world_t = glm::distance(ray_origin_world, intersectionPointWorldTemp);
 
-            // Calculate squared distances from the intersection point to each vertex
-            float dist_sq_0 = glm::dot(world_v0 - closest_intersection_point_world, world_v0 - closest_intersection_point_world);
-            float dist_sq_1 = glm::dot(world_v1 - closest_intersection_point_world, world_v1 - closest_intersection_point_world);
-            float dist_sq_2 = glm::dot(world_v2 - closest_intersection_point_world, world_v2 - closest_intersection_point_world);
+    //             // Check if this intersection is closer than previous hits *for this mesh*
+    //             // and closer than the overall closest hit found so far
+    //             if (world_t < closest_t) { // Found a new overall closest hit
+    //                 closest_t = world_t;
+    //                 closest_mesh = mesh;
+    //                 // Store the vertices and indices of this triangle
+    //                 mesh_hit_v0_idx = idx0;
+    //                 mesh_hit_v1_idx = idx1;
+    //                 mesh_hit_v2_idx = idx2;
+    //                 hit_v0 = v0; // Model space vertices
+    //                 hit_v1 = v1;
+    //                 hit_v2 = v2;
+    //                 closest_intersection_point_world = intersectionPointWorldTemp; // Store the exact world intersection point
+    //                 mesh_hit = true; // Mark that this mesh was hit
+    //             }
+    //         }
+    //     } // End triangle loop
 
-            // Find the minimum distance and store the corresponding original vertex index
-            if (dist_sq_0 <= dist_sq_1 && dist_sq_0 <= dist_sq_2) {
-                closest_vertex_index = mesh_hit_v0_idx;
-            } else if (dist_sq_1 <= dist_sq_0 && dist_sq_1 <= dist_sq_2) {
-                closest_vertex_index = mesh_hit_v1_idx;
-            } else {
-                closest_vertex_index = mesh_hit_v2_idx;
-            }
-        }
-    } // End mesh loop
+    //     // --- 4. If this mesh contained the closest hit so far, find the closest vertex ---
+    //     if (mesh_hit && closest_mesh == mesh) {
+    //         // We already stored closest_intersection_point_world when updating closest_t
 
-    // --- 5. Set output parameters and return ---
-    if (closest_mesh != nullptr) {
-        outHitMesh = closest_mesh;
-        outHitVertexIndex = closest_vertex_index;
-        outIntersectionPointWorld = closest_intersection_point_world; // Set the final intersection point
-        // Debug output (optional)
-        // std::cout << "Hit Mesh: " << outHitMesh->name
-        //           << ", Vertex Index: " << outHitVertexIndex
-        //           << ", Intersection Point: (" << outIntersectionPointWorld.x << ", "
-        //           << outIntersectionPointWorld.y << ", " << outIntersectionPointWorld.z << ")" << std::endl;
-        return true;
-    }
+    //         // Transform the vertices of the *hit triangle* to world space
+    //         glm::vec3 world_v0 = glm::vec3(modelMatrix * glm::vec4(hit_v0, 1.0f));
+    //         glm::vec3 world_v1 = glm::vec3(modelMatrix * glm::vec4(hit_v1, 1.0f));
+    //         glm::vec3 world_v2 = glm::vec3(modelMatrix * glm::vec4(hit_v2, 1.0f));
+
+    //         // Calculate squared distances from the intersection point to each vertex
+    //         float dist_sq_0 = glm::dot(world_v0 - closest_intersection_point_world, world_v0 - closest_intersection_point_world);
+    //         float dist_sq_1 = glm::dot(world_v1 - closest_intersection_point_world, world_v1 - closest_intersection_point_world);
+    //         float dist_sq_2 = glm::dot(world_v2 - closest_intersection_point_world, world_v2 - closest_intersection_point_world);
+
+    //         // Find the minimum distance and store the corresponding original vertex index
+    //         if (dist_sq_0 <= dist_sq_1 && dist_sq_0 <= dist_sq_2) {
+    //             closest_vertex_index = mesh_hit_v0_idx;
+    //         } else if (dist_sq_1 <= dist_sq_0 && dist_sq_1 <= dist_sq_2) {
+    //             closest_vertex_index = mesh_hit_v1_idx;
+    //         } else {
+    //             closest_vertex_index = mesh_hit_v2_idx;
+    //         }
+    //     }
+    // } // End mesh loop
+
+    // // --- 5. Set output parameters and return ---
+    // if (closest_mesh != nullptr) {
+    //     outHitMesh = closest_mesh;
+    //     outHitVertexIndex = closest_vertex_index;
+    //     outIntersectionPointWorld = closest_intersection_point_world; // Set the final intersection point
+    //     // Debug output (optional)
+    //     // std::cout << "Hit Mesh: " << outHitMesh->name
+    //     //           << ", Vertex Index: " << outHitVertexIndex
+    //     //           << ", Intersection Point: (" << outIntersectionPointWorld.x << ", "
+    //     //           << outIntersectionPointWorld.y << ", " << outIntersectionPointWorld.z << ")" << std::endl;
+    //     return true;
+    // }
 
     return false; // No intersection found
 }

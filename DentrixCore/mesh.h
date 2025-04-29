@@ -12,9 +12,6 @@
 class Mesh {
   public:
     pmp::SurfaceMesh mesh;
-    std::vector<float> vertices = {};
-    std::vector<float> normals = {};
-    std::vector<unsigned int> indices = {};
     std::string name;
     // Needed to reset model back to origin
     glm::vec3 center;
@@ -26,7 +23,6 @@ class Mesh {
 
     static bool drawBoundingBox;
 
-    Mesh(aiMesh* aimesh, glm::vec3 center, QOpenGLFunctions_3_3_Core* gl);
     Mesh(pmp::SurfaceMesh& mesh, QOpenGLFunctions_3_3_Core* gl);
     ~Mesh();
 
@@ -46,6 +42,7 @@ class Mesh {
   private:
     unsigned int VAO, VBO_pos, VBO_norm, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;
+    unsigned int numIndices;
     QOpenGLFunctions_3_3_Core* gl;
     float currentScale = 1.0f;
 

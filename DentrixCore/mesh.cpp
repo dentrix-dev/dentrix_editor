@@ -8,68 +8,6 @@
 
 bool Mesh::drawBoundingBox = true;
 
-Mesh::Mesh(aiMesh *aimesh, glm::vec3 scene_center, QOpenGLFunctions_3_3_Core* gl) {
-    this->gl = gl;
-
-    // Create a PMP vertex property for position
-    mesh.vertex_property<pmp::Point>("v:point");
-    auto vnormals = mesh.vertex_property<pmp::Normal>("v:normal");
-
-    // Map to keep track of added vertices
-    std::vector<pmp::Vertex> vertexHandles;
-    vertexHandles.reserve(aimesh->mNumVertices);
-    vertices.reserve(aimesh->mNumVertices * 3);
-    normals.reserve(aimesh->mNumVertices * 3);
-
-    // 1. Add all vertices
-    for (unsigned int i = 0; i < aimesh->mNumVertices; ++i) {
-        aiVector3D v = aimesh->mVertices[i];
-        pmp::Point pos(v.x - scene_center.x, v.y - scene_center.y, v.z - scene_center.z);
-        pmp::Vertex vh = mesh.add_vertex(pos);
-        vertexHandles.push_back(vh);
-
-        vertices.push_back(pos[0]);
-        vertices.push_back(pos[1]);
-        vertices.push_back(pos[2]);
-
-        // Handle normals
-        pmp::Normal n(0, 0, 0);
-        if (aimesh->HasNormals()) {
-            aiVector3D aiN = aimesh->mNormals[i];
-            n = pmp::Normal(aiN.x, aiN.y, aiN.z);
-        }
-        vnormals[vh] = n;
-
-        normals.push_back(n[0]);
-        normals.push_back(n[1]);
-        normals.push_back(n[2]);
-    }
-
-    indices.reserve(aimesh->mNumFaces * 3);
-
-    for (unsigned int i = 0; i < aimesh->mNumFaces; ++i) {
-        const aiFace& face = aimesh->mFaces[i];
-        if (face.mNumIndices == 3) {
-            std::vector<pmp::Vertex> faceVerts;
-            for (unsigned int j = 0; j < 3; ++j) {
-                unsigned int idx = face.mIndices[j];
-                faceVerts.push_back(vertexHandles[idx]);
-                indices.push_back(idx); // OpenGL index buffer
-            }
-            mesh.add_face(faceVerts);
-        }
-    }
-
-    const aiAABB &aabb = aimesh->mAABB;
-    aabb_min = glm::vec3(aabb.mMin.x-scene_center.x,aabb.mMin.y-scene_center.y,aabb.mMin.z-scene_center.z);
-    aabb_max = glm::vec3(aabb.mMax.x-scene_center.x,aabb.mMax.y-scene_center.y,aabb.mMax.z-scene_center.z);
-    center = 0.5f * (aabb_min + aabb_max);
-    name = aimesh->mName.C_Str();
-
-    setup();
-    setupBoundingBox();
-}
-
 Mesh::Mesh(pmp::SurfaceMesh& input_mesh, QOpenGLFunctions_3_3_Core* gl) {
     this->gl = gl;
     mesh = input_mesh;
@@ -81,12 +19,21 @@ Mesh::Mesh(pmp::SurfaceMesh& input_mesh, QOpenGLFunctions_3_3_Core* gl) {
     aabb_max = Utils::pmpPointToGlm(aabb.max());
     center = 0.5f * (aabb_min + aabb_max);
 
+    setup();
+    setupBoundingBox();
+}
+
+Mesh::~Mesh() {
+
+}
+
+void Mesh::setup() {
     auto vpos = mesh.vertex_property<pmp::Point>("v:point");
     auto fnormal = mesh.face_property<pmp::Normal>("f:normal");
 
-    vertices.clear();
-    normals.clear();
-    indices.clear();
+    std::vector<float> vertices = {};
+    std::vector<float> normals = {};
+    std::vector<unsigned int> indices = {};
 
     unsigned int index = 0;
     for (auto f : mesh.faces()) {
@@ -116,15 +63,8 @@ Mesh::Mesh(pmp::SurfaceMesh& input_mesh, QOpenGLFunctions_3_3_Core* gl) {
             qWarning() << "Non-triangular face detected!";
         }
     }
-    setup();
-    setupBoundingBox();
-}
+    numIndices = indices.size();
 
-Mesh::~Mesh() {
-
-}
-
-void Mesh::setup() {
     gl->glGenVertexArrays(1, &VAO);
     gl->glGenBuffers(1, &VBO_pos);
     gl->glGenBuffers(1, &VBO_norm);
@@ -146,7 +86,7 @@ void Mesh::setup() {
 
     // --- Element Buffer
     gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     gl->glBindVertexArray(0);
 }
@@ -204,6 +144,101 @@ void Mesh::setupBoundingBox() {
     // Optional: Unbind VBO and EBO after VAO is unbound. VAO remembers these bindings.
     // gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
     // gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Mesh::updateBuffers() {
+    auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+    auto fnormal = mesh.face_property<pmp::Normal>("f:normal");
+
+    std::vector<float> vertices = {};
+    std::vector<float> normals = {};
+    std::vector<unsigned int> indices = {};
+
+    unsigned int index = 0;
+    for (auto f : mesh.faces()) {
+        pmp::Normal n = fnormal[f];
+        std::vector<unsigned int> faceIndices;
+
+        for (auto v : mesh.vertices(f)) {
+            pmp::Point p = vpos[v];
+
+            vertices.push_back(p[0] - center.x);
+            vertices.push_back(p[1] - center.y);
+            vertices.push_back(p[2] - center.z);
+
+            normals.push_back(n[0]);
+            normals.push_back(n[1]);
+            normals.push_back(n[2]);
+
+            faceIndices.push_back(index++);
+        }
+
+        if (faceIndices.size() == 3) {
+            indices.push_back(faceIndices[0]);
+            indices.push_back(faceIndices[1]);
+            indices.push_back(faceIndices[2]);
+        }
+        else {
+            qWarning() << "Non-triangular face detected!";
+        }
+    }
+    numIndices = indices.size();
+
+    // Update position buffer
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
+
+    // Update normal buffer
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
+    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, normals.size() * sizeof(float), normals.data());
+
+    // Update indices buffer
+    gl->glBindBuffer(GL_ARRAY_BUFFER, EBO);
+    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), indices.data());
+
+    // Unbind buffers
+    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Mesh::draw() {
+    gl->glBindVertexArray(VAO);
+    gl->glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
+    gl->glBindVertexArray(0);
+
+    if (drawBoundingBox) {
+        gl->glBindVertexArray(VAO_BB);
+        // Draw 12 lines using the 24 indices provided
+        gl->glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+        gl->glBindVertexArray(0);
+    }
+}
+
+void Mesh::setScale(float scaleFactor)
+{
+    currentScale = scaleFactor;
+    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
+}
+
+void Mesh::setScaleDirectional(float x, float y, float z)
+{
+    directionalScaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, z));
+}
+
+void Mesh::updateMeshScale(glm::vec3 sceneCenter)
+{
+    pmp::Point center = pmp::centroid(mesh);
+    // pmp::Point center = Utils::glmToPmpPoint(sceneCenter);
+    // Scale vertices around center
+    for (auto v : mesh.vertices())
+    {
+        pmp::Point p = mesh.position(v);
+        p = center + (p - center) * currentScale;
+        mesh.position(v) = p;
+    }
+    pmp::face_normals(mesh);
+    pmp::vertex_normals(mesh);
+    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    updateBuffers();
 }
 
 bool Mesh::testRayOBBIntersection(
@@ -309,83 +344,4 @@ bool Mesh::testRayOBBIntersection(
 
     intersection_distance = tMin;
     return true;
-}
-
-void Mesh::draw() {
-    gl->glBindVertexArray(VAO);
-    gl->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    gl->glBindVertexArray(0);
-
-    if (drawBoundingBox) {
-        gl->glBindVertexArray(VAO_BB);
-        // Draw 12 lines using the 24 indices provided
-        gl->glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
-        gl->glBindVertexArray(0);
-    }
-}
-
-void Mesh::updateBuffers() {
-    // Get properties from the mesh
-    auto vpos = mesh.get_vertex_property<pmp::Point>("v:point");
-    auto vnormals = mesh.get_vertex_property<pmp::Normal>("v:normal");
-
-    // Update OpenGL buffers
-    vertices.clear();
-    normals.clear();
-    vertices.reserve(mesh.n_vertices() * 3);
-    normals.reserve(mesh.n_vertices() * 3);
-
-    // Loop over all vertices in the mesh to update positions and normals
-    for (auto v : mesh.vertices()) {
-        // Update positions in OpenGL
-        const auto& p = vpos[v];
-        vertices.push_back(p[0]);
-        vertices.push_back(p[1]);
-        vertices.push_back(p[2]);
-
-        // Update normals in OpenGL
-        const auto& n = vnormals[v];
-        normals.push_back(n[0]);
-        normals.push_back(n[1]);
-        normals.push_back(n[2]);
-    }
-
-    // Update position buffer
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
-    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
-
-    // Update normal buffer
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
-    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, normals.size() * sizeof(float), normals.data());
-
-    // Unbind buffers
-    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void Mesh::setScale(float scaleFactor)
-{
-    currentScale = scaleFactor;
-    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
-}
-
-void Mesh::setScaleDirectional(float x, float y, float z)
-{
-    directionalScaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, z));
-}
-
-void Mesh::updateMeshScale(glm::vec3 sceneCenter)
-{
-    pmp::Point center = pmp::centroid(mesh);
-    // pmp::Point center = Utils::glmToPmpPoint(sceneCenter);
-    // Scale vertices around center
-    for (auto v : mesh.vertices())
-    {
-        pmp::Point p = mesh.position(v);
-        p = center + (p - center) * currentScale;
-        mesh.position(v) = p;
-    }
-    pmp::face_normals(mesh);
-    pmp::vertex_normals(mesh);
-    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    updateBuffers();
 }
