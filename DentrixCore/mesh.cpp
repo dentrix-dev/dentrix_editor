@@ -24,8 +24,8 @@ Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name, QOpenGLFunctions_3_3_
     center = 0.5f * (aabb_min + aabb_max);
 
     // Update bounding box
-    aabb_min -= center;
-    aabb_max -= center;
+    // aabb_min -= center;
+    // aabb_max -= center;
 
     setup();
     setupBoundingBox();
@@ -51,9 +51,9 @@ void Mesh::setup() {
         for (auto v : mesh.vertices(f)) {
             pmp::Point p = vpos[v];
 
-            vertices.push_back(p[0] - center.x);
-            vertices.push_back(p[1] - center.y);
-            vertices.push_back(p[2] - center.z);
+            vertices.push_back(p[0]);
+            vertices.push_back(p[1]);
+            vertices.push_back(p[2]);
 
             normals.push_back(n[0]);
             normals.push_back(n[1]);
@@ -162,9 +162,9 @@ void Mesh::updateVerticesBuffer() {
     for (auto f : mesh.faces()) {
         for (auto v : mesh.vertices(f)) {
             pmp::Point p = vpos[v];
-            vertices.push_back(p[0] - center.x);
-            vertices.push_back(p[1] - center.y);
-            vertices.push_back(p[2] - center.z);
+            vertices.push_back(p[0]);
+            vertices.push_back(p[1]);
+            vertices.push_back(p[2]);
         }
     }
     std::cout << "vector generated" << std::endl;
@@ -191,9 +191,9 @@ void Mesh::updateBuffers() {
         for (auto v : mesh.vertices(f)) {
             pmp::Point p = vpos[v];
 
-            vertices.push_back(p[0] - center.x);
-            vertices.push_back(p[1] - center.y);
-            vertices.push_back(p[2] - center.z);
+            vertices.push_back(p[0]);
+            vertices.push_back(p[1]);
+            vertices.push_back(p[2]);
 
             normals.push_back(n[0]);
             normals.push_back(n[1]);
