@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <pmp/io/io.h>
 #include <pmp/surface_mesh.h>
+#include "utils.h"
 #include "filehandler.h"
 
 
@@ -90,11 +91,19 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
     std::vector<Mesh*> fileMeshes = FileHandler::readOBJ(path, gl);
     std::cout << fileMeshes.size() << std::endl;
 
-    std::vector<Mesh*> meshes;
-    meshes.push_back(new Mesh(surfaceMesh, "tooth0", gl));
-    // for (int i=0; i<numMeshes; i++) {
-    //     meshes.push_back(new Mesh(scene->mMeshes[i], center, gl));
-    // }
+    glm::vec3 sceneCenter(0.0f);
+    for (int i=0; i<fileMeshes.size(); i++) {
+        sceneCenter += fileMeshes[i]->center;
+    }
+    sceneCenter /= (float)fileMeshes.size();
+    for (int i=0; i<fileMeshes.size(); i++) {
+        for (auto v : fileMeshes[i]->mesh.vertices()) {
+            fileMeshes[i]->mesh.position(v) -= Utils::glmToPmpPoint(sceneCenter);
+        }
+        fileMeshes[i]->aabb_max -= sceneCenter;
+        fileMeshes[i]->aabb_min -= sceneCenter;
+        fileMeshes[i]->updateBuffers();
+    }
     return fileMeshes;
 }
 
