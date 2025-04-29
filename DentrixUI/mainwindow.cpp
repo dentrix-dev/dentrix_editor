@@ -59,6 +59,10 @@ void MainWindow::loadModel()
             centralLayout->addWidget(glWidget, 1);
 
             rightPanelStack = new RightPanelStackedWidget(glWidget);
+            Q_ASSERT(rightPanelStack->uniformScalePanel);
+            Q_ASSERT(rightPanelStack->directionalScalePanel);
+            connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->uniformScalePanel, &UniformScalePanelWidget::onQActionGroupTriggered);
+            connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->directionalScalePanel, &DirectionalScalePanelWidget::onQActionGroupTriggered);
 
             // Add to layout
             centralLayout->addWidget(rightPanelStack);

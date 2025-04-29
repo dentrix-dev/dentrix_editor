@@ -1,7 +1,4 @@
 #include "rightpanelstackedwidget.h"
-#include "Widgets/ToolPanelWidgets/uniformscalepanelwidget.h"
-#include "Widgets/ToolPanelWidgets/directionalscalepanelwidget.h"
-#include "Widgets/ToolPanelWidgets/deformationpanelwidget.h"
 #include <QVBoxLayout>
 #include <QLabel>
 
@@ -14,11 +11,11 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget *glWidget):
     emptyLayout->addStretch();
 
 
-    UniformScalePanelWidget* uniformScalePanel = new UniformScalePanelWidget(glWidget);
+    uniformScalePanel = new UniformScalePanelWidget(glWidget);
 
-    DirectionalScalePanelWidget* directionalScalePanel = new DirectionalScalePanelWidget(glWidget);
+    directionalScalePanel = new DirectionalScalePanelWidget(glWidget);
 
-    DeformationPanelWidget* deformationPanel = new DeformationPanelWidget(glWidget);
+    deformationPanel = new DeformationPanelWidget(glWidget);
 
 
     // Add panels to the stack

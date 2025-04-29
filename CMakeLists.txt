@@ -42,6 +42,8 @@ set(CORE_SOURCES
     DentrixCore/camera.h
     DentrixCore/mesh.cpp
     DentrixCore/mesh.h
+    DentrixCore/utils.cpp
+    DentrixCore/utils.h
 )
 
 set(PROJECT_SOURCES

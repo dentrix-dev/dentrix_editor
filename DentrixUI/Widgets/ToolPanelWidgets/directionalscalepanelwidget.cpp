@@ -1,6 +1,5 @@
 #include "directionalscalepanelwidget.h"
 #include "QBoxLayout"
-#include "QSlider"
 #include "QLabel"
 #include "QCheckBox"
 
@@ -10,10 +9,10 @@ DirectionalScalePanelWidget::DirectionalScalePanelWidget(GLWidget *glWidget)
 {
     QVBoxLayout* viewLayout = new QVBoxLayout(this);
     viewLayout->addWidget(new QLabel("Directional Scale"));
-    QSlider *directionalScaleSlider = new QSlider(Qt::Horizontal);
-    directionalScaleSlider->setMinimum(5);    // Maps to 0.1
-    directionalScaleSlider->setMaximum(20);   // Maps to 5.0
-    directionalScaleSlider->setValue(10);     // e.g., 1.0
+    directionalScaleSlider = new QSlider(Qt::Horizontal);
+    directionalScaleSlider->setMinimum(5);    // Maps to 0.5
+    directionalScaleSlider->setMaximum(15);   // Maps to 1.5
+    directionalScaleSlider->setValue(10);     // Maps to 1.0
     viewLayout->addWidget(directionalScaleSlider);
     QCheckBox* xCheckBox = new QCheckBox("X");
     QCheckBox* yCheckBox = new QCheckBox("Y");
@@ -30,3 +29,11 @@ DirectionalScalePanelWidget::DirectionalScalePanelWidget(GLWidget *glWidget)
     });
     viewLayout->addStretch();
 }
+
+void DirectionalScalePanelWidget::onQActionGroupTriggered(QAction *action)
+{
+    std::cout<<__func__<<std::endl;
+    directionalScaleSlider->setValue(10);
+}
+
+

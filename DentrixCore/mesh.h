@@ -40,7 +40,7 @@ class Mesh {
     );
     void draw();
     void updateBuffers();
-    void updateMeshScale();
+    void updateMeshScale(glm::vec3 sceneCenter);
 
   private:
     unsigned int VAO, VBO_pos, VBO_norm, EBO;

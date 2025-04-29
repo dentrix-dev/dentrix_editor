@@ -13,7 +13,7 @@
 #include <glm/trigonometric.hpp>
 #include <pmp/surface_mesh.h>
 #include <pmp/io/io.h>
-
+#include <iostream>
 
 GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {
 }
@@ -222,7 +222,9 @@ void GLWidget::onEditSceneClicked()
 
 void GLWidget::setSelectedMeshScale(int scale)
 {
-    float scaleF = scale/10.0;
+    // std::cout<<"scale :"<<scale<<std::end;
+    float scaleF = scale/10.0f;
+    std::cout <<"scaleF :"<< scaleF<<std::endl;
     // std::cout<<"scale: "<<scaleF<<std::endl;
     if (selectedMesh != nullptr) {
         selectedMesh->setScale(scaleF);
@@ -233,7 +235,7 @@ void GLWidget::setSelectedMeshScale(int scale)
 void GLWidget::updateMeshScale()
 {
     if (selectedMesh != nullptr) {
-        selectedMesh->updateMeshScale();
+        selectedMesh->updateMeshScale(currentScene->center);
         update();
     }
 }
