@@ -13,11 +13,19 @@ Mesh::Mesh(pmp::SurfaceMesh& input_mesh, QOpenGLFunctions_3_3_Core* gl) {
     mesh = input_mesh;
     name = "tooth0";
 
+    // Calculate per-face normals for vertices
+    // (vertex has a normal for each face it's a part of)
     pmp::face_normals(mesh);
+
+    // Calculate mesh bounding box and center
     pmp::BoundingBox aabb = pmp::bounds(mesh);
     aabb_min = Utils::pmpPointToGlm(aabb.min());
     aabb_max = Utils::pmpPointToGlm(aabb.max());
     center = 0.5f * (aabb_min + aabb_max);
+
+    // Update bounding box
+    aabb_min -= center;
+    aabb_max -= center;
 
     setup();
     setupBoundingBox();
@@ -146,6 +154,27 @@ void Mesh::setupBoundingBox() {
     // gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void Mesh::updateVerticesBuffer() {
+    auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+    std::vector<float> vertices;
+    vertices.reserve(mesh.n_faces() * 3 * 3);
+
+    for (auto f : mesh.faces()) {
+        for (auto v : mesh.vertices(f)) {
+            pmp::Point p = vpos[v];
+            vertices.push_back(p[0] - center.x);
+            vertices.push_back(p[1] - center.y);
+            vertices.push_back(p[2] - center.z);
+        }
+    }
+    std::cout << "vector generated" << std::endl;
+    // Update position buffer
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), nullptr, GL_DYNAMIC_DRAW); // orphan old buffer
+    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
+    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Mesh::updateBuffers() {
     auto vpos = mesh.vertex_property<pmp::Point>("v:point");
     auto fnormal = mesh.face_property<pmp::Normal>("f:normal");
@@ -183,6 +212,7 @@ void Mesh::updateBuffers() {
         }
     }
     numIndices = indices.size();
+    std::cout << "vectors generated" << std::endl;
 
     // Update position buffer
     gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
