@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <pmp/io/io.h>
 #include <pmp/surface_mesh.h>
+#include "filehandler.h"
 
 
 //toDO: refactor later into a utils class
@@ -86,13 +87,15 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
 
     pmp::SurfaceMesh surfaceMesh;
     pmp::read(surfaceMesh, path);
+    std::vector<Mesh*> fileMeshes = FileHandler::readOBJ(path, gl);
+    std::cout << fileMeshes.size() << std::endl;
 
     std::vector<Mesh*> meshes;
-    meshes.push_back(new Mesh(surfaceMesh, gl));
+    meshes.push_back(new Mesh(surfaceMesh, "tooth0", gl));
     // for (int i=0; i<numMeshes; i++) {
     //     meshes.push_back(new Mesh(scene->mMeshes[i], center, gl));
     // }
-    return meshes;
+    return fileMeshes;
 }
 
 bool Scene::RayTriangleIntersect(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, float &outIntersectionDistance) {
