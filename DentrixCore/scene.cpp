@@ -7,6 +7,8 @@
 #include "scene.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <pmp/io/io.h>
+#include <pmp/surface_mesh.h>
 
 
 //toDO: refactor later into a utils class
@@ -82,10 +84,14 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
     }
     center = center / (float)numMeshes;
 
+    pmp::SurfaceMesh surfaceMesh;
+    pmp::read(surfaceMesh, path);
+
     std::vector<Mesh*> meshes;
-    for (int i=0; i<numMeshes; i++) {
-        meshes.push_back(new Mesh(scene->mMeshes[i], center, gl));
-    }
+    meshes.push_back(new Mesh(surfaceMesh, gl));
+    // for (int i=0; i<numMeshes; i++) {
+    //     meshes.push_back(new Mesh(scene->mMeshes[i], center, gl));
+    // }
     return meshes;
 }
 
