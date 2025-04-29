@@ -13,6 +13,7 @@ UniformScalePanelWidget::UniformScalePanelWidget(GLWidget *glWidget)
     uniformScaleSlider->setValue(10);     // Maps to 1
     connect(uniformScaleSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshScale);
     connect(uniformScaleSlider, &QSlider::sliderReleased, glWidget, &GLWidget::updateMeshScale);
+    connect(uniformScaleSlider, &QSlider::sliderReleased, this, &UniformScalePanelWidget::resetSlider);
     editLayout->addWidget(uniformScaleSlider);
     editLayout->addStretch();
 }
@@ -22,3 +23,9 @@ void UniformScalePanelWidget::onQActionGroupTriggered(QAction *action)
     std::cout<<__func__<<std::endl;
     uniformScaleSlider->setValue(10);
 }
+
+void UniformScalePanelWidget::resetSlider()
+{
+    uniformScaleSlider->setValue(10);
+}
+

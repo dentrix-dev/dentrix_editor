@@ -16,6 +16,7 @@ signals:
 
 public slots:
     void onQActionGroupTriggered(QAction* action);
+    void resetSlider();
 
 };
 

@@ -27,6 +27,9 @@ DirectionalScalePanelWidget::DirectionalScalePanelWidget(GLWidget *glWidget)
 
         glWidget->setSelectedMeshDirectionalScale(value, xEnabled, yEnabled, zEnabled);
     });
+    connect(directionalScaleSlider, &QSlider::sliderReleased, this, [=]() {
+        directionalScaleSlider->setValue(10);
+    });
     viewLayout->addStretch();
 }
 
