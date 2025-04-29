@@ -63,9 +63,16 @@ void GLWidget::initializeGL()
     update();
     std::cout << "mesh loaded" << std::endl;
     std::cout << currentScene->meshes[0]->mesh.n_vertices() << std::endl;
-    std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
-    std::cout << currentScene->meshes[0]->normals.size() << std::endl;
-    std::cout << currentScene->meshes[0]->indices.size() << std::endl;
+    int bounds = 0;
+    for (pmp::Halfedge h : currentScene->meshes[0]->mesh.halfedges()) {
+        if (currentScene->meshes[0]->mesh.is_boundary(h)) {
+            bounds++;
+        }
+    }
+    std::cout << bounds << std::endl;
+    // std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
+    // std::cout << currentScene->meshes[0]->normals.size() << std::endl;
+    // std::cout << currentScene->meshes[0]->indices.size() << std::endl;
 }
 
 void GLWidget::resizeGL(int w, int h)
