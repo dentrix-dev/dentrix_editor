@@ -36,6 +36,7 @@ class Mesh {
         float& intersection_distance // Output : distance between ray_origin and the intersection with the OBB
     );
     void draw();
+    void updateVerticesBuffer();
     void updateBuffers();
     void updateMeshScale(glm::vec3 sceneCenter);
 
