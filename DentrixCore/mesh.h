@@ -38,6 +38,7 @@ class Mesh {
     void draw();
     void updateVerticesBuffer();
     void updateBuffers();
+    void updateBoundingBoxBuffers();
     void updateMeshScale(glm::vec3 sceneCenter);
 
   private:
