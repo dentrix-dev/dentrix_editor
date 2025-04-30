@@ -69,6 +69,7 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
     std::vector<Mesh*> fileMeshes = FileHandler::readOBJ(path, gl);
     std::cout << fileMeshes.size() << std::endl;
 
+    // Translate all meshes to the center of the scene
     glm::vec3 sceneCenter(0.0f);
     for (int i=0; i<fileMeshes.size(); i++) {
         sceneCenter += fileMeshes[i]->center;
@@ -78,6 +79,7 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
         for (auto v : fileMeshes[i]->mesh.vertices()) {
             fileMeshes[i]->mesh.position(v) -= Utils::glmToPmpPoint(sceneCenter);
         }
+        fileMeshes[i]->center -= sceneCenter;
         fileMeshes[i]->aabb_max -= sceneCenter;
         fileMeshes[i]->aabb_min -= sceneCenter;
         fileMeshes[i]->updateBoundingBoxBuffers();
