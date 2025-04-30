@@ -2,8 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
 #include "scene.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -68,26 +66,6 @@ glm::vec3 Scene::getMeshesCenter() {
 // PMP doesn't support loading multiple separate objects from .obj files
 // Objects are loaded using Assimp and PMP meshes are constructed manually
 std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl) {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_GenBoundingBoxes);
-
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-    }
-
-    // Get scene center
-    unsigned int numMeshes = scene->mNumMeshes;
-    glm::vec3 center(0.0f);
-    for (int i=0; i < numMeshes; i++) {
-        const aiAABB &aabb = scene->mMeshes[i]->mAABB;
-        glm::vec3 aabb_min = glm::vec3(aabb.mMin.x,aabb.mMin.y,aabb.mMin.z);
-        glm::vec3 aabb_max = glm::vec3(aabb.mMax.x,aabb.mMax.y,aabb.mMax.z);
-        center += 0.5f * (aabb_min + aabb_max);
-    }
-    center = center / (float)numMeshes;
-
-    pmp::SurfaceMesh surfaceMesh;
-    pmp::read(surfaceMesh, path);
     std::vector<Mesh*> fileMeshes = FileHandler::readOBJ(path, gl);
     std::cout << fileMeshes.size() << std::endl;
 
@@ -102,6 +80,7 @@ std::vector<Mesh*> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core*
         }
         fileMeshes[i]->aabb_max -= sceneCenter;
         fileMeshes[i]->aabb_min -= sceneCenter;
+        fileMeshes[i]->updateBoundingBoxBuffers();
         fileMeshes[i]->updateBuffers();
     }
     return fileMeshes;

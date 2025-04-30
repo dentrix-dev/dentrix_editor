@@ -154,6 +154,25 @@ void Mesh::setupBoundingBox() {
     // gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void Mesh::updateBoundingBoxBuffers() {
+    std::vector<glm::vec3> bb_vertices;
+    bb_vertices.resize(8);
+
+    bb_vertices[0] = glm::vec3(aabb_min.x, aabb_min.y, aabb_min.z); // 0 --- Near bottom left
+    bb_vertices[1] = glm::vec3(aabb_max.x, aabb_min.y, aabb_min.z); // 1 --= Near bottom right
+    bb_vertices[2] = glm::vec3(aabb_max.x, aabb_max.y, aabb_min.z); // 2 -=- Near top right
+    bb_vertices[3] = glm::vec3(aabb_min.x, aabb_max.y, aabb_min.z); // 3 --- Near top left
+    bb_vertices[4] = glm::vec3(aabb_min.x, aabb_min.y, aabb_max.z); // 4 --- Far bottom left
+    bb_vertices[5] = glm::vec3(aabb_max.x, aabb_min.y, aabb_max.z); // 5 --= Far bottom right
+    bb_vertices[6] = glm::vec3(aabb_max.x, aabb_max.y, aabb_max.z); // 6 -=- Far top right
+    bb_vertices[7] = glm::vec3(aabb_min.x, aabb_max.y, aabb_max.z); // 7 --- Far top left
+
+    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
+    // Use bb_vertices data and size. Note the size calculation uses sizeof(glm::vec3)
+    gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
+    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Mesh::updateVerticesBuffer() {
     auto vpos = mesh.vertex_property<pmp::Point>("v:point");
     std::vector<float> vertices;
