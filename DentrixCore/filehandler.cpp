@@ -33,27 +33,16 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string &filepath, QOpenGLFunctions_
 
         if (prefix == "o") {
             if (!name.empty()) {
-                std::cout << "Saving mesh: " << name << std::endl;
-                std::cout << "vertices: " << vertices[0] << vertices[1] << vertices[2] << std::endl;
-                std::cout << vertices.size() << std::endl;
-                std::cout << indices.size() << std::endl;
                 vertexIndex += vertices.size() / 3;
 
                 pmp::SurfaceMesh surfaceMesh;
                 for (int i=0; i<vertices.size(); i=i+3) {
                     vhandles.push_back(surfaceMesh.add_vertex(pmp::Point(vertices[i],vertices[i+1],vertices[i+2])));
                 }
-                std::cout << "vertices added" << std::endl;
                 for (int i=0; i<indices.size(); i=i+3) {
                     std::vector<pmp::Vertex> faceVertices = {vhandles[indices[i]],vhandles[indices[i+1]],vhandles[indices[i+2]]};
-                    if (i == 0) {
-                        std::cout << "fv: " << faceVertices[0] << " " << faceVertices[1] << " " << faceVertices[2] << std::endl;
-                    }
-                    if (faceVertices.size() != 3)
-                        std::cout << "size: " << faceVertices.size() << std::endl;
                     surfaceMesh.add_face(faceVertices);
                 }
-                std::cout << "faces added" << std::endl;
 
                 meshes.push_back(new Mesh(surfaceMesh, name, gl));
                 vhandles.clear();

@@ -186,7 +186,6 @@ void Mesh::updateVerticesBuffer() {
             vertices.push_back(p[2]);
         }
     }
-    std::cout << "vector generated" << std::endl;
     // Update position buffer
     gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
     gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), nullptr, GL_DYNAMIC_DRAW); // orphan old buffer
@@ -231,7 +230,6 @@ void Mesh::updateBuffers() {
         }
     }
     numIndices = indices.size();
-    std::cout << "vectors generated" << std::endl;
 
     // Update position buffer
     gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
