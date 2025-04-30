@@ -1,6 +1,7 @@
 #include <iostream>
 #include "glwidget.h"
 #include "mainwindow.h"
+#include "pmp/types.h"
 #include "scene.h"
 #include "shader.h"
 #include <glm/glm.hpp>
@@ -103,7 +104,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection, rayDirection);
 
     Mesh* hitMesh = nullptr;
-    unsigned int hitVertexIndex;
+    pmp::Vertex hitVertexIndex;
     glm::vec3 intersectionPoint;
     bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex, intersectionPoint);
 

@@ -28,7 +28,7 @@ class Scene {
         glm::vec3 ray_direction_world,      // Ray direction in world space (normalized)
         glm::mat4 sceneMatrix,              // Base scene transform (applied before mesh transforms)
         Mesh*& outHitMesh,                  // Output: Pointer to the hit mesh
-        unsigned int& outHitVertexIndex,    // Output: Index of the closest vertex in the hit mesh
+        pmp::Vertex& outHitVertexIndex,    // Output: Index of the closest vertex in the hit mesh
         glm::vec3& outIntersectionPointWorld // Output: Exact intersection point in world space
         );
 
