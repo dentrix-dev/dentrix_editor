@@ -7,7 +7,6 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <vector>
 #include <pmp/surface_mesh.h>
-#include <assimp/scene.h>
 
 class Mesh {
   public:

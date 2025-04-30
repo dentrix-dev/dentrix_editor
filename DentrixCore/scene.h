@@ -1,5 +1,4 @@
 #pragma once
-#include <assimp/scene.h>
 #include <vector>
 #include "glm/glm.hpp"
 #include <string>
