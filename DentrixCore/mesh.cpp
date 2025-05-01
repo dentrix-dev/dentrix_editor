@@ -233,15 +233,15 @@ void Mesh::updateBuffers() {
 
     // Update position buffer
     gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
-    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
+    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
     // Update normal buffer
     gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
-    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, normals.size() * sizeof(float), normals.data());
+    gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_DYNAMIC_DRAW);
 
     // Update indices buffer
-    gl->glBindBuffer(GL_ARRAY_BUFFER, EBO);
-    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), indices.data());
+    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
     // Unbind buffers
     gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
