@@ -19,6 +19,8 @@ CPMAddPackage(
     NAME mcg
     GIT_REPOSITORY https://github.com/dentrix-dev/mcg.git
     GIT_TAG master
+    OPTIONS
+        "MCG_BUILD_PLAYGROUND OFF"
 )
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets OpenGL OpenGLWidgets)
