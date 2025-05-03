@@ -48,6 +48,9 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
 					surfaceMesh.add_face(faceVertices);
 				}
 
+				if (name == "tooth0")
+					surfaceMesh.add_vertex_property<bool>("v:selected");
+
 				meshes.push_back(new Mesh(surfaceMesh, name, gl));
 				vhandles.clear();
 				vertices.clear();
