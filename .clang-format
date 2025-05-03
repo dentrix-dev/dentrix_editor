@@ -1,7 +1,19 @@
 BasedOnStyle: Google
+UseTab: ForIndentation  
 IndentWidth: 4
-UseTab: Always          
-BreakBeforeBraces: Allman
+TabWidth: 4        
 AllowShortFunctionsOnASingleLine: Empty
 ColumnLimit: 100
-
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false      # if, for, while — braces stay on the same line
+  AfterEnum: false
+  AfterFunction: true               # function definitions — brace on new line
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+AccessModifierOffset: -4
