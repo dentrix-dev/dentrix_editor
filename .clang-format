@@ -1,6 +1,6 @@
 BasedOnStyle: Google
 IndentWidth: 4
-UseTab: Never           # change to 'Always' to enforce tabs
+UseTab: Always          
 BreakBeforeBraces: Allman
 AllowShortFunctionsOnASingleLine: Empty
 ColumnLimit: 100
