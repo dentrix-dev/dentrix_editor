@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <unordered_set>
 
 #include "filehandler.h"
 #include "utils.h"
@@ -90,6 +91,33 @@ std::vector<Mesh *> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core
 		fileMeshes[i]->updateBoundingBoxBuffers();
 		fileMeshes[i]->updateBuffers();
 	}
+
+	// ========================== Hole filling =========================
+	// Fill all holes in the gum mesh
+	// pmp::SurfaceMesh &mesh = fileMeshes[0]->mesh;
+	// std::vector<std::vector<pmp::Halfedge>> boundary_loops;
+	// std::unordered_set<int> visited;
+	//
+	// for (auto he : mesh.halfedges()) {
+	// 	if (mesh.is_boundary(he) && visited.find(he.idx()) == visited.end()) {
+	// 		std::vector<pmp::Halfedge> loop;
+	// 		pmp::Halfedge start = he;
+	// 		pmp::Halfedge current = he;
+	//
+	// 		do {
+	// 			loop.push_back(current);
+	// 			visited.insert(current.idx());
+	// 			current = mesh.next_halfedge(current);
+	// 		} while (current != start);
+	//
+	// 		boundary_loops.push_back(loop);
+	// 	}
+	// }
+	//
+	// for (auto vec: boundary_loops) {
+	// 	fileMeshes[0]->fillHole(vec[0]);
+	// }
+
 	return fileMeshes;
 }
 

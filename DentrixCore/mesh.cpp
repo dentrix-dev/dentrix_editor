@@ -197,7 +197,7 @@ void Mesh::fillHole(pmp::Halfedge h)
 	mesh.add_face(face);
 
 	// Smooth boundary vertices to avoid jaggy sharp faces
-	auto vselected = mesh.add_vertex_property<bool>("v:selected");
+	auto vselected = mesh.get_vertex_property<bool>("v:selected");
 	for (pmp::Vertex v : holeVertices) vselected[v] = true;
 	pmp::fair(mesh, 1);
 

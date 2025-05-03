@@ -14,7 +14,6 @@
 #include <iostream>
 
 #include "mainwindow.h"
-#include "pmp/types.h"
 #include "scene.h"
 #include "shader.h"
 
