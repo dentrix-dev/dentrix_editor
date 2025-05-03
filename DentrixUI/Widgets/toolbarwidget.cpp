@@ -14,15 +14,15 @@ ToolBarWidget::ToolBarWidget():
     actionGroup->setExclusive(true);
 
     // Create actions (buttons) to add to the toolbar
-    QAction *uniformTranslateAction = new QAction(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
-    uniformTranslateAction->setCheckable(true);
-    actionGroup->addAction(uniformTranslateAction);
-    QAction *saveAction = new QAction(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
-    saveAction->setCheckable(true);
-    actionGroup->addAction(saveAction);
-    QAction *exitAction = new QAction(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
-    exitAction->setCheckable(true);
-    actionGroup->addAction(exitAction);
+	QAction *uniformScaleAction = new QAction(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
+	uniformScaleAction->setCheckable(true);
+	actionGroup->addAction(uniformScaleAction);
+	QAction *directionalScaleAction = new QAction(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
+	directionalScaleAction->setCheckable(true);
+	actionGroup->addAction(directionalScaleAction);
+	QAction *freeDeformAction = new QAction(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
+	freeDeformAction->setCheckable(true);
+	actionGroup->addAction(freeDeformAction);
 
     // Add a spacer widget to push following widgets to the bottom
     QWidget *spacer = new QWidget();
@@ -37,9 +37,9 @@ ToolBarWidget::ToolBarWidget():
     editAction->setDefaultWidget(editButton);
 
     // Add the actions to the toolbar
-    this->addAction(uniformTranslateAction);
-    this->addAction(saveAction);
-    this->addAction(exitAction);
+	this->addAction(uniformScaleAction);
+	this->addAction(directionalScaleAction);
+	this->addAction(freeDeformAction);
     this->addSeparator();
     this->addAction(spacerAction);
     this->addAction(editAction);
