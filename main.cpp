@@ -1,9 +1,9 @@
-#include "mainwindow.h"
-
 #include <QApplication>
 #include <QStyleFactory>
 
-//toDo: Move to stylesheet location
+#include "mainwindow.h"
+
+// toDo: Move to stylesheet location
 QString styleSheet = R"(
     /* General Application */
     QMainWindow {
@@ -88,7 +88,6 @@ QString styleSheet = R"(
         color: white;
     }
 )";
-
 
 int main(int argc, char *argv[])
 {

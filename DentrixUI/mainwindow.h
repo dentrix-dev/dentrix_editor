@@ -1,13 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QButtonGroup>
 #include <QMainWindow>
-#include "glwidget.h"
 #include <QPushButton>
 #include <QStackedWidget>
-#include <QButtonGroup>
+
 #include "Widgets/rightpanelstackedwidget.h"
 #include "Widgets/toolbarwidget.h"
+#include "glwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,31 +18,31 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+	MainWindow(QWidget* parent = nullptr);
+	~MainWindow();
 
-    //toDo: refactor into a separate transformationState class
-    static bool inUnformScale;
-    static bool inDirectionalScale;
-    static bool inFreeDeformation;
+	// toDo: refactor into a separate transformationState class
+	static bool inUnformScale;
+	static bool inDirectionalScale;
+	static bool inFreeDeformation;
 
 private:
-    Ui::MainWindow *ui;
-    GLWidget *glWidget;
+	Ui::MainWindow* ui;
+	GLWidget* glWidget;
 
-    ToolBarWidget* toolbar;
-    RightPanelStackedWidget* rightPanelStack;
+	ToolBarWidget* toolbar;
+	RightPanelStackedWidget* rightPanelStack;
 
-    void createToolBar();
+	void createToolBar();
 
 private slots:
-    void loadModel();
-    void onMeshSelectedInMainScene();
-    void onMovedToEditScene();
-    void onMovedToMainScene();
-    void onQActionGroupTriggered(QAction* action);
+	void loadModel();
+	void onMeshSelectedInMainScene();
+	void onMovedToEditScene();
+	void onMovedToMainScene();
+	void onQActionGroupTriggered(QAction* action);
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

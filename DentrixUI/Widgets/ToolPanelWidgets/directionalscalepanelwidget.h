@@ -1,21 +1,21 @@
 #ifndef DIRECTIONALSCALEPANELWIDGET_H
 #define DIRECTIONALSCALEPANELWIDGET_H
 
-#include <QWidget>
 #include <glwidget.h>
+
 #include <QSlider>
+#include <QWidget>
 
 class DirectionalScalePanelWidget : public QWidget
 {
-    Q_OBJECT
-    QSlider *directionalScaleSlider;
-public:
-    explicit DirectionalScalePanelWidget(GLWidget *glWidget);
+	Q_OBJECT
+	QSlider *directionalScaleSlider;
 
+public:
+	explicit DirectionalScalePanelWidget(GLWidget *glWidget);
 
 public slots:
-    void onQActionGroupTriggered(QAction* action);
-
+	void onQActionGroupTriggered(QAction *action);
 };
 
-#endif // DIRECTIONALSCALEPANELWIDGET_H
+#endif  // DIRECTIONALSCALEPANELWIDGET_H
