@@ -7,6 +7,10 @@
 #include <pmp/surface_mesh.h>
 #include <utils.h>
 
+#include <vector>
+
+#include "pmp/algorithms/fairing.h"
+
 bool Mesh::drawBoundingBox = true;
 
 Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name, QOpenGLFunctions_3_3_Core* gl)
@@ -156,6 +160,49 @@ void Mesh::setupBoundingBox()
 	// Optional: Unbind VBO and EBO after VAO is unbound. VAO remembers these bindings.
 	// gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 	// gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+// Fills a hole in the mesh, defined by a halfedge that lies on the hole boundary
+// Creates vertex in the middle of the hole, connects it to hole boundary vertices and smooths them
+void Mesh::fillHole(pmp::Halfedge h)
+{
+	pmp::Point centerPoint;
+	std::vector<pmp::Vertex> holeVertices;
+
+	assert(mesh.is_boundary(h));  // Make sure it's a boundary halfedge
+
+	// Find the vertices on the hole boundary
+	pmp::Halfedge start = h;
+	pmp::Halfedge he = start;
+	do {
+		pmp::Vertex v = mesh.from_vertex(he);
+		holeVertices.push_back(v);
+		he = mesh.next_halfedge(he);
+	} while (he != start);
+
+	// Find the center of the hole
+	for (pmp::Vertex v : holeVertices) {
+		centerPoint += mesh.position(v);
+	}
+	centerPoint /= (float)holeVertices.size();
+
+	// Create new vertex and connect it to hole boundary vertices
+	pmp::Vertex centerVertex = mesh.add_vertex(centerPoint);
+	for (int i = 0; i < holeVertices.size() - 1; i++) {
+		std::vector<pmp::Vertex> face = {centerVertex, holeVertices[i], holeVertices[i + 1]};
+		mesh.add_face(face);
+	}
+	std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex,
+	                                 holeVertices[holeVertices.size() - 1]};
+	mesh.add_face(face);
+
+	// Smooth boundary vertices to avoid jaggy sharp faces
+	auto vselected = mesh.add_vertex_property<bool>("v:selected");
+	for (pmp::Vertex v : holeVertices) vselected[v] = true;
+	pmp::fair(mesh, 1);
+
+	pmp::face_normals(mesh);
+	updateBuffers();
 }
 
 void Mesh::updateBoundingBoxBuffers()
