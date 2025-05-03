@@ -30,6 +30,7 @@ public:
 	void setScale(float scaleFactor);
 	void setScaleDirectional(float x, float y, float z);
 
+	void fillHole(pmp::Halfedge h);
 	bool testRayOBBIntersection(
 	    glm::vec3 ray_origin,     // Ray origin, in world space
 	    glm::vec3 ray_direction,  // Ray direction (NOT target position!), in world space. Must be
