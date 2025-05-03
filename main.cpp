@@ -100,13 +100,3 @@ int main(int argc, char *argv[])
     w.show();
     return a.exec();
 }
-
-void foo(){
-	if(1)
-	{
-		if(1)
-		{
-			return;
-		}
-	}
-}
