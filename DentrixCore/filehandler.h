@@ -1,16 +1,17 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
 
-#include <vector>
-#include "mesh.h"
 #include <QOpenGLFunctions_3_3_Core>
+#include <vector>
+
+#include "mesh.h"
 
 class FileHandler
 {
 public:
-    FileHandler();
+	FileHandler();
 
-    static std::vector<Mesh*> readOBJ(std::string& filepath, QOpenGLFunctions_3_3_Core* gl);
+	static std::vector<Mesh*> readOBJ(std::string& filepath, QOpenGLFunctions_3_3_Core* gl);
 };
 
-#endif // FILEHANDLER_H
+#endif  // FILEHANDLER_H
