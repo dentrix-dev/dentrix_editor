@@ -51,16 +51,4 @@ DeformationPanelWidget::DeformationPanelWidget(GLWidget* glWidget) : QWidget{nul
 	deformationLayout->addWidget(sizeSlider);
 	connect(sizeSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setBrushSize);
 	deformationLayout->addStretch();
-
-	if (1) {
-		if (1) {
-			int test = 1 + 3;
-		}
-	}
-	if (1) {
-		if (1) {
-			test += 2;
-		}
-	}
-	std::cout << "test";
 }
