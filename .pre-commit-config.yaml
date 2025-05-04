@@ -3,6 +3,6 @@ repos:
     rev: v15.0.7  # Use a valid tag!
     hooks:
       - id: clang-format
-        files: ^(DentrixUI/|DentrixCore/|main\.cpp)$  # Only match files in these directories or main.cpp
+        files: ^(DentrixUI/|DentrixCore/|main\.cpp)  # Only match files in these directories or main.cpp
         exclude: ^(third_party/)  # Optional: exclude third-party files or directories
 
