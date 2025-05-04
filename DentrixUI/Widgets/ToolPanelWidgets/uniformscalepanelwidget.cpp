@@ -13,8 +13,7 @@ UniformScalePanelWidget::UniformScalePanelWidget(GLWidget *glWidget) : QWidget{n
 	uniformScaleSlider->setValue(10);    // Maps to 1
 	connect(uniformScaleSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshScale);
 	connect(uniformScaleSlider, &QSlider::sliderReleased, glWidget, &GLWidget::updateMeshScale);
-	connect(uniformScaleSlider, &QSlider::sliderReleased, this,
-	        &UniformScalePanelWidget::resetSlider);
+	connect(uniformScaleSlider, &QSlider::sliderReleased, this, &UniformScalePanelWidget::resetSlider);
 	editLayout->addWidget(uniformScaleSlider);
 	editLayout->addStretch();
 }

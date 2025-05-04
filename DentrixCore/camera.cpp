@@ -37,9 +37,8 @@ void Camera::addDistance(float offset)
 	position = glm::normalize(position) * distance;
 }
 
-void Camera::ScreenPosToWorldRay(int mouseX, int mouseY, int screenWidth, int screenHeight,
-                                 glm::mat4 ViewMatrix, glm::mat4 ProjectionMatrix,
-                                 glm::vec3& out_direction)
+void Camera::ScreenPosToWorldRay(int mouseX, int mouseY, int screenWidth, int screenHeight, glm::mat4 ViewMatrix,
+                                 glm::mat4 ProjectionMatrix, glm::vec3& out_direction)
 {
 	// 1. Screen to NDC
 	float ndcX = (2.0f * mouseX) / screenWidth - 1.0f;

@@ -39,17 +39,16 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
 
 				pmp::SurfaceMesh surfaceMesh;
 				for (int i = 0; i < vertices.size(); i = i + 3) {
-					vhandles.push_back(surfaceMesh.add_vertex(
-					    pmp::Point(vertices[i], vertices[i + 1], vertices[i + 2])));
+					vhandles.push_back(
+					    surfaceMesh.add_vertex(pmp::Point(vertices[i], vertices[i + 1], vertices[i + 2])));
 				}
 				for (int i = 0; i < indices.size(); i = i + 3) {
-					std::vector<pmp::Vertex> faceVertices = {
-					    vhandles[indices[i]], vhandles[indices[i + 1]], vhandles[indices[i + 2]]};
+					std::vector<pmp::Vertex> faceVertices = {vhandles[indices[i]], vhandles[indices[i + 1]],
+					                                         vhandles[indices[i + 2]]};
 					surfaceMesh.add_face(faceVertices);
 				}
 
-				if (name == "tooth0")
-					surfaceMesh.add_vertex_property<bool>("v:selected");
+				if (name == "tooth0") surfaceMesh.add_vertex_property<bool>("v:selected");
 
 				meshes.push_back(new Mesh(surfaceMesh, name, gl));
 				vhandles.clear();
@@ -76,8 +75,7 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
 	if (!name.empty()) {
 		pmp::SurfaceMesh surfaceMesh;
 		for (int i = 0; i < vertices.size(); i = i + 3) {
-			vhandles.push_back(
-			    surfaceMesh.add_vertex(pmp::Point(vertices[i], vertices[i + 1], vertices[i + 2])));
+			vhandles.push_back(surfaceMesh.add_vertex(pmp::Point(vertices[i], vertices[i + 1], vertices[i + 2])));
 		}
 		for (int i = 0; i < indices.size(); i = i + 3) {
 			std::vector<pmp::Vertex> faceVertices = {vhandles[indices[i]], vhandles[indices[i + 1]],

@@ -41,8 +41,7 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh)
 
 		// Scaling needs to happen at 0,0
 		// Translate the mesh to origin using its center, scale it, translate it back
-		glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i]->center) *
-		                               meshes[i]->scaleTransform *
+		glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i]->center) * meshes[i]->scaleTransform *
 		                               meshes[i]->directionalScaleTransform *
 		                               glm::translate(glm::mat4(1.0f), -1.0f * meshes[i]->center);
 
@@ -121,9 +120,8 @@ std::vector<Mesh *> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core
 	return fileMeshes;
 }
 
-bool Scene::RayTriangleIntersect(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection,
-                                 const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2,
-                                 float &outIntersectionDistance)
+bool Scene::RayTriangleIntersect(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const glm::vec3 &v0,
+                                 const glm::vec3 &v1, const glm::vec3 &v2, float &outIntersectionDistance)
 {
 	const float EPSILON = 0.000001f;
 	glm::vec3 edge1 = v1 - v0;
@@ -156,8 +154,7 @@ bool Scene::RayTriangleIntersect(const glm::vec3 &rayOrigin, const glm::vec3 &ra
 		return false;
 }
 
-bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 ModelMatrix,
-                      Mesh *&intersectedMesh)
+bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 ModelMatrix, Mesh *&intersectedMesh)
 {
 	std::string meshName = "none";
 	bool intersectionFound = false;
@@ -190,8 +187,7 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
 
 bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_direction_world,
                                glm::mat4 sceneMatrix,  // Base scene transform
-                               Mesh *&outHitMesh, pmp::Vertex &outHitVertexIndex,
-                               glm::vec3 &outIntersectionPointWorld)
+                               Mesh *&outHitMesh, pmp::Vertex &outHitVertexIndex, glm::vec3 &outIntersectionPointWorld)
 {
 	float closest_t = std::numeric_limits<float>::max();
 	outHitMesh = nullptr;
@@ -211,8 +207,7 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 		// This depends on how you handle transformations.
 		// Example: Base scene transform * mesh-specific transforms
 		// Adjust this according to your transformation hierarchy!
-		glm::mat4 modelMatrix =
-		    sceneMatrix * mesh->directionalScaleTransform * mesh->scaleTransform;  // Example order
+		glm::mat4 modelMatrix = sceneMatrix * mesh->directionalScaleTransform * mesh->scaleTransform;  // Example order
 
 		// --- 1. Optional but recommended: Coarse Bounding Box Check ---
 		float obb_intersection_distance;
@@ -227,8 +222,7 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 		// --- 2. Transform Ray into Model Space ---
 		glm::mat4 invModelMatrix = glm::inverse(modelMatrix);
 		glm::vec4 ray_origin_model_h = invModelMatrix * glm::vec4(ray_origin_world, 1.0f);
-		glm::vec4 ray_direction_model_h =
-		    invModelMatrix * glm::vec4(ray_direction_world, 0.0f);  // Direction needs 0.0
+		glm::vec4 ray_direction_model_h = invModelMatrix * glm::vec4(ray_direction_world, 0.0f);  // Direction needs 0.0
 
 		glm::vec3 ray_origin_model = glm::vec3(ray_origin_model_h);
 		// IMPORTANT: Re-normalize direction after non-uniform scaling/shear in
@@ -253,14 +247,13 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 
 			float t;
 			// Use the MODEL SPACE ray and vertices
-			if (RayTriangleIntersect(ray_origin_model, ray_direction_model, faceVertices[0],
-			                         faceVertices[1], faceVertices[2], t)) {
+			if (RayTriangleIntersect(ray_origin_model, ray_direction_model, faceVertices[0], faceVertices[1],
+			                         faceVertices[2], t)) {
 				// We need the distance 't' relative to the *original world ray* to
 				// compare across different meshes Transform the intersection point
 				// found in model space back to world space
 				glm::vec3 intersectionPointModel = ray_origin_model + ray_direction_model * t;
-				glm::vec3 intersectionPointWorldTemp =
-				    glm::vec3(modelMatrix * glm::vec4(intersectionPointModel, 1.0f));
+				glm::vec3 intersectionPointWorldTemp = glm::vec3(modelMatrix * glm::vec4(intersectionPointModel, 1.0f));
 
 				// Calculate distance from the world ray origin
 				// Use distance squared for comparison to avoid sqrt, only do sqrt at
@@ -283,10 +276,9 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 					hit_v0 = faceVertices[0];  // Model space vertices
 					hit_v1 = faceVertices[1];
 					hit_v2 = faceVertices[2];
-					closest_intersection_point_world =
-					    intersectionPointWorldTemp;  // Store the exact world intersection
-					                                 // point
-					mesh_hit = true;                 // Mark that this mesh was hit
+					closest_intersection_point_world = intersectionPointWorldTemp;  // Store the exact world
+					                                                                // intersection point
+					mesh_hit = true;                                                // Mark that this mesh was hit
 				}
 			}
 		}  // End triangle loop
@@ -303,12 +295,12 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 			glm::vec3 world_v2 = glm::vec3(modelMatrix * glm::vec4(hit_v2, 1.0f));
 
 			// Calculate squared distances from the intersection point to each vertex
-			float dist_sq_0 = glm::dot(world_v0 - closest_intersection_point_world,
-			                           world_v0 - closest_intersection_point_world);
-			float dist_sq_1 = glm::dot(world_v1 - closest_intersection_point_world,
-			                           world_v1 - closest_intersection_point_world);
-			float dist_sq_2 = glm::dot(world_v2 - closest_intersection_point_world,
-			                           world_v2 - closest_intersection_point_world);
+			float dist_sq_0 =
+			    glm::dot(world_v0 - closest_intersection_point_world, world_v0 - closest_intersection_point_world);
+			float dist_sq_1 =
+			    glm::dot(world_v1 - closest_intersection_point_world, world_v1 - closest_intersection_point_world);
+			float dist_sq_2 =
+			    glm::dot(world_v2 - closest_intersection_point_world, world_v2 - closest_intersection_point_world);
 
 			// Find the minimum distance and store the corresponding original vertex
 			// index
@@ -326,21 +318,19 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 	if (closest_mesh != nullptr) {
 		outHitMesh = closest_mesh;
 		outHitVertexIndex = closest_vertex_index;
-		outIntersectionPointWorld =
-		    closest_intersection_point_world;  // Set the final intersection point
+		outIntersectionPointWorld = closest_intersection_point_world;  // Set the final intersection point
 		return true;
 	}
 
 	return false;  // No intersection found
 }
 
-void Scene::GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name,
-                                    std::string &neighbor2Name)
+void Scene::GetNeighboringMeshNames(std::string meshName, std::string &neighbor1Name, std::string &neighbor2Name)
 {
 	// Upper jaw teeth ordering in local mapping (not universal mapping)
-	std::string upperMeshNames[16] = {
-	    "tooth16", "tooth15", "tooth14", "tooth13", "tooth12", "tooth11", "tooth10", "tooth9",
-	    "tooth1",  "tooth2",  "tooth3",  "tooth4",  "tooth5",  "tooth6",  "tooth7",  "tooth8"};
+	std::string upperMeshNames[16] = {"tooth16", "tooth15", "tooth14", "tooth13", "tooth12", "tooth11",
+	                                  "tooth10", "tooth9",  "tooth1",  "tooth2",  "tooth3",  "tooth4",
+	                                  "tooth5",  "tooth6",  "tooth7",  "tooth8"};
 
 	int upperMeshIndex;
 	for (int i = 0; i < 16; i++) {

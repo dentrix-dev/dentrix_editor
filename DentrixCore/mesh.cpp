@@ -86,22 +86,19 @@ void Mesh::setup()
 
 	// --- Position VBO (location = 0)
 	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
-	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
-	                 GL_STATIC_DRAW);
+	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 	gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	gl->glEnableVertexAttribArray(0);
 
 	// --- Normal VBO (location = 1)
 	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
-	gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(),
-	                 GL_STATIC_DRAW);
+	gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
 	gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	gl->glEnableVertexAttribArray(1);
 
 	// --- Element Buffer
 	gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices.data(),
-	                 GL_STATIC_DRAW);
+	gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
 	gl->glBindVertexArray(0);
 }
@@ -141,14 +138,13 @@ void Mesh::setupBoundingBox()
 	// 4. Buffer vertex data (only positions)
 	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
 	// Use bb_vertices data and size. Note the size calculation uses sizeof(glm::vec3)
-	gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(),
-	                 GL_STATIC_DRAW);
+	gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
 
 	// 5. Buffer index data
 	gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_BB);
 	// Use bb_indices data and size
-	gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, bb_indices.size() * sizeof(unsigned int),
-	                 bb_indices.data(), GL_STATIC_DRAW);
+	gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, bb_indices.size() * sizeof(unsigned int), bb_indices.data(),
+	                 GL_STATIC_DRAW);
 
 	// 6. Set up vertex attributes (only position)
 	gl->glEnableVertexAttribArray(0);
@@ -192,8 +188,7 @@ void Mesh::fillHole(pmp::Halfedge h)
 		std::vector<pmp::Vertex> face = {centerVertex, holeVertices[i], holeVertices[i + 1]};
 		mesh.add_face(face);
 	}
-	std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex,
-	                                 holeVertices[holeVertices.size() - 1]};
+	std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex, holeVertices[holeVertices.size() - 1]};
 	mesh.add_face(face);
 
 	// Smooth boundary vertices to avoid jaggy sharp faces
@@ -221,8 +216,7 @@ void Mesh::updateBoundingBoxBuffers()
 
 	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
 	// Use bb_vertices data and size. Note the size calculation uses sizeof(glm::vec3)
-	gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(),
-	                 GL_STATIC_DRAW);
+	gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
 	gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -288,18 +282,15 @@ void Mesh::updateBuffers()
 
 	// Update position buffer
 	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
-	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
-	                 GL_DYNAMIC_DRAW);
+	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
 	// Update normal buffer
 	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
-	gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(),
-	                 GL_DYNAMIC_DRAW);
+	gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_DYNAMIC_DRAW);
 
 	// Update indices buffer
 	gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(),
-	                 GL_DYNAMIC_DRAW);
+	gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
 	// Unbind buffers
 	gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -346,14 +337,13 @@ void Mesh::updateMeshScale(glm::vec3 sceneCenter)
 	updateBuffers();
 }
 
-bool Mesh::testRayOBBIntersection(
-    glm::vec3 ray_origin,     // Ray origin, in world space
-    glm::vec3 ray_direction,  // Ray direction (NOT target position!), in world space. Must be
-                              // normalize()'d.
-    glm::mat4 ModelMatrix,    // Transformation applied to the mesh (which will thus be also applied
-                              // to its bounding box)
-    float& intersection_distance  // Output : distance between ray_origin and the intersection with
-                                  // the OBB
+bool Mesh::testRayOBBIntersection(glm::vec3 ray_origin,     // Ray origin, in world space
+                                  glm::vec3 ray_direction,  // Ray direction (NOT target position!), in world space.
+                                                            // Must be normalize()'d.
+                                  glm::mat4 ModelMatrix,  // Transformation applied to the mesh (which will thus be also
+                                                          // applied to its bounding box)
+                                  float& intersection_distance  // Output : distance between ray_origin and the
+                                                                // intersection with the OBB
 )
 {
 	// Intersection method from Real-Time Rendering and Essential Mathematics for Games

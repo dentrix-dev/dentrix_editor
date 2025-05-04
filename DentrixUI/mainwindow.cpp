@@ -16,13 +16,11 @@ bool MainWindow::inUnformScale = false;
 bool MainWindow::inDirectionalScale = false;
 bool MainWindow::inFreeDeformation = false;
 
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr)
 {
 	ui->setupUi(this);
 	setWindowTitle("Dentrix Editor");
-	resize(QApplication::primaryScreen()->geometry().width(),
-	       QApplication::primaryScreen()->geometry().height());
+	resize(QApplication::primaryScreen()->geometry().width(), QApplication::primaryScreen()->geometry().height());
 	connect(ui->actionLoad_Model, &QAction::triggered, this, &MainWindow::loadModel);
 	createToolBar();
 }
@@ -36,23 +34,20 @@ void MainWindow::createToolBar()
 {
 	toolbar = new ToolBarWidget();
 	addToolBar(Qt::LeftToolBarArea, toolbar);
-	connect(toolbar->getActionGroup(), &QActionGroup::triggered, this,
-	        &MainWindow::onQActionGroupTriggered);
+	connect(toolbar->getActionGroup(), &QActionGroup::triggered, this, &MainWindow::onQActionGroupTriggered);
 }
 
 void MainWindow::loadModel()
 {
-	QString filePath = QFileDialog::getOpenFileName(this, "Open Model File", "../../models",
-	                                                "Model Files (*.obj *.stl *.ply)");
+	QString filePath =
+	    QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
 	if (!filePath.isEmpty()) {
 		if (!glWidget) {
 			glWidget = new GLWidget(this, filePath.toStdString());
-			connect(glWidget, &GLWidget::meshSelectedInMainScene, this,
-			        &MainWindow::onMeshSelectedInMainScene);
+			connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
 			connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
 			connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
-			connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget,
-			        &GLWidget::onEditSceneClicked);
+			connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
 
 			// ... inside the if (!glWidget) section
 			// Create a horizontal layout for the central widget
@@ -66,11 +61,9 @@ void MainWindow::loadModel()
 			rightPanelStack = new RightPanelStackedWidget(glWidget);
 			Q_ASSERT(rightPanelStack->uniformScalePanel);
 			Q_ASSERT(rightPanelStack->directionalScalePanel);
-			connect(toolbar->getActionGroup(), &QActionGroup::triggered,
-			        rightPanelStack->uniformScalePanel,
+			connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->uniformScalePanel,
 			        &UniformScalePanelWidget::onQActionGroupTriggered);
-			connect(toolbar->getActionGroup(), &QActionGroup::triggered,
-			        rightPanelStack->directionalScalePanel,
+			connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->directionalScalePanel,
 			        &DirectionalScalePanelWidget::onQActionGroupTriggered);
 
 			// Add to layout

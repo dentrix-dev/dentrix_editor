@@ -31,14 +31,13 @@ public:
 	void setScaleDirectional(float x, float y, float z);
 
 	void fillHole(pmp::Halfedge h);
-	bool testRayOBBIntersection(
-	    glm::vec3 ray_origin,     // Ray origin, in world space
-	    glm::vec3 ray_direction,  // Ray direction (NOT target position!), in world space. Must be
-	                              // normalize()'d.
-	    glm::mat4 ModelMatrix,    // Transformation applied to the mesh (which will thus be also
-	                              // applied to its bounding box)
-	    float& intersection_distance  // Output : distance between ray_origin and the intersection
-	                                  // with the OBB
+	bool testRayOBBIntersection(glm::vec3 ray_origin,     // Ray origin, in world space
+	                            glm::vec3 ray_direction,  // Ray direction (NOT target position!), in world space. Must
+	                                                      // be normalize()'d.
+	                            glm::mat4 ModelMatrix,    // Transformation applied to the mesh (which will thus be also
+	                                                      // applied to its bounding box)
+	                            float& intersection_distance  // Output : distance between ray_origin and the
+	                                                          // intersection with the OBB
 	);
 	void draw();
 	void updateVerticesBuffer();

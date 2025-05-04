@@ -17,9 +17,7 @@
 #include "scene.h"
 #include "shader.h"
 
-GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path)
-{
-}
+GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {}
 
 GLWidget::~GLWidget() {}
 
@@ -51,8 +49,7 @@ void GLWidget::initializeGL()
 	shader->use();
 
 	// Setup projection matrix
-	projection = glm::perspective(glm::radians(45.0f), (float)QWidget::width() / QWidget::height(),
-	                              0.1f, 1000.0f);
+	projection = glm::perspective(glm::radians(45.0f), (float)QWidget::width() / QWidget::height(), 0.1f, 1000.0f);
 	shader->setMatrix4("projection", glm::value_ptr(projection));
 
 	model = glm::mat4(1.0f);
@@ -103,20 +100,20 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 	isRotating = false;
 
 	glm::vec3 rayDirection;
-	Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view,
-	                            projection, rayDirection);
+	Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection,
+	                            rayDirection);
 
 	Mesh *hitMesh = nullptr;
 	pmp::Vertex hitVertexIndex;
 	glm::vec3 intersectionPoint;
-	bool intersection = currentScene->IntersectTriangles(
-	    camera.position, rayDirection, model, hitMesh, hitVertexIndex, intersectionPoint);
+	bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex,
+	                                                     intersectionPoint);
 
 	if (intersection) {
 		std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
 		std::cout << "Vertex index: " << hitVertexIndex << std::endl;
-		std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y
-		          << " " << intersectionPoint.z << std::endl;
+		std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " "
+		          << intersectionPoint.z << std::endl;
 	}
 }
 
@@ -140,18 +137,16 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 		float mouseX = event->position().x();
 		float mouseY = event->position().y();
 		glm::vec3 rayDirection;
-		Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view,
-		                            projection, rayDirection);
-		std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " "
-		          << camera.position.z << std::endl;
-		std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " "
-		          << camera.front.z << std::endl;
-		std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " "
-		          << rayDirection.z << std::endl;
+		Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection,
+		                            rayDirection);
+		std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z
+		          << std::endl;
+		std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
+		std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z
+		          << std::endl;
 
 		Mesh *intersectedMesh = nullptr;
-		bool intersection =
-		    currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
+		bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
 		std::cout << "intersection: " << intersection << std::endl;
 		if (intersection && intersectedMesh != nullptr) {
 			std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;

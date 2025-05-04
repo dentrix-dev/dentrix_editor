@@ -10,10 +10,8 @@ class ToolBarWidget : public QToolBar
 	QPushButton *editButton;
 
 	// should probably be static
-	const QString editButtonInactiveStyleSheet =
-	    "background-color: gray; color: white; padding: 5px;";
-	const QString editButtonActiveStyleSheet =
-	    "background-color: #3498db; color: white; padding: 5px;";
+	const QString editButtonInactiveStyleSheet = "background-color: gray; color: white; padding: 5px;";
+	const QString editButtonActiveStyleSheet = "background-color: #3498db; color: white; padding: 5px;";
 
 public:
 	ToolBarWidget();
