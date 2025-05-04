@@ -56,7 +56,7 @@ DeformationPanelWidget::DeformationPanelWidget(GLWidget* glWidget) : QWidget{nul
 	{
 		if(1)
 		{
-			int test = 1+1;
+			int test = 1+3;
 		}
 	}
 

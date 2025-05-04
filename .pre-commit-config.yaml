@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v15.0.0  # Specify the desired version
+    rev: v15.0.7  # Use a valid tag!
     hooks:
       - id: clang-format
         files: ^(DentrixUI/|DentrixCore/|main\.cpp)$  # Only match files in these directories or main.cpp
