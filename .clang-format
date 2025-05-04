@@ -3,7 +3,7 @@ UseTab: ForIndentation
 IndentWidth: 4
 TabWidth: 4        
 AllowShortFunctionsOnASingleLine: Empty
-ColumnLimit: 100
+ColumnLimit: 120
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass: true
