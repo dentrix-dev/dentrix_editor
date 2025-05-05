@@ -62,10 +62,10 @@ void GLWidget::initializeGL()
 	currentScene = &mainScene;
 	update();
 	std::cout << "mesh loaded" << std::endl;
-	std::cout << currentScene->meshes[0]->mesh.n_vertices() << std::endl;
+	std::cout << currentScene->meshes[0]->surfaceMesh.n_vertices() << std::endl;
 	int bounds = 0;
-	for (pmp::Halfedge h : currentScene->meshes[0]->mesh.halfedges()) {
-		if (currentScene->meshes[0]->mesh.is_boundary(h)) {
+	for (pmp::Halfedge h : currentScene->meshes[0]->surfaceMesh.halfedges()) {
+		if (currentScene->meshes[0]->surfaceMesh.is_boundary(h)) {
 			bounds++;
 		}
 	}

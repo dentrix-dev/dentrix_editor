@@ -29,7 +29,7 @@ void Scene::fillHoles(std::vector<Mesh *> &fileMeshes)
 {
 	// ========================== Hole filling =========================
 	// Fill all holes in the gum mesh
-	pmp::SurfaceMesh &mesh = fileMeshes[0]->mesh;
+	pmp::SurfaceMesh &mesh = fileMeshes[0]->surfaceMesh;
 	std::vector<std::vector<pmp::Halfedge>> boundary_loops;
 	std::unordered_set<int> visited;
 
@@ -110,8 +110,8 @@ std::vector<Mesh *> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core
 	}
 	sceneCenter /= (float)fileMeshes.size();
 	for (int i = 0; i < fileMeshes.size(); i++) {
-		for (auto v : fileMeshes[i]->mesh.vertices()) {
-			fileMeshes[i]->mesh.position(v) -= Utils::glmToPmpPoint(sceneCenter);
+		for (auto v : fileMeshes[i]->surfaceMesh.vertices()) {
+			fileMeshes[i]->surfaceMesh.position(v) -= Utils::glmToPmpPoint(sceneCenter);
 		}
 		fileMeshes[i]->center -= sceneCenter;
 		fileMeshes[i]->aabb_max -= sceneCenter;
@@ -242,11 +242,11 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 		float mesh_closest_t = std::numeric_limits<float>::max();
 		glm::vec3 hit_v0, hit_v1, hit_v2;  // Keep track of hit triangle vertices
 
-		for (auto f : mesh->mesh.faces()) {
+		for (auto f : mesh->surfaceMesh.faces()) {
 			faceVertices.clear();
 			faceVerticesIndices.clear();
-			for (auto v : mesh->mesh.vertices(f)) {
-				faceVertices.push_back(Utils::pmpPointToGlm(mesh->mesh.position(v)));
+			for (auto v : mesh->surfaceMesh.vertices(f)) {
+				faceVertices.push_back(Utils::pmpPointToGlm(mesh->surfaceMesh.position(v)));
 				faceVerticesIndices.push_back(v);
 			}
 

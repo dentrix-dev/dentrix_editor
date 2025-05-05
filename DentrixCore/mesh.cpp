@@ -17,14 +17,14 @@ Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name, QOpenGLFunctions_3_3_
 {
 	this->gl = gl;
 	this->name = name;
-	mesh = input_mesh;
+	surfaceMesh = input_mesh;
 
 	// Calculate per-face normals for vertices
 	// (vertex has a normal for each face it's a part of)
-	pmp::face_normals(mesh);
+	pmp::face_normals(surfaceMesh);
 
 	// Calculate mesh bounding box and center
-	pmp::BoundingBox aabb = pmp::bounds(mesh);
+	pmp::BoundingBox aabb = pmp::bounds(surfaceMesh);
 	aabb_min = Utils::pmpPointToGlm(aabb.min());
 	aabb_max = Utils::pmpPointToGlm(aabb.max());
 	center = 0.5f * (aabb_min + aabb_max);
@@ -41,19 +41,19 @@ Mesh::~Mesh() {}
 
 void Mesh::setup()
 {
-	auto vpos = mesh.vertex_property<pmp::Point>("v:point");
-	auto fnormal = mesh.face_property<pmp::Normal>("f:normal");
+	auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
+	auto fnormal = surfaceMesh.face_property<pmp::Normal>("f:normal");
 
 	std::vector<float> vertices = {};
 	std::vector<float> normals = {};
 	std::vector<unsigned int> indices = {};
 
 	unsigned int index = 0;
-	for (auto f : mesh.faces()) {
+	for (auto f : surfaceMesh.faces()) {
 		pmp::Normal n = fnormal[f];
 		std::vector<unsigned int> faceIndices;
 
-		for (auto v : mesh.vertices(f)) {
+		for (auto v : surfaceMesh.vertices(f)) {
 			pmp::Point p = vpos[v];
 
 			vertices.push_back(p[0]);
@@ -165,38 +165,38 @@ void Mesh::fillHole(pmp::Halfedge h)
 	pmp::Point centerPoint;
 	std::vector<pmp::Vertex> holeVertices;
 
-	assert(mesh.is_boundary(h));  // Make sure it's a boundary halfedge
+	assert(surfaceMesh.is_boundary(h));  // Make sure it's a boundary halfedge
 
 	// Find the vertices on the hole boundary
 	pmp::Halfedge start = h;
 	pmp::Halfedge he = start;
 	do {
-		pmp::Vertex v = mesh.from_vertex(he);
+		pmp::Vertex v = surfaceMesh.from_vertex(he);
 		holeVertices.push_back(v);
-		he = mesh.next_halfedge(he);
+		he = surfaceMesh.next_halfedge(he);
 	} while (he != start);
 
 	// Find the center of the hole
 	for (pmp::Vertex v : holeVertices) {
-		centerPoint += mesh.position(v);
+		centerPoint += surfaceMesh.position(v);
 	}
 	centerPoint /= (float)holeVertices.size();
 
 	// Create new vertex and connect it to hole boundary vertices
-	pmp::Vertex centerVertex = mesh.add_vertex(centerPoint);
+	pmp::Vertex centerVertex = surfaceMesh.add_vertex(centerPoint);
 	for (int i = 0; i < holeVertices.size() - 1; i++) {
 		std::vector<pmp::Vertex> face = {centerVertex, holeVertices[i], holeVertices[i + 1]};
-		mesh.add_face(face);
+		surfaceMesh.add_face(face);
 	}
 	std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex, holeVertices[holeVertices.size() - 1]};
-	mesh.add_face(face);
+	surfaceMesh.add_face(face);
 
 	// Smooth boundary vertices to avoid jaggy sharp faces
-	auto vselected = mesh.get_vertex_property<bool>("v:selected");
+	auto vselected = surfaceMesh.get_vertex_property<bool>("v:selected");
 	for (pmp::Vertex v : holeVertices) vselected[v] = true;
-	pmp::fair(mesh, 1);
+	pmp::fair(surfaceMesh, 1);
 
-	pmp::face_normals(mesh);
+	pmp::face_normals(surfaceMesh);
 	updateBuffers();
 }
 
@@ -222,12 +222,12 @@ void Mesh::updateBoundingBoxBuffers()
 
 void Mesh::updateVerticesBuffer()
 {
-	auto vpos = mesh.vertex_property<pmp::Point>("v:point");
+	auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
 	std::vector<float> vertices;
-	vertices.reserve(mesh.n_faces() * 3 * 3);
+	vertices.reserve(surfaceMesh.n_faces() * 3 * 3);
 
-	for (auto f : mesh.faces()) {
-		for (auto v : mesh.vertices(f)) {
+	for (auto f : surfaceMesh.faces()) {
+		for (auto v : surfaceMesh.vertices(f)) {
 			pmp::Point p = vpos[v];
 			vertices.push_back(p[0]);
 			vertices.push_back(p[1]);
@@ -244,19 +244,19 @@ void Mesh::updateVerticesBuffer()
 
 void Mesh::updateBuffers()
 {
-	auto vpos = mesh.vertex_property<pmp::Point>("v:point");
-	auto fnormal = mesh.face_property<pmp::Normal>("f:normal");
+	auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
+	auto fnormal = surfaceMesh.face_property<pmp::Normal>("f:normal");
 
 	std::vector<float> vertices = {};
 	std::vector<float> normals = {};
 	std::vector<unsigned int> indices = {};
 
 	unsigned int index = 0;
-	for (auto f : mesh.faces()) {
+	for (auto f : surfaceMesh.faces()) {
 		pmp::Normal n = fnormal[f];
 		std::vector<unsigned int> faceIndices;
 
-		for (auto v : mesh.vertices(f)) {
+		for (auto v : surfaceMesh.vertices(f)) {
 			pmp::Point p = vpos[v];
 
 			vertices.push_back(p[0]);
@@ -323,16 +323,16 @@ void Mesh::setScaleDirectional(float x, float y, float z)
 
 void Mesh::updateMeshScale(glm::vec3 sceneCenter)
 {
-	pmp::Point center = pmp::centroid(mesh);
+	pmp::Point center = pmp::centroid(surfaceMesh);
 	// pmp::Point center = Utils::glmToPmpPoint(sceneCenter);
 	// Scale vertices around center
-	for (auto v : mesh.vertices()) {
-		pmp::Point p = mesh.position(v);
+	for (auto v : surfaceMesh.vertices()) {
+		pmp::Point p = surfaceMesh.position(v);
 		p = center + (p - center) * currentScale;
-		mesh.position(v) = p;
+		surfaceMesh.position(v) = p;
 	}
-	pmp::face_normals(mesh);
-	pmp::vertex_normals(mesh);
+	pmp::face_normals(surfaceMesh);
+	pmp::vertex_normals(surfaceMesh);
 	scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 	updateBuffers();
 }

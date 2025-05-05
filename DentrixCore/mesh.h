@@ -12,7 +12,7 @@
 class Mesh
 {
 public:
-	pmp::SurfaceMesh mesh;
+	pmp::SurfaceMesh surfaceMesh;
 	std::string name;
 	// Needed to reset model back to origin
 	glm::vec3 center;
