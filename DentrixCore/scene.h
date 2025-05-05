@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "glm/glm.hpp"
 #include "mesh.h"
 #include "shader.h"
 
