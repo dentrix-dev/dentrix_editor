@@ -2,6 +2,9 @@
 
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include "pmp/io/io.h"
+#include "pmp/surface_mesh.h"
 
 FileHandler::FileHandler() {}
 
@@ -91,3 +94,11 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
 	file.close();  // Close the file when done
 	return meshes;
 }
+
+Mesh* FileHandler::readSTL(std::string &filepath, std::string& name, QOpenGLFunctions_3_3_Core *gl) {
+	pmp::SurfaceMesh surfaceMesh;
+	pmp::read(surfaceMesh, filepath);
+
+	return new Mesh(surfaceMesh, name, gl);
+}
+
