@@ -45,7 +45,7 @@ public:
 	void updateMeshScale(glm::vec3 sceneCenter);
 
 private:
-	unsigned int VAO, VBO_pos, VBO_norm, EBO;
+	unsigned int VAO, VBO, EBO;
 	unsigned int VAO_BB, VBO_BB, EBO_BB;
 	unsigned int numIndices;
 	QOpenGLFunctions_3_3_Core* gl;

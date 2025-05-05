@@ -44,8 +44,8 @@ void Mesh::setup()
 	auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
 	auto fnormal = surfaceMesh.face_property<pmp::Normal>("f:normal");
 
+	// Stores position and normals
 	std::vector<float> vertices = {};
-	std::vector<float> normals = {};
 	std::vector<unsigned int> indices = {};
 
 	unsigned int index = 0;
@@ -60,9 +60,9 @@ void Mesh::setup()
 			vertices.push_back(p[1]);
 			vertices.push_back(p[2]);
 
-			normals.push_back(n[0]);
-			normals.push_back(n[1]);
-			normals.push_back(n[2]);
+			vertices.push_back(n[0]);
+			vertices.push_back(n[1]);
+			vertices.push_back(n[2]);
 
 			faceIndices.push_back(index++);
 		}
@@ -78,22 +78,21 @@ void Mesh::setup()
 	numIndices = indices.size();
 
 	gl->glGenVertexArrays(1, &VAO);
-	gl->glGenBuffers(1, &VBO_pos);
-	gl->glGenBuffers(1, &VBO_norm);
+	gl->glGenBuffers(1, &VBO);
 	gl->glGenBuffers(1, &EBO);
 
 	gl->glBindVertexArray(VAO);
 
-	// --- Position VBO (location = 0)
-	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+	// Vertices VBO
+	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-	gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	// Position attribute
+	gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	gl->glEnableVertexAttribArray(0);
 
-	// --- Normal VBO (location = 1)
-	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
-	gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
-	gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	// Normal attribute
+	gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	gl->glEnableVertexAttribArray(1);
 
 	// --- Element Buffer
@@ -223,19 +222,25 @@ void Mesh::updateBoundingBoxBuffers()
 void Mesh::updateVerticesBuffer()
 {
 	auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
+	auto fnormal = surfaceMesh.face_property<pmp::Normal>("f:normal");
+
 	std::vector<float> vertices;
-	vertices.reserve(surfaceMesh.n_faces() * 3 * 3);
+	vertices.reserve(surfaceMesh.n_faces() * 3 * 3 * 2);
 
 	for (auto f : surfaceMesh.faces()) {
+		pmp::Normal n = fnormal[f];
 		for (auto v : surfaceMesh.vertices(f)) {
 			pmp::Point p = vpos[v];
 			vertices.push_back(p[0]);
 			vertices.push_back(p[1]);
 			vertices.push_back(p[2]);
+			vertices.push_back(n[0]);
+			vertices.push_back(n[1]);
+			vertices.push_back(n[2]);
 		}
 	}
 	// Update position buffer
-	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), nullptr,
 	                 GL_DYNAMIC_DRAW);  // orphan old buffer
 	gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
@@ -248,7 +253,6 @@ void Mesh::updateBuffers()
 	auto fnormal = surfaceMesh.face_property<pmp::Normal>("f:normal");
 
 	std::vector<float> vertices = {};
-	std::vector<float> normals = {};
 	std::vector<unsigned int> indices = {};
 
 	unsigned int index = 0;
@@ -263,9 +267,9 @@ void Mesh::updateBuffers()
 			vertices.push_back(p[1]);
 			vertices.push_back(p[2]);
 
-			normals.push_back(n[0]);
-			normals.push_back(n[1]);
-			normals.push_back(n[2]);
+			vertices.push_back(n[0]);
+			vertices.push_back(n[1]);
+			vertices.push_back(n[2]);
 
 			faceIndices.push_back(index++);
 		}
@@ -280,13 +284,9 @@ void Mesh::updateBuffers()
 	}
 	numIndices = indices.size();
 
-	// Update position buffer
-	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+	// Update vertices buffer
+	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
-
-	// Update normal buffer
-	gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_norm);
-	gl->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_DYNAMIC_DRAW);
 
 	// Update indices buffer
 	gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
