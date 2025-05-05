@@ -9,6 +9,8 @@
 
 class Scene
 {
+	static void fillHoles(std::vector<Mesh*>& fileMeshes);
+
 public:
 	glm::vec3 center = glm::vec3(0.0f);
 	std::vector<Mesh*> meshes;
