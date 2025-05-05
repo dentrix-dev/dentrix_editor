@@ -120,7 +120,7 @@ std::vector<Mesh *> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core
 		fileMeshes[i]->updateBuffers();
 	}
 
-	fillHoles(fileMeshes);
+	// fillHoles(fileMeshes);
 
 	return fileMeshes;
 }
