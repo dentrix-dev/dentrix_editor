@@ -23,302 +23,302 @@ GLWidget::~GLWidget() {}
 
 void GLWidget::loadModel(const std::string &path)
 {
-	std::cout << __func__ << std::endl;
-	makeCurrent();
+    std::cout << __func__ << std::endl;
+    makeCurrent();
 
-	// Delete references to previous meshes
-	for (int i = 0; i < meshes.size(); i++) delete meshes[i];
+    // Delete references to previous meshes
+    for (int i = 0; i < meshes.size(); i++) delete meshes[i];
 
-	meshes = Scene::loadScene(path, this);
+    meshes = Scene::loadScene(path, this);
 
-	mainScene = Scene(meshes);
-	currentScene = &mainScene;
-	selectedMesh = nullptr;
-	update();  // Refresh the OpenGL view
+    mainScene = Scene(meshes);
+    currentScene = &mainScene;
+    selectedMesh = nullptr;
+    update();  // Refresh the OpenGL view
 }
 
 void GLWidget::initializeGL()
 {
-	initializeOpenGLFunctions();
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);  // set background color
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
+    initializeOpenGLFunctions();
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);  // set background color
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
-	// Shaders
-	shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
-	shader->use();
+    // Shaders
+    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
+    shader->use();
 
-	// Setup projection matrix
-	projection = glm::perspective(glm::radians(45.0f), (float)QWidget::width() / QWidget::height(), 0.1f, 1000.0f);
-	shader->setMatrix4("projection", glm::value_ptr(projection));
+    // Setup projection matrix
+    projection = glm::perspective(glm::radians(45.0f), (float)QWidget::width() / QWidget::height(), 0.1f, 1000.0f);
+    shader->setMatrix4("projection", glm::value_ptr(projection));
 
-	model = glm::mat4(1.0f);
-	shader->setMatrix4("model", glm::value_ptr(model));
+    model = glm::mat4(1.0f);
+    shader->setMatrix4("model", glm::value_ptr(model));
 
-	// Load model
-	meshes = Scene::loadScene(initialFilePath, this);
+    // Load model
+    meshes = Scene::loadScene(initialFilePath, this);
 
-	mainScene = Scene(meshes);
-	currentScene = &mainScene;
-	update();
-	std::cout << "mesh loaded" << std::endl;
-	std::cout << currentScene->meshes[0]->surfaceMesh.n_vertices() << std::endl;
-	int bounds = 0;
-	for (pmp::Halfedge h : currentScene->meshes[0]->surfaceMesh.halfedges()) {
-		if (currentScene->meshes[0]->surfaceMesh.is_boundary(h)) {
-			bounds++;
-		}
-	}
-	std::cout << bounds << std::endl;
-	// std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
-	// std::cout << currentScene->meshes[0]->normals.size() << std::endl;
-	// std::cout << currentScene->meshes[0]->indices.size() << std::endl;
+    mainScene = Scene(meshes);
+    currentScene = &mainScene;
+    update();
+    std::cout << "mesh loaded" << std::endl;
+    std::cout << currentScene->meshes[0]->surfaceMesh.n_vertices() << std::endl;
+    int bounds = 0;
+    for (pmp::Halfedge h : currentScene->meshes[0]->surfaceMesh.halfedges()) {
+        if (currentScene->meshes[0]->surfaceMesh.is_boundary(h)) {
+            bounds++;
+        }
+    }
+    std::cout << bounds << std::endl;
+    // std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
+    // std::cout << currentScene->meshes[0]->normals.size() << std::endl;
+    // std::cout << currentScene->meshes[0]->indices.size() << std::endl;
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
-	projection = glm::perspective(glm::radians(45.0f), (float)w / h, 0.1f, 1000.0f);
-	shader->setMatrix4("projection", glm::value_ptr(projection));
-	glViewport(0, 0, w, h);  // adjust viewport to new size
+    projection = glm::perspective(glm::radians(45.0f), (float)w / h, 0.1f, 1000.0f);
+    shader->setMatrix4("projection", glm::value_ptr(projection));
+    glViewport(0, 0, w, h);  // adjust viewport to new size
 }
 
 void GLWidget::paintGL()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear screen
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear screen
 
-	view = camera.GetViewMatrix();
-	shader->setMatrix4("view", glm::value_ptr(view));
+    view = camera.GetViewMatrix();
+    shader->setMatrix4("view", glm::value_ptr(view));
 
-	currentScene->Draw(shader, selectedMesh);
+    currentScene->Draw(shader, selectedMesh);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-	std::cout << __func__ << std::endl;
-	mousePosX = event->position().x();
-	mousePosY = event->position().y();
-	isRotating = false;
+    std::cout << __func__ << std::endl;
+    mousePosX = event->position().x();
+    mousePosY = event->position().y();
+    isRotating = false;
 
-	glm::vec3 rayDirection;
-	Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection,
-	                            rayDirection);
+    glm::vec3 rayDirection;
+    Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection,
+                                rayDirection);
 
-	Mesh *hitMesh = nullptr;
-	pmp::Vertex hitVertexIndex;
-	glm::vec3 intersectionPoint;
-	bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex,
-	                                                     intersectionPoint);
+    Mesh *hitMesh = nullptr;
+    pmp::Vertex hitVertexIndex;
+    glm::vec3 intersectionPoint;
+    bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex,
+                                                         intersectionPoint);
 
-	if (intersection) {
-		std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
-		std::cout << "Vertex index: " << hitVertexIndex << std::endl;
-		std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " "
-		          << intersectionPoint.z << std::endl;
-	}
+    if (intersection) {
+        std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
+        std::cout << "Vertex index: " << hitVertexIndex << std::endl;
+        std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " "
+                  << intersectionPoint.z << std::endl;
+    }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	float offsetX = event->position().x() - mousePosX;
-	float offsetY = event->position().y() - mousePosY;
-	if (abs(offsetX) > 3 || abs(offsetY) > 3) {
-		isRotating = true;
-	}
-	camera.processMouse(offsetX, offsetY);
-	mousePosX = event->position().x();
-	mousePosY = event->position().y();
-	update();
+    float offsetX = event->position().x() - mousePosX;
+    float offsetY = event->position().y() - mousePosY;
+    if (abs(offsetX) > 3 || abs(offsetY) > 3) {
+        isRotating = true;
+    }
+    camera.processMouse(offsetX, offsetY);
+    mousePosX = event->position().x();
+    mousePosY = event->position().y();
+    update();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (!isRotating) {
-		std::cout << __func__ << std::endl;
-		float mouseX = event->position().x();
-		float mouseY = event->position().y();
-		glm::vec3 rayDirection;
-		Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection,
-		                            rayDirection);
-		std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z
-		          << std::endl;
-		std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
-		std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z
-		          << std::endl;
+    if (!isRotating) {
+        std::cout << __func__ << std::endl;
+        float mouseX = event->position().x();
+        float mouseY = event->position().y();
+        glm::vec3 rayDirection;
+        Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection,
+                                    rayDirection);
+        std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z
+                  << std::endl;
+        std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
+        std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z
+                  << std::endl;
 
-		Mesh *intersectedMesh = nullptr;
-		bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
-		std::cout << "intersection: " << intersection << std::endl;
-		if (intersection && intersectedMesh != nullptr) {
-			std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
-			selectedMesh = intersectedMesh;
-			if (inMainScene) emit meshSelectedInMainScene();
-			// selectedMesh->setScale(1.2);
-		} else {
-			std::cout << "nullpointer" << std::endl;
-		}
-		update();
-	}
+        Mesh *intersectedMesh = nullptr;
+        bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
+        std::cout << "intersection: " << intersection << std::endl;
+        if (intersection && intersectedMesh != nullptr) {
+            std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
+            selectedMesh = intersectedMesh;
+            if (inMainScene) emit meshSelectedInMainScene();
+            // selectedMesh->setScale(1.2);
+        } else {
+            std::cout << "nullpointer" << std::endl;
+        }
+        update();
+    }
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
-	QPoint numPixels = event->pixelDelta();
-	QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
 
-	if (!numPixels.isNull()) {
-		camera.addDistance(numPixels.y());
-	} else if (!numDegrees.isNull()) {
-		QPoint numSteps = numDegrees / 15;
-		camera.addDistance(numSteps.y());
-	}
+    if (!numPixels.isNull()) {
+        camera.addDistance(numPixels.y());
+    } else if (!numDegrees.isNull()) {
+        QPoint numSteps = numDegrees / 15;
+        camera.addDistance(numSteps.y());
+    }
 
-	update();
-	event->accept();
+    update();
+    event->accept();
 }
 
 void GLWidget::saveEditSceneAndReturnToMainScene()
 {
-	currentScene = &mainScene;
-	inMainScene = true;
-	update();
+    currentScene = &mainScene;
+    inMainScene = true;
+    update();
 }
 
 void GLWidget::setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive)
 {
-	std::cout << __func__;
-	float scaleF = val / 10.0;
-	std::cout << "scale: " << scaleF << std::endl;
-	if (selectedMesh != nullptr) {
-		float x = 1.0f;
-		float y = 1.0f;
-		float z = 1.0f;
-		if (xActive) x = val / 10.0;
-		if (yActive) y = val / 10.0f;
-		if (zActive) z = val / 10.0f;
-		selectedMesh->setScaleDirectional(x, y, z);
-		update();
-	}
+    std::cout << __func__;
+    float scaleF = val / 10.0;
+    std::cout << "scale: " << scaleF << std::endl;
+    if (selectedMesh != nullptr) {
+        float x = 1.0f;
+        float y = 1.0f;
+        float z = 1.0f;
+        if (xActive) x = val / 10.0;
+        if (yActive) y = val / 10.0f;
+        if (zActive) z = val / 10.0f;
+        selectedMesh->setScaleDirectional(x, y, z);
+        update();
+    }
 }
 
 void GLWidget::onEditSceneClicked()
 {
-	if (selectedMesh != nullptr && inMainScene) {
-		std::string neighbor1Name = "";
-		std::string neighbor2Name = "";
-		Scene::GetNeighboringMeshNames(selectedMesh->name, neighbor1Name, neighbor2Name);
+    if (selectedMesh != nullptr && inMainScene) {
+        std::string neighbor1Name = "";
+        std::string neighbor2Name = "";
+        Scene::GetNeighboringMeshNames(selectedMesh->name, neighbor1Name, neighbor2Name);
 
-		std::vector<Mesh *> editMeshes = {selectedMesh};
+        std::vector<Mesh *> editMeshes = {selectedMesh};
 
-		// Add neighboring teeth meshes
-		if (neighbor1Name != "") {
-			for (int i = 0; i < meshes.size(); i++) {
-				if (meshes[i]->name == neighbor1Name) {
-					editMeshes.push_back(meshes[i]);
-				}
-			}
-		}
-		if (neighbor2Name != "") {
-			for (int i = 0; i < meshes.size(); i++) {
-				if (meshes[i]->name == neighbor2Name) editMeshes.push_back(meshes[i]);
-			}
-		}
+        // Add neighboring teeth meshes
+        if (neighbor1Name != "") {
+            for (int i = 0; i < meshes.size(); i++) {
+                if (meshes[i]->name == neighbor1Name) {
+                    editMeshes.push_back(meshes[i]);
+                }
+            }
+        }
+        if (neighbor2Name != "") {
+            for (int i = 0; i < meshes.size(); i++) {
+                if (meshes[i]->name == neighbor2Name) editMeshes.push_back(meshes[i]);
+            }
+        }
 
-		editScene = Scene(editMeshes);
-		editScene.center = selectedMesh->center;
-		currentScene = &editScene;
-		emit movedToEditScene();
-		inMainScene = false;
-	} else if (!inMainScene) {
-		saveEditSceneAndReturnToMainScene();
-		emit movedToMainScene();
-	}
-	update();
+        editScene = Scene(editMeshes);
+        editScene.center = selectedMesh->center;
+        currentScene = &editScene;
+        emit movedToEditScene();
+        inMainScene = false;
+    } else if (!inMainScene) {
+        saveEditSceneAndReturnToMainScene();
+        emit movedToMainScene();
+    }
+    update();
 }
 
 void GLWidget::setSelectedMeshScale(int scale)
 {
-	// std::cout<<"scale :"<<scale<<std::end;
-	float scaleF = scale / 10.0f;
-	std::cout << "scaleF :" << scaleF << std::endl;
-	// std::cout<<"scale: "<<scaleF<<std::endl;
-	if (selectedMesh != nullptr) {
-		selectedMesh->setScale(scaleF);
-		update();
-	}
+    // std::cout<<"scale :"<<scale<<std::end;
+    float scaleF = scale / 10.0f;
+    std::cout << "scaleF :" << scaleF << std::endl;
+    // std::cout<<"scale: "<<scaleF<<std::endl;
+    if (selectedMesh != nullptr) {
+        selectedMesh->setScale(scaleF);
+        update();
+    }
 }
 
 void GLWidget::updateMeshScale()
 {
-	if (selectedMesh != nullptr) {
-		selectedMesh->updateMeshScale(currentScene->center);
-		update();
-	}
+    if (selectedMesh != nullptr) {
+        selectedMesh->updateMeshScale(currentScene->center);
+        update();
+    }
 }
 
 void GLWidget::setFreeDeformAddMode(bool isAdd)
 {
-	freeDeformAddMode = isAdd;
-	updateCursor();
-	update();
-	std::cout << "[FreeDeform] Mode:" << (isAdd ? "Add" : "Remove") << std::endl;
+    freeDeformAddMode = isAdd;
+    updateCursor();
+    update();
+    std::cout << "[FreeDeform] Mode:" << (isAdd ? "Add" : "Remove") << std::endl;
 }
 
 void GLWidget::setDeformationStrength(int value)
 {
-	std::cout << "[FreeDeform] Strength set to:" << value << std::endl;
+    std::cout << "[FreeDeform] Strength set to:" << value << std::endl;
 }
 
 void GLWidget::setBrushSize(int value)
 {
-	brushSize = value;
-	std::cout << "[FreeDeform] Brush size set to:" << value << std::endl;
-	updateCursor();
+    brushSize = value;
+    std::cout << "[FreeDeform] Brush size set to:" << value << std::endl;
+    updateCursor();
 }
 
 void GLWidget::updateCursor()
 {
-	if (MainWindow::inFreeDeformation) {
-		if (freeDeformAddMode) {
-			setCursor(createAddCursor(brushSize));
-		} else {
-			setCursor(createRemoveCursor(brushSize));
-		}
-	} else {
-		setCursor(defaultCursor);
-	}
+    if (MainWindow::inFreeDeformation) {
+        if (freeDeformAddMode) {
+            setCursor(createAddCursor(brushSize));
+        } else {
+            setCursor(createRemoveCursor(brushSize));
+        }
+    } else {
+        setCursor(defaultCursor);
+    }
 }
 
 QCursor GLWidget::createAddCursor(int size)
 {
-	int cursorSize = std::min(64, std::max(8, size * 2));
-	QPixmap pixmap(cursorSize, cursorSize);
-	pixmap.fill(Qt::transparent);
-	QPainter painter(&pixmap);
-	painter.setRenderHint(QPainter::Antialiasing);
-	painter.setPen(QPen(Qt::green, 2));
-	int padding = cursorSize / 8;
-	painter.drawEllipse(padding, padding, cursorSize - padding * 2, cursorSize - padding * 2);
-	int centerX = cursorSize / 2;
-	int centerY = cursorSize / 2;
-	int lineLength = cursorSize / 2;
-	painter.drawLine(centerX, centerY - lineLength / 2, centerX, centerY + lineLength / 2);
-	painter.drawLine(centerX - lineLength / 2, centerY, centerX + lineLength / 2, centerY);
-	return QCursor(pixmap, centerX, centerY);
+    int cursorSize = std::min(64, std::max(8, size * 2));
+    QPixmap pixmap(cursorSize, cursorSize);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(QPen(Qt::green, 2));
+    int padding = cursorSize / 8;
+    painter.drawEllipse(padding, padding, cursorSize - padding * 2, cursorSize - padding * 2);
+    int centerX = cursorSize / 2;
+    int centerY = cursorSize / 2;
+    int lineLength = cursorSize / 2;
+    painter.drawLine(centerX, centerY - lineLength / 2, centerX, centerY + lineLength / 2);
+    painter.drawLine(centerX - lineLength / 2, centerY, centerX + lineLength / 2, centerY);
+    return QCursor(pixmap, centerX, centerY);
 }
 
 QCursor GLWidget::createRemoveCursor(int size)
 {
-	int cursorSize = std::min(64, std::max(8, size * 2));
-	QPixmap pixmap(cursorSize, cursorSize);
-	pixmap.fill(Qt::transparent);
-	QPainter painter(&pixmap);
-	painter.setRenderHint(QPainter::Antialiasing);
-	painter.setPen(QPen(Qt::red, 2));
-	int padding = cursorSize / 8;
-	painter.drawEllipse(padding, padding, cursorSize - padding * 2, cursorSize - padding * 2);
-	int centerX = cursorSize / 2;
-	int centerY = cursorSize / 2;
-	int lineLength = cursorSize / 2;
-	painter.drawLine(centerX - lineLength / 2, centerY, centerX + lineLength / 2, centerY);
-	return QCursor(pixmap, centerX, centerY);
+    int cursorSize = std::min(64, std::max(8, size * 2));
+    QPixmap pixmap(cursorSize, cursorSize);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(QPen(Qt::red, 2));
+    int padding = cursorSize / 8;
+    painter.drawEllipse(padding, padding, cursorSize - padding * 2, cursorSize - padding * 2);
+    int centerX = cursorSize / 2;
+    int centerY = cursorSize / 2;
+    int lineLength = cursorSize / 2;
+    painter.drawLine(centerX - lineLength / 2, centerY, centerX + lineLength / 2, centerY);
+    return QCursor(pixmap, centerX, centerY);
 }

@@ -5,9 +5,9 @@
 
 class SmoothPanelWidget : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit SmoothPanelWidget(QWidget *parent = nullptr);
+    explicit SmoothPanelWidget(QWidget *parent = nullptr);
 
 signals:
 };

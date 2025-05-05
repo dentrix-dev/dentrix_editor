@@ -9,10 +9,10 @@
 class FileHandler
 {
 public:
-	FileHandler();
+    FileHandler();
 
-	static std::vector<Mesh*> readOBJ(std::string& filepath, QOpenGLFunctions_3_3_Core* gl);
-	static Mesh* readSTL(std::string& filepath, std::string& name, QOpenGLFunctions_3_3_Core* gl);
+    static std::vector<Mesh*> readOBJ(std::string& filepath, QOpenGLFunctions_3_3_Core* gl);
+    static Mesh* readSTL(std::string& filepath, std::string& name, QOpenGLFunctions_3_3_Core* gl);
 };
 
 #endif  // FILEHANDLER_H

@@ -8,14 +8,14 @@
 
 class DirectionalScalePanelWidget : public QWidget
 {
-	Q_OBJECT
-	QSlider *directionalScaleSlider;
+    Q_OBJECT
+    QSlider *directionalScaleSlider;
 
 public:
-	explicit DirectionalScalePanelWidget(GLWidget *glWidget);
+    explicit DirectionalScalePanelWidget(GLWidget *glWidget);
 
 public slots:
-	void onQActionGroupTriggered(QAction *action);
+    void onQActionGroupTriggered(QAction *action);
 };
 
 #endif  // DIRECTIONALSCALEPANELWIDGET_H

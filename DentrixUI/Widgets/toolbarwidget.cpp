@@ -9,60 +9,60 @@ const QString ToolBarWidget::FREE_DEFORM_ACTION_TEXT = "Free Deformation";
 
 ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
 {
-	// Create Transformation Actions Group
-	actionGroup = new QActionGroup(this);
-	actionGroup->setExclusive(true);
+    // Create Transformation Actions Group
+    actionGroup = new QActionGroup(this);
+    actionGroup->setExclusive(true);
 
-	// Create actions (buttons) to add to the toolbar
-	QAction *uniformScaleAction = new QAction(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
-	uniformScaleAction->setCheckable(true);
-	actionGroup->addAction(uniformScaleAction);
-	QAction *directionalScaleAction = new QAction(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
-	directionalScaleAction->setCheckable(true);
-	actionGroup->addAction(directionalScaleAction);
-	QAction *freeDeformAction = new QAction(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
-	freeDeformAction->setCheckable(true);
-	actionGroup->addAction(freeDeformAction);
+    // Create actions (buttons) to add to the toolbar
+    QAction *uniformScaleAction = new QAction(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
+    uniformScaleAction->setCheckable(true);
+    actionGroup->addAction(uniformScaleAction);
+    QAction *directionalScaleAction = new QAction(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
+    directionalScaleAction->setCheckable(true);
+    actionGroup->addAction(directionalScaleAction);
+    QAction *freeDeformAction = new QAction(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
+    freeDeformAction->setCheckable(true);
+    actionGroup->addAction(freeDeformAction);
 
-	// Add a spacer widget to push following widgets to the bottom
-	QWidget *spacer = new QWidget();
-	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	QWidgetAction *spacerAction = new QWidgetAction(actionGroup);
-	spacerAction->setDefaultWidget(spacer);
-	// Create a styled blue "Edit" button
-	editButton = new QPushButton("Edit");
-	editButton->setStyleSheet(editButtonInactiveStyleSheet);
-	// Wrap it in a QWidgetAction so it can go in the QToolBar
-	QWidgetAction *editAction = new QWidgetAction(actionGroup);
-	editAction->setDefaultWidget(editButton);
+    // Add a spacer widget to push following widgets to the bottom
+    QWidget *spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QWidgetAction *spacerAction = new QWidgetAction(actionGroup);
+    spacerAction->setDefaultWidget(spacer);
+    // Create a styled blue "Edit" button
+    editButton = new QPushButton("Edit");
+    editButton->setStyleSheet(editButtonInactiveStyleSheet);
+    // Wrap it in a QWidgetAction so it can go in the QToolBar
+    QWidgetAction *editAction = new QWidgetAction(actionGroup);
+    editAction->setDefaultWidget(editButton);
 
-	// Add the actions to the toolbar
-	this->addAction(uniformScaleAction);
-	this->addAction(directionalScaleAction);
-	this->addAction(freeDeformAction);
-	this->addSeparator();
-	this->addAction(spacerAction);
-	this->addAction(editAction);
+    // Add the actions to the toolbar
+    this->addAction(uniformScaleAction);
+    this->addAction(directionalScaleAction);
+    this->addAction(freeDeformAction);
+    this->addSeparator();
+    this->addAction(spacerAction);
+    this->addAction(editAction);
 
-	// Add toolbar to the left side
+    // Add toolbar to the left side
 }
 
 QActionGroup *ToolBarWidget::getActionGroup() const
 {
-	return actionGroup;
+    return actionGroup;
 }
 
 QPushButton *ToolBarWidget::getEditButton()
 {
-	return editButton;
+    return editButton;
 }
 
 QString ToolBarWidget::getEditButtonInactiveStyleSheet() const
 {
-	return editButtonInactiveStyleSheet;
+    return editButtonInactiveStyleSheet;
 }
 
 QString ToolBarWidget::getEditButtonActiveStyleSheet() const
 {
-	return editButtonActiveStyleSheet;
+    return editButtonActiveStyleSheet;
 }

@@ -10,15 +10,15 @@
 class RightPanelStackedWidget : public QStackedWidget
 {
 public:
-	RightPanelStackedWidget(GLWidget* glWidget);
+    RightPanelStackedWidget(GLWidget* glWidget);
 
-	UniformScalePanelWidget* uniformScalePanel = nullptr;
+    UniformScalePanelWidget* uniformScalePanel = nullptr;
 
-	DirectionalScalePanelWidget* directionalScalePanel = nullptr;
+    DirectionalScalePanelWidget* directionalScalePanel = nullptr;
 
-	DeformationPanelWidget* deformationPanel = nullptr;
+    DeformationPanelWidget* deformationPanel = nullptr;
 
-	SmoothPanelWidget* smoothPanel = nullptr;
+    SmoothPanelWidget* smoothPanel = nullptr;
 };
 
 #endif  // RIGHTPANELSTACKEDWIDGET_H

@@ -7,9 +7,9 @@
 
 class DeformationPanelWidget : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit DeformationPanelWidget(GLWidget *glWidget);
+    explicit DeformationPanelWidget(GLWidget *glWidget);
 
 signals:
 };
