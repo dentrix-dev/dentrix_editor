@@ -3,6 +3,7 @@
 #include <pmp/io/io.h>
 #include <pmp/surface_mesh.h>
 
+#include <chrono>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -56,7 +57,11 @@ void GLWidget::initializeGL()
     shader->setMatrix4("model", glm::value_ptr(model));
 
     // Load model
+    auto modelLoadTime1 = std::chrono::steady_clock::now();
     meshes = Scene::loadScene(initialFilePath, this);
+    auto modelLoadTime2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double, std::milli> ms_double = modelLoadTime2 - modelLoadTime1;
+    std::cout << "Model loaded in " << ms_double << std::endl;
 
     mainScene = Scene(meshes);
     currentScene = &mainScene;
