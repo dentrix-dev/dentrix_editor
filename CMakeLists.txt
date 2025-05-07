@@ -17,7 +17,7 @@ include(cmake/CPM.cmake)
 
 CPMAddPackage(
     NAME mcg
-    GIT_REPOSITORY https://github.com/dentrix-dev/mcg.git
+    GIT_REPOSITORY git@github.com:dentrix-dev/mcg.git
     GIT_TAG master
     OPTIONS
         "MCG_BUILD_PLAYGROUND OFF"
@@ -62,6 +62,7 @@ set(PROJECT_SOURCES
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(dentrix_editor
         MANUAL_FINALIZATION
+        resources.qrc
         ${PROJECT_SOURCES}
         DentrixUI/Widgets/ToolPanelWidgets/uniformscalepanelwidget.h DentrixUI/Widgets/ToolPanelWidgets/uniformscalepanelwidget.cpp
         DentrixUI/Widgets/ToolPanelWidgets/directionalscalepanelwidget.h DentrixUI/Widgets/ToolPanelWidgets/directionalscalepanelwidget.cpp

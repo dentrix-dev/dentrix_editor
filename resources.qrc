@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>DentrixUI/Icons/hint.png</file>
+    </qresource>
+</RCC>
