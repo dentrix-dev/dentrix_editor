@@ -57,8 +57,6 @@ set(PROJECT_SOURCES
     main.cpp
     ${UI_SOURCES}
     ${CORE_SOURCES}
-        DentrixUI/cursorFactory.cpp
-        DentrixUI/cursorFactory.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
