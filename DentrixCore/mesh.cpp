@@ -443,3 +443,38 @@ bool Mesh::testRayOBBIntersection(glm::vec3 ray_origin,     // Ray origin, in wo
     intersection_distance = tMin;
     return true;
 }
+
+void Mesh::applyFreeDeformation(Brush& brush, bool isAdd) {
+    auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
+    if (!surfaceMesh.has_vertex_property("v:normal")) {
+        pmp::vertex_normals(surfaceMesh);
+    }
+    auto vnormal = surfaceMesh.vertex_property<pmp::Normal>("v:normal");
+    std::vector<pmp::Vertex> vertices = brush.getVerticesInRadius(surfaceMesh);
+    //const float strengthMultiplier = 0.002f;
+    //float adjustedStrength = strength * strengthMultiplier;
+    for (auto v : vertices){
+        pmp::Point p = vpos[v];
+        glm::vec3 vertexPos(p[0], p[1], p[2]);
+
+        float distance = glm::distance(vertexPos, brush.getPosition());
+
+        float falloff = 1.0f - (distance / brush.getRadius());
+        falloff = pow(falloff, 3.0f);
+
+        pmp::Normal n = vnormal[v];
+        glm::vec3 normal(n[0], n[1], n[2]);
+        normal = glm::normalize(normal);
+
+        float direction = isAdd ? 1.0f : -1.0f;
+        float maxDisplacement = 0.001f * falloff; // constant displacment for now
+        //float actualStrength = adjustedStrength * falloff
+
+        glm::vec3 displacement = normal * maxDisplacement * direction;
+        pmp::Point newPos(p[0] + displacement.x, p[1] + displacement.y, p[2] + displacement.z);
+        vpos[v] = newPos;
+    }
+    pmp::vertex_normals(surfaceMesh);
+    pmp::face_normals(surfaceMesh);
+    updateBuffers();
+}

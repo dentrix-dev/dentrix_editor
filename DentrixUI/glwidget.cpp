@@ -12,12 +12,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
-
 #include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
 
-GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {}
+GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {setFocusPolicy(Qt::StrongFocus);}
 
 GLWidget::~GLWidget() {}
 
@@ -98,22 +97,24 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     mousePosX = event->position().x();
     mousePosY = event->position().y();
     isRotating = false;
-
     glm::vec3 rayDirection;
     Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection,
                                 rayDirection);
-
     Mesh *hitMesh = nullptr;
     pmp::Vertex hitVertexIndex;
     glm::vec3 intersectionPoint;
     bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex,
                                                          intersectionPoint);
-
     if (intersection) {
         std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
         std::cout << "Vertex index: " << hitVertexIndex << std::endl;
         std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " "
                   << intersectionPoint.z << std::endl;
+    }
+    if (MainWindow::inFreeDeformation && shiftHeld) {
+        brush.setPosition(intersectionPoint);
+        hitMesh->applyFreeDeformation(brush, freeDeformAddMode);
+        update();
     }
 }
 
@@ -124,7 +125,25 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (abs(offsetX) > 3 || abs(offsetY) > 3) {
         isRotating = true;
     }
-    camera.processMouse(offsetX, offsetY);
+    if (MainWindow::inFreeDeformation && shiftHeld) {
+        glm::vec3 rayDirection;
+        Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(), view, projection,
+                                    rayDirection);
+
+        Mesh* hitMesh = nullptr;
+        pmp::Vertex dummyVertex;
+        glm::vec3 intersectionPoint;
+        bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model,
+                                                             hitMesh, dummyVertex, intersectionPoint);
+
+        if (intersection) {
+            brush.setPosition(intersectionPoint);
+            hitMesh->applyFreeDeformation(brush, freeDeformAddMode);
+            update();
+        }
+    } else {
+        camera.processMouse(offsetX, offsetY);
+    }
     mousePosX = event->position().x();
     mousePosY = event->position().y();
     update();
@@ -255,9 +274,9 @@ void GLWidget::updateMeshScale()
     }
 }
 
-void GLWidget::setFreeDeformAddMode(bool isAdd)
-{
+void GLWidget::setFreeDeformAddMode(bool isAdd) {
     freeDeformAddMode = isAdd;
+    currentBrushMode = isAdd ? BrushMode::Add : BrushMode::Remove;
     updateCursor();
     update();
     std::cout << "[FreeDeform] Mode:" << (isAdd ? "Add" : "Remove") << std::endl;
@@ -265,60 +284,38 @@ void GLWidget::setFreeDeformAddMode(bool isAdd)
 
 void GLWidget::setDeformationStrength(int value)
 {
+    brush.setStrength(value);
     std::cout << "[FreeDeform] Strength set to:" << value << std::endl;
 }
 
-void GLWidget::setBrushSize(int value)
-{
-    brushSize = value;
-    std::cout << "[FreeDeform] Brush size set to:" << value << std::endl;
+void GLWidget::setBrushSize(int value) {
+    brush.setRadius(value);
+    std::cout << "[Brush] Size set to: " << value << std::endl;
     updateCursor();
 }
 
-void GLWidget::updateCursor()
-{
-    if (MainWindow::inFreeDeformation) {
-        if (freeDeformAddMode) {
-            setCursor(createAddCursor(brushSize));
-        } else {
-            setCursor(createRemoveCursor(brushSize));
-        }
+void GLWidget::updateCursor() {
+    if (MainWindow::inFreeDeformation && shiftHeld) {
+        setCursor(CursorFactory::createCursor(brush.getRadius(), currentBrushMode));
     } else {
-        setCursor(defaultCursor);
+        unsetCursor();
     }
 }
 
-QCursor GLWidget::createAddCursor(int size)
-{
-    int cursorSize = std::min(64, std::max(8, size * 2));
-    QPixmap pixmap(cursorSize, cursorSize);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(Qt::green, 2));
-    int padding = cursorSize / 8;
-    painter.drawEllipse(padding, padding, cursorSize - padding * 2, cursorSize - padding * 2);
-    int centerX = cursorSize / 2;
-    int centerY = cursorSize / 2;
-    int lineLength = cursorSize / 2;
-    painter.drawLine(centerX, centerY - lineLength / 2, centerX, centerY + lineLength / 2);
-    painter.drawLine(centerX - lineLength / 2, centerY, centerX + lineLength / 2, centerY);
-    return QCursor(pixmap, centerX, centerY);
+void GLWidget::keyPressEvent(QKeyEvent* event) {
+    std::cout<< "shift pressed\n";
+    if (event->key() == Qt::Key_Shift && !shiftHeld) {
+        shiftHeld = true;
+        if (MainWindow::inFreeDeformation)
+            updateCursor();
+    }
+    QOpenGLWidget::keyPressEvent(event);
 }
 
-QCursor GLWidget::createRemoveCursor(int size)
-{
-    int cursorSize = std::min(64, std::max(8, size * 2));
-    QPixmap pixmap(cursorSize, cursorSize);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(Qt::red, 2));
-    int padding = cursorSize / 8;
-    painter.drawEllipse(padding, padding, cursorSize - padding * 2, cursorSize - padding * 2);
-    int centerX = cursorSize / 2;
-    int centerY = cursorSize / 2;
-    int lineLength = cursorSize / 2;
-    painter.drawLine(centerX - lineLength / 2, centerY, centerX + lineLength / 2, centerY);
-    return QCursor(pixmap, centerX, centerY);
+void GLWidget::keyReleaseEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_Shift) {
+        shiftHeld = false;
+        unsetCursor();
+    }
+    QOpenGLWidget::keyReleaseEvent(event);
 }

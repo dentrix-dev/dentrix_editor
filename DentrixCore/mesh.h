@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+#include "Brush.h"
 
 class Mesh
 {
@@ -41,7 +42,7 @@ public:
     void updateBuffers();
     void updateBoundingBoxBuffers();
     void updateMeshScale(glm::vec3 sceneCenter);
-
+    void applyFreeDeformation(Brush& brush, bool isAdd);
 private:
     unsigned int VAO, VBO, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;

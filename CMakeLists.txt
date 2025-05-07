@@ -32,6 +32,10 @@ set(UI_SOURCES
     DentrixUI/mainwindow.ui
     DentrixUI/glwidget.cpp
     DentrixUI/glwidget.h
+    DentrixUI/Brush.cpp
+    DentrixUI/Brush.h
+    DentrixUI/cursorFactory.cpp
+    DentrixUI/cursorFactory.h
 )
 
 set(CORE_SOURCES
@@ -53,6 +57,8 @@ set(PROJECT_SOURCES
     main.cpp
     ${UI_SOURCES}
     ${CORE_SOURCES}
+        DentrixUI/cursorFactory.cpp
+        DentrixUI/cursorFactory.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
