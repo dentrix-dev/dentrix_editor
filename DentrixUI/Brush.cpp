@@ -1,7 +1,7 @@
 // Brush.cpp
 #include "Brush.h"
 
-Brush::Brush() : radius(1.0f), position(0.0f) {}
+Brush::Brush() : radius(10.0f), strength(10), position(0.0f) {}
 
 void Brush::setRadius(float r) {
     radius = r;
@@ -11,11 +11,11 @@ float Brush::getRadius(){
     return radius;
 }
 
-void Brush::setStrength(float s){
+void Brush::setStrength(int s){
     strength = s;
 }
 
-float Brush::getStrength(){
+int Brush::getStrength(){
     return strength;
 }
 
@@ -36,7 +36,7 @@ std::vector<pmp::Vertex> Brush::getVerticesInRadius(pmp::SurfaceMesh& mesh){
         pmp::Point p = vpos[v];
         glm::vec3 vertexPos(p[0], p[1], p[2]);
         float distance = glm::distance(vertexPos, position);
-        if (distance <= radius)
+        if (distance <= radius*0.05f)
         {
             verticesInRadius.push_back(v);
         }

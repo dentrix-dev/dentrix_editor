@@ -451,8 +451,8 @@ void Mesh::applyFreeDeformation(Brush& brush, bool isAdd) {
     }
     auto vnormal = surfaceMesh.vertex_property<pmp::Normal>("v:normal");
     std::vector<pmp::Vertex> vertices = brush.getVerticesInRadius(surfaceMesh);
-    //const float strengthMultiplier = 0.002f;
-    //float adjustedStrength = strength * strengthMultiplier;
+    const float strengthMultiplier = 0.0001f;
+    float adjustedStrength = brush.getStrength() * strengthMultiplier;
     for (auto v : vertices){
         pmp::Point p = vpos[v];
         glm::vec3 vertexPos(p[0], p[1], p[2]);
@@ -467,10 +467,9 @@ void Mesh::applyFreeDeformation(Brush& brush, bool isAdd) {
         normal = glm::normalize(normal);
 
         float direction = isAdd ? 1.0f : -1.0f;
-        float maxDisplacement = 0.001f * falloff; // constant displacment for now
-        //float actualStrength = adjustedStrength * falloff
+        float strength = adjustedStrength * falloff;
 
-        glm::vec3 displacement = normal * maxDisplacement * direction;
+        glm::vec3 displacement = normal * strength * direction;
         pmp::Point newPos(p[0] + displacement.x, p[1] + displacement.y, p[2] + displacement.z);
         vpos[v] = newPos;
     }

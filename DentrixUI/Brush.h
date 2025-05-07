@@ -9,8 +9,8 @@ public:
 
     void setRadius(float r);
     float getRadius();
-    void setStrength(float s);
-    float getStrength();
+    void setStrength(int s);
+    int getStrength();
 
     void setPosition(glm::vec3& pos);
     glm::vec3 getPosition();
@@ -20,6 +20,6 @@ public:
 
 private:
     float radius;
-    float strength;
+    int strength;
     glm::vec3 position;
 };
