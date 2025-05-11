@@ -5,11 +5,14 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLWidget>
 #include <QPainter>
+#include <QKeyEvent>
 #include <glm/glm.hpp>
 
 #include "camera.h"
 #include "scene.h"
 #include "shader.h"
+#include "Brush.h"
+#include "cursorFactory.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -24,6 +27,8 @@ public:
     void setDeformationStrength(int value);
     void setBrushSize(int value);
     void updateCursor();
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
 
 protected:
     // Main imported scene
@@ -59,13 +64,9 @@ private:
 
     void saveEditSceneAndReturnToMainScene();
     bool freeDeformAddMode = true;
-    QCursor addCursor;
-    QCursor removeCursor;
-    QCursor defaultCursor;
-    void initializeCursors();
-    QCursor createAddCursor(int size);
-    QCursor createRemoveCursor(int size);
-    int brushSize = 15;
+    Brush brush;
+    BrushMode currentBrushMode = BrushMode::Add;
+    bool shiftHeld = false;
 
 signals:
     void meshSelectedInMainScene();
