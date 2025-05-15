@@ -190,10 +190,40 @@ void Mesh::fillHole(pmp::Halfedge h)
     std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex, holeVertices[holeVertices.size() - 1]};
     surfaceMesh.add_face(face);
 
-    // Smooth boundary vertices to avoid jaggy sharp faces
-    auto vselected = surfaceMesh.get_vertex_property<bool>("v:selected");
-    for (pmp::Vertex v : holeVertices) vselected[v] = true;
-    pmp::fair(surfaceMesh, 1);
+    // Create a subMesh with only hole vertices and neighbors to speed up smoothing
+    pmp::SurfaceMesh subMesh = surfaceMesh;
+    auto vselected = subMesh.get_vertex_property<bool>("v:selected");
+    auto vkeep = subMesh.add_vertex_property<bool>("v:keep");
+    // Mapping to keep track of changed vertices, as deleting vertices changes their indices
+    auto voriginal = subMesh.add_vertex_property<unsigned int>("v:original");
+
+    // Mark hole vertices as selected
+    // Mark hole vertices and their neighbors as "keep"
+    for (unsigned int i = 0; i < holeVertices.size(); i++) {
+        pmp::Vertex v = holeVertices[i];
+        vkeep[v] = true;
+        vselected[v] = true;
+        voriginal[v] = i + 1;
+        for (pmp::Vertex vv : surfaceMesh.vertices(v)) {
+            vkeep[vv] = true;
+        }
+    }
+
+    // Delete all unkept vertices along with their faces
+    for (pmp::Vertex v : subMesh.vertices()) {
+        if (!vkeep[v]) subMesh.delete_vertex(v);
+    }
+    subMesh.garbage_collection();
+
+    // Smooth the filled hole, defined by vselected
+    pmp::fair(subMesh, 1);
+
+    // Copy the changed vertices to the original mesh
+    for (pmp::Vertex v : subMesh.vertices()) {
+        if (voriginal[v] != 0) {
+            surfaceMesh.position(holeVertices[voriginal[v]-1]) = subMesh.position(v);
+        }
+    }
 
     pmp::face_normals(surfaceMesh);
     updateBuffers();
