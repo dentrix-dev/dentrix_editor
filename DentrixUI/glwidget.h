@@ -67,6 +67,7 @@ private:
     Brush brush;
     BrushMode currentBrushMode = BrushMode::Add;
     bool shiftHeld = false;
+    bool ctrlHeld = false;
 
 signals:
     void meshSelectedInMainScene();

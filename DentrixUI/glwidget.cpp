@@ -2,6 +2,7 @@
 
 #include <pmp/io/io.h>
 #include <pmp/surface_mesh.h>
+#include <qnamespace.h>
 
 #include <chrono>
 #include <glm/ext/matrix_clip_space.hpp>
@@ -146,6 +147,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             hitMesh->applyFreeDeformation(brush, freeDeformAddMode);
             update();
         }
+    } else if (ctrlHeld) {
+        camera.processMove(offsetX, offsetY);
     } else {
         camera.processMouse(offsetX, offsetY);
     }
@@ -313,6 +316,8 @@ void GLWidget::keyPressEvent(QKeyEvent* event) {
         shiftHeld = true;
         if (MainWindow::inFreeDeformation)
             updateCursor();
+    } else if (event->key() == Qt::Key_Control) {
+        ctrlHeld = true;
     }
     QOpenGLWidget::keyPressEvent(event);
 }
@@ -321,6 +326,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Shift) {
         shiftHeld = false;
         unsetCursor();
+    } else if (event->key() == Qt::Key_Control) {
+        ctrlHeld = false;
     }
     QOpenGLWidget::keyReleaseEvent(event);
 }

@@ -2,11 +2,13 @@
 
 #include <iostream>
 
+#include "glm/detail/type_vec3.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/geometric.hpp"
 
 glm::mat4 Camera::GetViewMatrix()
 {
-    return glm::lookAt(position, position + front, up);
+    return glm::lookAt(position, target, up);
 }
 
 void Camera::processMouse(float xOffset, float yOffset)
@@ -24,8 +26,19 @@ void Camera::processMouse(float xOffset, float yOffset)
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    position = glm::normalize(direction) * distance;
+    position = target + glm::normalize(direction) * distance;
     front = glm::normalize(position * -1.0f);
+}
+
+void Camera::processMove(float xPan, float yPan)
+{
+    xPan *= sensitivity;
+    yPan *= sensitivity;
+
+    glm::vec3 right = glm::normalize(glm::cross(front, up));
+    glm::vec3 cameraUp = glm::normalize(glm::cross(right, front));
+    target += right * -xPan + cameraUp * yPan;
+    position += right * -xPan + cameraUp * yPan;
 }
 
 void Camera::addDistance(float offset)
@@ -34,7 +47,7 @@ void Camera::addDistance(float offset)
     if (distance < 5.0f) distance = 5.0f;
     if (distance > 150.0f) distance = 150.0f;
 
-    position = glm::normalize(position) * distance;
+    position = target + glm::normalize(position - target) * distance;
 }
 
 void Camera::ScreenPosToWorldRay(int mouseX, int mouseY, int screenWidth, int screenHeight, glm::mat4 ViewMatrix,

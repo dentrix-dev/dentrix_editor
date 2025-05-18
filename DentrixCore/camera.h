@@ -1,4 +1,5 @@
-#include "glm/glm.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 enum MovementDirection { FORWARD, BACK, RIGHT, LEFT };
 
@@ -13,9 +14,11 @@ class Camera
 public:
     glm::vec3 position = glm::vec3(0.0f, 0.0f, distance);
     glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 target = glm::vec3(0.0f);
     glm::mat4 GetViewMatrix();
 
     void processMouse(float xOffset, float yOffset);
+    void processMove(float xPan, float yPan);
     void addDistance(float distance);
 
     static void ScreenPosToWorldRay(
