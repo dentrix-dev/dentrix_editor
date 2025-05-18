@@ -27,8 +27,8 @@ public:
     void setDeformationStrength(int value);
     void setBrushSize(int value);
     void updateCursor();
-    void keyPressEvent(QKeyEvent* event);
-    void keyReleaseEvent(QKeyEvent* event);
+    void keyPressEvent(QKeyEvent* event) override;
+    void keyReleaseEvent(QKeyEvent* event) override;
 
 protected:
     // Main imported scene
