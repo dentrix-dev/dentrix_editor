@@ -1,18 +1,18 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLWidget>
 #include <QPainter>
-#include <QKeyEvent>
 #include <glm/glm.hpp>
 
+#include "Brush.h"
 #include "camera.h"
+#include "cursorFactory.h"
 #include "scene.h"
 #include "shader.h"
-#include "Brush.h"
-#include "cursorFactory.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -27,8 +27,8 @@ public:
     void setDeformationStrength(int value);
     void setBrushSize(int value);
     void updateCursor();
-    void keyPressEvent(QKeyEvent* event) override;
-    void keyReleaseEvent(QKeyEvent* event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 protected:
     // Main imported scene

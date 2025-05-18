@@ -14,11 +14,15 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
+
 #include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
 
-GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path) {setFocusPolicy(Qt::StrongFocus);}
+GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path)
+{
+    setFocusPolicy(Qt::StrongFocus);
+}
 
 GLWidget::~GLWidget() {}
 
@@ -133,14 +137,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
     if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
-        Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(), view, projection,
-                                    rayDirection);
+        Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(),
+                                    view, projection, rayDirection);
 
-        Mesh* hitMesh = nullptr;
+        Mesh *hitMesh = nullptr;
         pmp::Vertex dummyVertex;
         glm::vec3 intersectionPoint;
-        bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model,
-                                                             hitMesh, dummyVertex, intersectionPoint);
+        bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, dummyVertex,
+                                                             intersectionPoint);
 
         if (intersection) {
             brush.setPosition(intersectionPoint);
@@ -282,7 +286,8 @@ void GLWidget::updateMeshScale()
     }
 }
 
-void GLWidget::setFreeDeformAddMode(bool isAdd) {
+void GLWidget::setFreeDeformAddMode(bool isAdd)
+{
     freeDeformAddMode = isAdd;
     currentBrushMode = isAdd ? BrushMode::Add : BrushMode::Remove;
     updateCursor();
@@ -296,13 +301,15 @@ void GLWidget::setDeformationStrength(int value)
     std::cout << "[FreeDeform] Strength set to:" << value << std::endl;
 }
 
-void GLWidget::setBrushSize(int value) {
+void GLWidget::setBrushSize(int value)
+{
     brush.setRadius(value);
     std::cout << "[Brush] Size set to: " << value << std::endl;
     updateCursor();
 }
 
-void GLWidget::updateCursor() {
+void GLWidget::updateCursor()
+{
     if (MainWindow::inFreeDeformation && shiftHeld) {
         setCursor(CursorFactory::createCursor(brush.getRadius(), currentBrushMode));
     } else {
@@ -310,19 +317,20 @@ void GLWidget::updateCursor() {
     }
 }
 
-void GLWidget::keyPressEvent(QKeyEvent* event) {
-    std::cout<< "shift pressed\n";
+void GLWidget::keyPressEvent(QKeyEvent *event)
+{
+    std::cout << "shift pressed\n";
     if (event->key() == Qt::Key_Shift && !shiftHeld) {
         shiftHeld = true;
-        if (MainWindow::inFreeDeformation)
-            updateCursor();
+        if (MainWindow::inFreeDeformation) updateCursor();
     } else if (event->key() == Qt::Key_Control) {
         ctrlHeld = true;
     }
     QOpenGLWidget::keyPressEvent(event);
 }
 
-void GLWidget::keyReleaseEvent(QKeyEvent* event) {
+void GLWidget::keyReleaseEvent(QKeyEvent *event)
+{
     if (event->key() == Qt::Key_Shift) {
         shiftHeld = false;
         unsetCursor();
