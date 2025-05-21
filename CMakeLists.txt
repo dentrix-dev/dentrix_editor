@@ -51,6 +51,10 @@ set(CORE_SOURCES
     DentrixCore/utils.h
     DentrixCore/filehandler.cpp
     DentrixCore/filehandler.h
+    DentrixCore/Gizmo/gizmo.cpp
+    DentrixCore/Gizmo/gizmo.h
+    DentrixCore/Gizmo/gizmoComponent.cpp
+    DentrixCore/Gizmo/gizmoComponent.h
 )
 
 set(PROJECT_SOURCES
