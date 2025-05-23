@@ -4,7 +4,12 @@
 Gizmo::Gizmo(QOpenGLFunctions_3_3_Core *gl)
 {
     position = glm::vec3(0.0f);
-    components.push_back(GizmoComponent(glm::vec3(1.0f, 0.0f, 0.0f), gl));
+    glm::mat4 rotation = glm::mat4(1.0f);
+    components.push_back(GizmoComponent(glm::vec3(1.0f, 0.0f, 0.0f), rotation, gl));
+    rotation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    components.push_back(GizmoComponent(glm::vec3(0.0f, 1.0f, 0.0f), rotation, gl));
+    rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    components.push_back(GizmoComponent(glm::vec3(0.0f, 0.0f, 1.0f), rotation, gl));
 }
 
 void Gizmo::draw(Shader *shader)

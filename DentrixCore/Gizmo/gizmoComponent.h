@@ -15,6 +15,6 @@ public:
     glm::mat4 rotation;
 
 public:
-    GizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core *gl);
+    GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core *gl);
     void draw();
 };

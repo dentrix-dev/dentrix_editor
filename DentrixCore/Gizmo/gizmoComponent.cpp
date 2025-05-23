@@ -1,21 +1,20 @@
 #include "gizmoComponent.h"
-#include "glm/ext/matrix_transform.hpp"
 
-GizmoComponent::GizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
+GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core* gl)
 {
-    this->rotation = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f,0.0f,1.0f));
+    this->rotation = rotation;
     this->color = color;
     this->gl = gl;
     const std::vector<float> vertices = {
         // positions
-        -0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f,  // 0
-        -0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 1
-        5.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 2
-        5.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 3
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  // 4
-        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  // 5
-        5.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // 6
-        5.5f, -0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // 7
+        0.1f, -0.1f, 0.1f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
+        0.1f, 0.1f,  0.1f,  1.0f, 1.0f, 1.0f,  // Top left +Z
+        5.0f, 0.1f,  0.1f,  1.0f, 1.0f, 1.0f,  // Top right +Z
+        5.0f, -0.1f, 0.1f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
+        0.1f, -0.1f, -0.1f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
+        0.1f, 0.1f,  -0.1f, 1.0f, 1.0f, 1.0f,  // Top left -Z
+        5.0f, 0.1f,  -0.1f, 1.0f, 1.0f, 1.0f,  // Top right -Z
+        5.0f, -0.1f, -0.1f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
     };
 
     const std::vector<unsigned int> indices = {// front face
@@ -52,7 +51,8 @@ GizmoComponent::GizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
     gl->glBindVertexArray(0);
 }
 
-void GizmoComponent::draw() {
+void GizmoComponent::draw()
+{
     gl->glBindVertexArray(VAO);
     gl->glDrawElements(GL_TRIANGLES, 36 * sizeof(float), GL_UNSIGNED_INT, 0);
     gl->glBindVertexArray(0);
