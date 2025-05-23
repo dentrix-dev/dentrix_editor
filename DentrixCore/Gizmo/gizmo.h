@@ -1,6 +1,7 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
+#include <QOpenGLFunctions_3_3_Core>
 #include <vector>
 
 #include "Gizmo/gizmoComponent.h"
@@ -11,10 +12,8 @@ class gizmo
     std::vector<gizmoComponent> components;
     glm::vec3 position;
 
-protected:
-    gizmo();
-
 public:
+    gizmo(QOpenGLFunctions_3_3_Core* gl);
     void draw();
 };
 

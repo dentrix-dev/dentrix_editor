@@ -15,6 +15,7 @@
 #include <glm/trigonometric.hpp>
 #include <iostream>
 
+#include "Gizmo/gizmo.h"
 #include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
@@ -82,6 +83,7 @@ void GLWidget::initializeGL()
     // std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
     // std::cout << currentScene->meshes[0]->normals.size() << std::endl;
     // std::cout << currentScene->meshes[0]->indices.size() << std::endl;
+    myGizmo = new gizmo(this);
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -99,6 +101,7 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     currentScene->Draw(shader, selectedMesh);
+    myGizmo->draw();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)

@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 #include "Brush.h"
+#include "Gizmo/gizmo.h"
 #include "camera.h"
 #include "cursorFactory.h"
 #include "scene.h"
@@ -47,6 +48,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
+    gizmo* myGizmo;
     std::string initialFilePath;
 
     Shader *shader;

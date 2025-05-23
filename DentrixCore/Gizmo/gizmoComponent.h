@@ -12,6 +12,6 @@ class gizmoComponent
     glm::vec3 aabb_max;
 
 public:
-    gizmoComponent();
+    gizmoComponent(QOpenGLFunctions_3_3_Core* gl);
     void draw();
 };
