@@ -83,7 +83,7 @@ void GLWidget::initializeGL()
     // std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
     // std::cout << currentScene->meshes[0]->normals.size() << std::endl;
     // std::cout << currentScene->meshes[0]->indices.size() << std::endl;
-    myGizmo = new gizmo(this);
+    myGizmo = new Gizmo(this);
 }
 
 void GLWidget::resizeGL(int w, int h)

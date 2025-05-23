@@ -1,7 +1,7 @@
 #include "gizmoComponent.h"
 #include "glm/ext/matrix_transform.hpp"
 
-gizmoComponent::gizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
+GizmoComponent::GizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
 {
     this->rotation = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f,0.0f,1.0f));
     this->color = color;
@@ -52,7 +52,7 @@ gizmoComponent::gizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
     gl->glBindVertexArray(0);
 }
 
-void gizmoComponent::draw() {
+void GizmoComponent::draw() {
     gl->glBindVertexArray(VAO);
     gl->glDrawElements(GL_TRIANGLES, 36 * sizeof(float), GL_UNSIGNED_INT, 0);
     gl->glBindVertexArray(0);

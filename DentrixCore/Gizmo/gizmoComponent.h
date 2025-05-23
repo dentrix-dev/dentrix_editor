@@ -3,7 +3,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <glm/glm.hpp>
 
-class gizmoComponent
+class GizmoComponent
 {
     QOpenGLFunctions_3_3_Core *gl;
     unsigned int VAO, VBO, EBO;
@@ -15,6 +15,6 @@ public:
     glm::mat4 rotation;
 
 public:
-    gizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core *gl);
+    GizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core *gl);
     void draw();
 };

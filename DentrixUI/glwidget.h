@@ -48,7 +48,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    gizmo* myGizmo;
+    Gizmo* myGizmo;
     std::string initialFilePath;
 
     Shader *shader;

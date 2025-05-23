@@ -8,13 +8,13 @@
 #include "glm/ext/vector_float3.hpp"
 #include "shader.h"
 
-class gizmo
+class Gizmo
 {
-    std::vector<gizmoComponent> components;
+    std::vector<GizmoComponent> components;
     glm::vec3 position;
 
 public:
-    gizmo(QOpenGLFunctions_3_3_Core* gl);
+    Gizmo(QOpenGLFunctions_3_3_Core* gl);
     void draw(Shader* shader);
 };
 
