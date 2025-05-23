@@ -1,19 +1,21 @@
 #include "gizmoComponent.h"
+#include "glm/ext/matrix_transform.hpp"
 
 gizmoComponent::gizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
 {
+    this->rotation = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f,0.0f,1.0f));
     this->color = color;
     this->gl = gl;
     const std::vector<float> vertices = {
         // positions
         -0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f,  // 0
         -0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 1
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 2
-        0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 3
+        5.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 2
+        5.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // 3
         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  // 4
         -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  // 5
-        0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // 6
-        0.5f, -0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // 7
+        5.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // 6
+        5.5f, -0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // 7
     };
 
     const std::vector<unsigned int> indices = {// front face
