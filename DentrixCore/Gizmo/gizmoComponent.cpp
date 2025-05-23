@@ -1,7 +1,8 @@
 #include "gizmoComponent.h"
 
-gizmoComponent::gizmoComponent(QOpenGLFunctions_3_3_Core* gl)
+gizmoComponent::gizmoComponent(glm::vec3 color, QOpenGLFunctions_3_3_Core* gl)
 {
+    this->color = color;
     this->gl = gl;
     const std::vector<float> vertices = {
         // positions

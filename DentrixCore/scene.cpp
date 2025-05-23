@@ -63,9 +63,9 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh)
 {
     for (int i = 0; i < meshes.size(); i++) {
         if (selectedMesh && meshes[i]->name == selectedMesh->name) {
-            shader->setFloat("color", 0.8f);
+            shader->setVec3("color", 0.8f, 0.8f, 0.8f);
         } else {
-            shader->setFloat("color", 0.5f);
+            shader->setVec3("color", 0.5f, 0.5f, 0.5f);
         }
 
         // Scaling needs to happen at 0,0

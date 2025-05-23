@@ -6,6 +6,7 @@
 
 #include "Gizmo/gizmoComponent.h"
 #include "glm/ext/vector_float3.hpp"
+#include "shader.h"
 
 class gizmo
 {
@@ -14,7 +15,7 @@ class gizmo
 
 public:
     gizmo(QOpenGLFunctions_3_3_Core* gl);
-    void draw();
+    void draw(Shader* shader);
 };
 
 #endif  // GIZMO_H

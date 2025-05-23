@@ -101,7 +101,7 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     currentScene->Draw(shader, selectedMesh);
-    myGizmo->draw();
+    myGizmo->draw(shader);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
