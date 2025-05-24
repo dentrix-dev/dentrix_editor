@@ -102,8 +102,10 @@ void GLWidget::paintGL()
 
     currentScene->Draw(shader, selectedMesh);
 
-    glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
-    myGizmo->draw(shader, camera.distance);
+    if (selectedMesh != nullptr) {
+        glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
+        myGizmo->draw(shader, camera.distance);
+    }
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
