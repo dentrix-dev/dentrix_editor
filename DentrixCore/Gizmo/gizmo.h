@@ -16,7 +16,7 @@ public:
     glm::vec3 position;
 
     Gizmo(QOpenGLFunctions_3_3_Core* gl);
-    void draw(Shader* shader);
+    void draw(Shader* shader, float cameraDistance);
 };
 
 #endif  // GIZMO_H
