@@ -1,4 +1,5 @@
 #include "gizmo.h"
+#include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 Gizmo::Gizmo(QOpenGLFunctions_3_3_Core *gl)
@@ -16,7 +17,8 @@ void Gizmo::draw(Shader *shader)
 {
     for (GizmoComponent c : components) {
         shader->setVec3("color", c.color.x, c.color.y, c.color.z);
-        shader->setMatrix4("model", glm::value_ptr(c.rotation));
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) * c.rotation;
+        shader->setMatrix4("model", glm::value_ptr(modelMatrix));
         c.draw();
     }
 }

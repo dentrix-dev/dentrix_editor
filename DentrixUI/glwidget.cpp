@@ -101,6 +101,8 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     currentScene->Draw(shader, selectedMesh);
+
+    glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
     myGizmo->draw(shader);
 }
 
@@ -185,6 +187,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         if (intersection && intersectedMesh != nullptr) {
             std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
             selectedMesh = intersectedMesh;
+            myGizmo->position = intersectedMesh->center;
             if (inMainScene) emit meshSelectedInMainScene();
             // selectedMesh->setScale(1.2);
         } else {

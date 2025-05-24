@@ -7,14 +7,14 @@ GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunct
     this->gl = gl;
     const std::vector<float> vertices = {
         // positions
-        0.1f, -0.1f, 0.1f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
-        0.1f, 0.1f,  0.1f,  1.0f, 1.0f, 1.0f,  // Top left +Z
-        5.0f, 0.1f,  0.1f,  1.0f, 1.0f, 1.0f,  // Top right +Z
-        5.0f, -0.1f, 0.1f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
-        0.1f, -0.1f, -0.1f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
-        0.1f, 0.1f,  -0.1f, 1.0f, 1.0f, 1.0f,  // Top left -Z
-        5.0f, 0.1f,  -0.1f, 1.0f, 1.0f, 1.0f,  // Top right -Z
-        5.0f, -0.1f, -0.1f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
+        0.05f, -0.05f, 0.05f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
+        0.05f, 0.05f,  0.05f,  1.0f, 1.0f, 1.0f,  // Top left +Z
+        5.0f, 0.05f,  0.05f,  1.0f, 1.0f, 1.0f,  // Top right +Z
+        5.0f, -0.05f, 0.05f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
+        0.05f, -0.05f, -0.05f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
+        0.05f, 0.05f,  -0.05f, 1.0f, 1.0f, 1.0f,  // Top left -Z
+        5.0f, 0.05f,  -0.05f, 1.0f, 1.0f, 1.0f,  // Top right -Z
+        5.0f, -0.05f, -0.05f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
     };
 
     const std::vector<unsigned int> indices = {// front face

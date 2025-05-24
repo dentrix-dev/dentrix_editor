@@ -11,9 +11,10 @@
 class Gizmo
 {
     std::vector<GizmoComponent> components;
-    glm::vec3 position;
 
 public:
+    glm::vec3 position;
+
     Gizmo(QOpenGLFunctions_3_3_Core* gl);
     void draw(Shader* shader);
 };
