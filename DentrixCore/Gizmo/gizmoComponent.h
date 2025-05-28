@@ -8,6 +8,8 @@ class GizmoComponent
     QOpenGLFunctions_3_3_Core *gl;
     unsigned int VAO, VBO, EBO;
 
+    // TODO: Initalize opengl context within the class
+    // TODO: Move buffer data to geometry class
 public:
     glm::vec3 color;
     glm::vec3 aabb_min;
@@ -17,4 +19,5 @@ public:
 public:
     GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core *gl);
     void draw();
+    void onDrag(float xOffset, float yOffset, glm::vec3 &target);
 };

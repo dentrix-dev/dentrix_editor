@@ -7,14 +7,14 @@ GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunct
     this->gl = gl;
     const std::vector<float> vertices = {
         // positions
-        0.08f, -0.08f, 0.08f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
-        0.08f, 0.08f,  0.08f,  1.0f, 1.0f, 1.0f,  // Top left +Z
-        5.0f, 0.08f,  0.08f,  1.0f, 1.0f, 1.0f,  // Top right +Z
-        5.0f, -0.08f, 0.08f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
-        0.08f, -0.08f, -0.08f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
-        0.08f, 0.08f,  -0.08f, 1.0f, 1.0f, 1.0f,  // Top left -Z
-        5.0f, 0.08f,  -0.08f, 1.0f, 1.0f, 1.0f,  // Top right -Z
-        5.0f, -0.08f, -0.08f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
+        0.1f, -0.1f, 0.1f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
+        0.1f, 0.1f,  0.1f,  1.0f, 1.0f, 1.0f,  // Top left +Z
+        6.0f, 0.1f,  0.1f,  1.0f, 1.0f, 1.0f,  // Top right +Z
+        6.0f, -0.1f, 0.1f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
+        0.1f, -0.1f, -0.1f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
+        0.1f, 0.1f,  -0.1f, 1.0f, 1.0f, 1.0f,  // Top left -Z
+        6.0f, 0.1f,  -0.1f, 1.0f, 1.0f, 1.0f,  // Top right -Z
+        6.0f, -0.1f, -0.1f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
     };
 
     const std::vector<unsigned int> indices = {// front face
@@ -56,4 +56,6 @@ void GizmoComponent::draw()
     gl->glBindVertexArray(VAO);
     gl->glDrawElements(GL_TRIANGLES, 36 * sizeof(float), GL_UNSIGNED_INT, 0);
     gl->glBindVertexArray(0);
-};
+}
+
+void GizmoComponent::onDrag(float xOffset, float yOffset, glm::vec3& target) {}
