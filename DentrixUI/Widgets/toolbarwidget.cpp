@@ -16,12 +16,20 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     // Create actions (buttons) to add to the toolbar
     QAction *uniformScaleAction = new QAction(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
     uniformScaleAction->setCheckable(true);
+    uniformScaleAction->setIcon(QIcon(":/DentrixUI/Icons/uniform-scale.svg"));
+    uniformScaleAction->setToolTip(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
     actionGroup->addAction(uniformScaleAction);
+
     QAction *directionalScaleAction = new QAction(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
     directionalScaleAction->setCheckable(true);
+    directionalScaleAction->setIcon(QIcon(":/DentrixUI/Icons/directional-scale.svg"));
+    directionalScaleAction->setToolTip(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
     actionGroup->addAction(directionalScaleAction);
+
     QAction *freeDeformAction = new QAction(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
     freeDeformAction->setCheckable(true);
+    freeDeformAction->setIcon(QIcon(":/DentrixUI/Icons/free-deform.svg"));
+    freeDeformAction->setToolTip(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
     actionGroup->addAction(freeDeformAction);
 
     // Add a spacer widget to push following widgets to the bottom
@@ -43,6 +51,8 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     this->addSeparator();
     this->addAction(spacerAction);
     this->addAction(editAction);
+    this->setIconSize(QSize(24, 24));
+    this->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     // Add toolbar to the left side
 }

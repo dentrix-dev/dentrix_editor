@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>DentrixUI/Icons/hint.png</file>
+        <file>DentrixUI/Icons/directional-scale.svg</file>
+        <file>DentrixUI/Icons/free-deform.svg</file>
+        <file>DentrixUI/Icons/uniform-scale.svg</file>
     </qresource>
 </RCC>
