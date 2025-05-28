@@ -14,6 +14,8 @@ class ToolBarWidget : public QToolBar
     const QString editButtonActiveStyleSheet = "background-color: #3498db; color: white; padding: 5px;";
 
 public:
+    enum ButtonMode { Main_mode, Edit_mode };
+
     ToolBarWidget();
 
     QActionGroup *getActionGroup() const;
@@ -25,6 +27,9 @@ public:
     QPushButton *getEditButton();
     QString getEditButtonInactiveStyleSheet() const;
     QString getEditButtonActiveStyleSheet() const;
+
+    void set_edit_button_mode(ButtonMode status);
+    void set_edit_button_active(bool active = true);
 };
 
 #endif  // TOOLBARWIDGET_H

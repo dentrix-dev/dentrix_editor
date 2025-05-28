@@ -65,7 +65,7 @@ void GLWidget::initializeGL()
     meshes = Scene::loadScene(initialFilePath, this);
     auto modelLoadTime2 = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> ms_double = modelLoadTime2 - modelLoadTime1;
-    std::cout << "Model loaded in " << ms_double << std::endl;
+    // std::cout << "Model loaded in " << ms_double << std::endl;
 
     mainScene = Scene(meshes);
     currentScene = &mainScene;
