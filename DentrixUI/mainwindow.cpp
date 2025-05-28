@@ -73,6 +73,8 @@ void MainWindow::loadModel()
             setCentralWidget(centralContainer);
         } else {
             glWidget->loadModel(filePath.toStdString());
+            toolbar->set_edit_button_mode(ToolBarWidget::ButtonMode::Main_mode);
+            toolbar->set_edit_button_active(false);
         }
     }
 }
@@ -80,21 +82,17 @@ void MainWindow::loadModel()
 void MainWindow::onMeshSelectedInMainScene()
 {
     std::cout << __func__ << std::endl;
-    toolbar->getEditButton()->setStyleSheet(toolbar->getEditButtonActiveStyleSheet());
+    toolbar->set_edit_button_active();
 }
 
 void MainWindow::onMovedToEditScene()
 {
-    // editButton->setStyleSheet(editButtonInactiveStyleSheet);
-    // edit button becomes save and return
-    toolbar->getEditButton()->setText("Save");
-    toolbar->getEditButton()->setToolTip("Save and return to main scene");
+    toolbar->set_edit_button_mode(ToolBarWidget::Edit_mode);
 }
 
 void MainWindow::onMovedToMainScene()
 {
-    // editButton->setStyleSheet(editButtonInactiveStyleSheet);
-    toolbar->getEditButton()->setText("Edit");
+    toolbar->set_edit_button_mode(ToolBarWidget::Main_mode);
 }
 
 void MainWindow::onQActionGroupTriggered(QAction* action)

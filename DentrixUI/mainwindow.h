@@ -35,7 +35,6 @@ private:
 
     ToolBarWidget* toolbar;
     RightPanelStackedWidget* rightPanelStack;
-
     void createToolBar();
 
 private slots:

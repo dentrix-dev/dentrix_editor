@@ -76,3 +76,22 @@ QString ToolBarWidget::getEditButtonActiveStyleSheet() const
 {
     return editButtonActiveStyleSheet;
 }
+
+void ToolBarWidget::set_edit_button_mode(ButtonMode status)
+{
+    if (status == ButtonMode::Edit_mode) {
+        editButton->setText("Save");
+        editButton->setToolTip("Save and return to main scene");
+    } else {
+        editButton->setText("Edit");
+        editButton->setToolTip("Click to enter edit mode");
+    }
+}
+
+void ToolBarWidget::set_edit_button_active(bool active)
+{
+    if (active)
+        editButton->setStyleSheet(editButtonActiveStyleSheet);
+    else
+        editButton->setStyleSheet(editButtonInactiveStyleSheet);
+}
