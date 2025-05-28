@@ -17,6 +17,7 @@ public:
     glm::vec3 target = glm::vec3(0.0f);
     glm::mat4 GetViewMatrix();
 
+    void resetPosition();
     void processMouse(float xOffset, float yOffset);
     void processMove(float xPan, float yPan);
     void addDistance(float distance);

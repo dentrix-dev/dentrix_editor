@@ -234,6 +234,7 @@ void GLWidget::setSelectedMeshDirectionalScale(int val, bool xActive, bool yActi
 void GLWidget::onEditSceneClicked()
 {
     if (selectedMesh != nullptr && inMainScene) {
+        camera.resetPosition();
         std::string neighbor1Name = "";
         std::string neighbor2Name = "";
         Scene::GetNeighboringMeshNames(selectedMesh->name, neighbor1Name, neighbor2Name);
