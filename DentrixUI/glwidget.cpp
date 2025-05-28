@@ -123,7 +123,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     }
     if (MainWindow::inFreeDeformation && shiftHeld) {
         brush.setPosition(intersectionPoint);
-        hitMesh->applyFreeDeformation(brush, freeDeformAddMode);
+        selectedMesh->applyFreeDeformation(brush, freeDeformAddMode);
         update();
     }
 }
@@ -148,7 +148,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
         if (intersection) {
             brush.setPosition(intersectionPoint);
-            hitMesh->applyFreeDeformation(brush, freeDeformAddMode);
+            selectedMesh->applyFreeDeformation(brush, freeDeformAddMode);
             update();
         }
     } else if (ctrlHeld) {
