@@ -16,9 +16,11 @@
 #include <iostream>
 
 #include "Gizmo/gizmo.h"
+#include "Gizmo/gizmoComponent.h"
 #include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
+#include "utils.h"
 
 GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path)
 {
@@ -117,6 +119,23 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     glm::vec3 rayDirection;
     Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection,
                                 rayDirection);
+
+    // Check if gizmo is clicked
+    bool gizmoIntersected = false;
+    for (GizmoComponent c : myGizmo->components) {
+        // Check individual intersection with each gizmo component
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), myGizmo->position) * c.rotation;
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(camera.distance / 100.0f));
+
+        float intersection_distance;
+        gizmoIntersected = Utils::doesRayIntersectAABB(c.aabb_min, c.aabb_max, camera.position, rayDirection, modelMatrix,
+                                                       intersection_distance);
+        if (gizmoIntersected) {
+            std::cout << c.color.x << c.color.y << c.color.z << std::endl;
+            break;
+        }
+    }
+
     Mesh *hitMesh = nullptr;
     pmp::Vertex hitVertexIndex;
     glm::vec3 intersectionPoint;

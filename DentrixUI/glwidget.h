@@ -64,6 +64,8 @@ private:
     Mesh *selectedMesh = nullptr;
     bool isRotating = false;
 
+    bool isDraggingGizmo = false;
+
     void saveEditSceneAndReturnToMainScene();
     bool freeDeformAddMode = true;
     Brush brush;
