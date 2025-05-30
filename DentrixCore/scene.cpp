@@ -170,7 +170,8 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
         if (meshes[i]->name == "tooth0") {
             continue;
         }
-        if (meshes[i]->testRayOBBIntersection(ray_origin, ray_direction, ModelMatrix, distance)) {
+        if (Utils::doesRayIntersectAABB(meshes[i]->aabb_min, meshes[i]->aabb_max, ray_origin, ray_direction,
+                                          ModelMatrix, distance)) {
             std::cout << meshes[i]->name << std::endl;
             if (!intersectionFound) {  // First intersection found
                 intersectionFound = true;
@@ -216,8 +217,8 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
 
         // --- 1. Optional but recommended: Coarse Bounding Box Check ---
         float obb_intersection_distance;
-        if (!mesh->testRayOBBIntersection(ray_origin_world, ray_direction_world, modelMatrix,
-                                          obb_intersection_distance)) {
+        if (!Utils::doesRayIntersectAABB(mesh->aabb_min, mesh->aabb_max, ray_origin_world, ray_direction_world,
+                                           modelMatrix, obb_intersection_distance)) {
             continue;  // Skip this mesh if ray doesn't hit its OBB
         }
         // Optional refinement: If obb_intersection_distance > closest_t, we can
