@@ -164,8 +164,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         isRotating = true;
     }
     if (isDraggingGizmo && selectedGizmoComponent != nullptr) {
-        selectedGizmoComponent->onDrag(offsetX / QWidget::width(), offsetY / QWidget::height(), selectedToothGizmoModelMatrix);
-        myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(myGizmo->position, 1.0f);
+        selectedGizmoComponent->onDrag(offsetX / 100.0f, -offsetY / 100.0f, selectedToothGizmoModelMatrix);
+        myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
     } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
         Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(),
