@@ -195,7 +195,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    isDraggingGizmo = false;
+    if (isDraggingGizmo) {
+        isDraggingGizmo = false;
+        for (pmp::Vertex v : selectedMesh->surfaceMesh.vertices()) {
+            glm::vec3 vertexPos = Utils::pmpPointToGlm(selectedMesh->surfaceMesh.position(v));
+            glm::vec3 translatedVertexPos = selectedToothGizmoModelMatrix * glm::vec4(vertexPos, 1.0f);
+            selectedMesh->surfaceMesh.position(v) = Utils::glmToPmpPoint(translatedVertexPos);
+        }
+        selectedMesh->updateBuffers();
+        // TODO: Abstract this to selectedMesh->translate(modelMatrix);
+        selectedMesh->aabb_min = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->aabb_min, 1.0f);
+        selectedMesh->aabb_max = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->aabb_max, 1.0f);
+        selectedMesh->center = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
+        selectedMesh->updateBoundingBoxBuffers();
+        selectedToothGizmoModelMatrix = glm::mat4(1.0f);
+    }
     if (!isRotating) {
         std::cout << __func__ << std::endl;
         float mouseX = event->position().x();
