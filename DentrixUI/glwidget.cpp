@@ -164,7 +164,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         isRotating = true;
     }
     if (isDraggingGizmo && selectedGizmoComponent != nullptr) {
-        selectedGizmoComponent->onDrag(offsetX / 100.0f, -offsetY / 100.0f, selectedToothGizmoModelMatrix);
+        // TODO: Correctly project mouse offset to world coordinates instead of manually tuning
+        selectedGizmoComponent->onDrag(offsetX / 20.0f, -offsetY / 20.0f, selectedToothGizmoModelMatrix);
         myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
     } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
