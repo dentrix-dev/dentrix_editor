@@ -19,5 +19,5 @@ public:
 public:
     GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core *gl);
     void draw();
-    void onDrag(float xOffset, float yOffset, glm::vec3 &target);
+    void onDrag(float xOffset, float yOffset, glm::mat4 &target);
 };

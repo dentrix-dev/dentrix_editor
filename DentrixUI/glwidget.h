@@ -10,6 +10,7 @@
 
 #include "Brush.h"
 #include "Gizmo/gizmo.h"
+#include "Gizmo/gizmoComponent.h"
 #include "camera.h"
 #include "cursorFactory.h"
 #include "scene.h"
@@ -48,7 +49,6 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    Gizmo* myGizmo;
     std::string initialFilePath;
 
     Shader *shader;
@@ -64,7 +64,10 @@ private:
     Mesh *selectedMesh = nullptr;
     bool isRotating = false;
 
+    Gizmo *myGizmo;
     bool isDraggingGizmo = false;
+    GizmoComponent *selectedGizmoComponent = nullptr;
+    glm::mat4 selectedToothGizmoModelMatrix = glm::mat4(1.0f);
 
     void saveEditSceneAndReturnToMainScene();
     bool freeDeformAddMode = true;

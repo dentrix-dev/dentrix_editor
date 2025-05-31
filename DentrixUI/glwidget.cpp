@@ -102,7 +102,7 @@ void GLWidget::paintGL()
     view = camera.GetViewMatrix();
     shader->setMatrix4("view", glm::value_ptr(view));
 
-    currentScene->Draw(shader, selectedMesh);
+    currentScene->Draw(shader, selectedMesh, selectedToothGizmoModelMatrix);
 
     if (selectedMesh != nullptr) {
         glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
@@ -128,11 +128,13 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         modelMatrix = glm::scale(modelMatrix, glm::vec3(camera.distance / 100.0f));
 
         float intersection_distance;
-        gizmoIntersected = Utils::doesRayIntersectAABB(c.aabb_min, c.aabb_max, camera.position, rayDirection, modelMatrix,
-                                                       intersection_distance);
+        gizmoIntersected = Utils::doesRayIntersectAABB(c.aabb_min, c.aabb_max, camera.position, rayDirection,
+                                                       modelMatrix, intersection_distance);
         if (gizmoIntersected) {
+            isDraggingGizmo = true;
+            selectedGizmoComponent = &c;
             std::cout << c.color.x << c.color.y << c.color.z << std::endl;
-            break;
+            return;
         }
     }
 
@@ -161,7 +163,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (abs(offsetX) > 3 || abs(offsetY) > 3) {
         isRotating = true;
     }
-    if (MainWindow::inFreeDeformation && shiftHeld) {
+    if (isDraggingGizmo && selectedGizmoComponent != nullptr) {
+        selectedGizmoComponent->onDrag(offsetX / QWidget::width(), offsetY / QWidget::height(), selectedToothGizmoModelMatrix);
+        myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(myGizmo->position, 1.0f);
+    } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
         Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(),
                                     view, projection, rayDirection);
@@ -189,6 +194,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    isDraggingGizmo = false;
     if (!isRotating) {
         std::cout << __func__ << std::endl;
         float mouseX = event->position().x();

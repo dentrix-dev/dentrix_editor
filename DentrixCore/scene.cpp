@@ -59,7 +59,7 @@ Scene::Scene(std::vector<Mesh *> meshes)
     this->meshes = meshes;
 }
 
-void Scene::Draw(Shader *shader, Mesh *selectedMesh)
+void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGizmoModelMatrix)
 {
     for (int i = 0; i < meshes.size(); i++) {
         if (selectedMesh && meshes[i]->name == selectedMesh->name) {
@@ -78,6 +78,11 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh)
         // In mainScene, this has no effect since the vertices are already centered on first load
         // In editScene, this centers the new mesh array
         meshfinalTransform = glm::translate(glm::mat4(1.0f), -1.0f * center) * meshfinalTransform;
+
+        // Apply gizmo transformation
+        if (selectedMesh && meshes[i]->name == selectedMesh->name) {
+            meshfinalTransform = selectedToothGizmoModelMatrix * meshfinalTransform;
+        }
 
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
@@ -171,7 +176,7 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
             continue;
         }
         if (Utils::doesRayIntersectAABB(meshes[i]->aabb_min, meshes[i]->aabb_max, ray_origin, ray_direction,
-                                          ModelMatrix, distance)) {
+                                        ModelMatrix, distance)) {
             std::cout << meshes[i]->name << std::endl;
             if (!intersectionFound) {  // First intersection found
                 intersectionFound = true;
@@ -218,7 +223,7 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
         // --- 1. Optional but recommended: Coarse Bounding Box Check ---
         float obb_intersection_distance;
         if (!Utils::doesRayIntersectAABB(mesh->aabb_min, mesh->aabb_max, ray_origin_world, ray_direction_world,
-                                           modelMatrix, obb_intersection_distance)) {
+                                         modelMatrix, obb_intersection_distance)) {
             continue;  // Skip this mesh if ray doesn't hit its OBB
         }
         // Optional refinement: If obb_intersection_distance > closest_t, we can

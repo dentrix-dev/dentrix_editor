@@ -1,4 +1,5 @@
 #include "gizmoComponent.h"
+#include "glm/ext/matrix_transform.hpp"
 
 GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core* gl)
 {
@@ -60,4 +61,6 @@ void GizmoComponent::draw()
     gl->glBindVertexArray(0);
 }
 
-void GizmoComponent::onDrag(float xOffset, float yOffset, glm::vec3& target) {}
+void GizmoComponent::onDrag(float xOffset, float yOffset, glm::mat4& target) {
+    target = glm::translate(target, glm::vec3(xOffset, yOffset, 0.0f));
+}

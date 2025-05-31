@@ -18,7 +18,7 @@ public:
 
     static std::vector<Mesh*> loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl);
     glm::vec3 getMeshesCenter();
-    void Draw(Shader* shader, Mesh* selectedMesh);
+    void Draw(Shader* shader, Mesh* selectedMesh, glm::mat4& selectedToothGizmoModelMatrix);
     bool Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 SceneMatrix, Mesh*& intersectedMesh);
 
     bool IntersectTriangles(glm::vec3 ray_origin_world,      // Ray origin in world space
