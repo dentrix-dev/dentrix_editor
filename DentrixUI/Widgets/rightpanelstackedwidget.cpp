@@ -15,7 +15,8 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
 
     directionalScalePanel = new DirectionalScalePanelWidget(glWidget);
 
-    deformationPanel = new DeformationPanelWidget(glWidget);
+    deformationPanel = new DeformationPanelWidget();
+    initDeformationPanelSignals();
 
     rotatePanel = new RotatePanelWidget();
     initRotatePanelSignals();
@@ -31,6 +32,16 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
     this->addWidget(smoothPanel);
 
     this->setFixedWidth(200);
+}
+
+void RightPanelStackedWidget::initDeformationPanelSignals()
+{
+    connect(deformationPanel->getModeGroup(), &QButtonGroup::idClicked, deformationPanel, [=](int id) {
+        bool isAdd = (id == 0);
+        glWidget->setFreeDeformAddMode(isAdd);
+    });
+    connect(deformationPanel->getStrengthSlider(), &QSlider::sliderMoved, glWidget, &GLWidget::setDeformationStrength);
+    connect(deformationPanel->getSizeSlider(), &QSlider::sliderMoved, glWidget, &GLWidget::setBrushSize);
 }
 
 void RightPanelStackedWidget::initRotatePanelSignals()

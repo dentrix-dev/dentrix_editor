@@ -5,11 +5,25 @@
 
 #include <QWidget>
 
+#include "QButtonGroup"
+#include "QSlider"
+
 class DeformationPanelWidget : public QWidget
 {
     Q_OBJECT
+
+    QButtonGroup* modeGroup;
+    QSlider* strengthSlider;
+    QSlider* sizeSlider;
+
 public:
-    explicit DeformationPanelWidget(GLWidget *glWidget);
+    explicit DeformationPanelWidget();
+
+    QButtonGroup* getModeGroup();
+
+    QSlider* getStrengthSlider();
+
+    QSlider* getSizeSlider();
 
 signals:
 };

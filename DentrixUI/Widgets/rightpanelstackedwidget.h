@@ -24,6 +24,7 @@ public:
     RotatePanelWidget* rotatePanel = nullptr;
 
 private:
+    void initDeformationPanelSignals();
     void initRotatePanelSignals();
 
     GLWidget* glWidget = nullptr;
