@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+
 #include "Brush.h"
 
 class Mesh
@@ -20,6 +21,7 @@ public:
     glm::vec3 aabb_min;
     glm::vec3 aabb_max;
     glm::mat4 scaleTransform = glm::mat4(1.0f);
+    glm::mat4 rotateTransform = glm::mat4(1.0f);
     glm::mat4 directionalScaleTransform = glm::mat4(1.0f);
 
     static bool drawBoundingBox;
@@ -28,6 +30,7 @@ public:
     ~Mesh();
 
     void setScale(float scaleFactor);
+    void setRotationAngle(float rotationAngle);
     void setScaleDirectional(float x, float y, float z);
 
     void fillHole(pmp::Halfedge h);
@@ -42,13 +45,16 @@ public:
     void updateBuffers();
     void updateBoundingBoxBuffers();
     void updateMeshScale(glm::vec3 sceneCenter);
+    void rotateMesh(glm::vec3 sceneCenter);
     void applyFreeDeformation(Brush& brush, bool isAdd);
+
 private:
     unsigned int VAO, VBO, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;
     unsigned int numIndices;
     QOpenGLFunctions_3_3_Core* gl;
     float currentScale = 1.0f;
+    int rotationAngleDegrees = 0;
 
     void setup();
     void setupBoundingBox();

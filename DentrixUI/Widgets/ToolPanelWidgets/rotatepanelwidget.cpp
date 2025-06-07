@@ -14,12 +14,9 @@ RotatePanelWidget::RotatePanelWidget(QWidget *parent) : QWidget{parent}
     QVBoxLayout *editLayout = new QVBoxLayout(this);
     editLayout->addWidget(new QLabel("Rotate"));
     rotateSlider = new QSlider(Qt::Horizontal);
-    rotateSlider->setMinimum(5);   // Maps to 0.5
-    rotateSlider->setMaximum(15);  // Maps to 1.5
-    rotateSlider->setValue(10);    // Maps to 1
-    // connect(rotateSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshScale);
-    // connect(rotateSlider, &QSlider::sliderReleased, glWidget, &GLWidget::updateMeshScale);
-    // connect(rotateSlider, &QSlider::sliderReleased, this, &UniformScalePanelWidget::resetSlider);
+    rotateSlider->setMinimum(-360);  // Maps to 0.5
+    rotateSlider->setMaximum(360);   // Maps to 1.5
+    rotateSlider->setValue(0);       // Maps to 1
     editLayout->addWidget(rotateSlider);
     editLayout->addStretch();
 }
@@ -27,10 +24,10 @@ RotatePanelWidget::RotatePanelWidget(QWidget *parent) : QWidget{parent}
 void RotatePanelWidget::onQActionGroupTriggered(QAction *action)
 {
     std::cout << __func__ << std::endl;
-    rotateSlider->setValue(10);
+    rotateSlider->setValue(0);
 }
 
 void RotatePanelWidget::resetSlider()
 {
-    rotateSlider->setValue(10);
+    rotateSlider->setValue(0);
 }

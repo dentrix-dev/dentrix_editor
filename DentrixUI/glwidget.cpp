@@ -279,10 +279,29 @@ void GLWidget::setSelectedMeshScale(int scale)
     }
 }
 
+void GLWidget::setSelectedMeshRotationAngle(int rotationAngleDegrees)
+{
+    // std::cout<<"scale :"<<scale<<std::end;
+    std::cout << "rotationAngleDegrees :" << rotationAngleDegrees << std::endl;
+    // std::cout<<"scale: "<<scaleF<<std::endl;
+    if (selectedMesh != nullptr) {
+        selectedMesh->setRotationAngle(rotationAngleDegrees);
+        update();
+    }
+}
+
 void GLWidget::updateMeshScale()
 {
     if (selectedMesh != nullptr) {
         selectedMesh->updateMeshScale(currentScene->center);
+        update();
+    }
+}
+
+void GLWidget::rotateMesh()
+{
+    if (selectedMesh != nullptr) {
+        selectedMesh->rotateMesh(currentScene->center);
         update();
     }
 }

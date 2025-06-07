@@ -5,6 +5,7 @@
 
 RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedWidget(nullptr)
 {
+    this->glWidget = glWidget;
     QWidget* emptyPanel = new QWidget();
     QVBoxLayout* emptyLayout = new QVBoxLayout(emptyPanel);
     emptyLayout->addWidget(new QLabel("No transformation is selected."));
@@ -17,6 +18,7 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
     deformationPanel = new DeformationPanelWidget(glWidget);
 
     rotatePanel = new RotatePanelWidget();
+    initRotatePanelSignals();
 
     smoothPanel = new SmoothPanelWidget();
 
@@ -29,4 +31,12 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
     this->addWidget(smoothPanel);
 
     this->setFixedWidth(200);
+}
+
+void RightPanelStackedWidget::initRotatePanelSignals()
+{
+    QSlider* rotateSlider = rotatePanel->getRotateSlider();
+    connect(rotateSlider, &QSlider::sliderMoved, glWidget, &GLWidget::setSelectedMeshRotationAngle);
+    connect(rotateSlider, &QSlider::sliderReleased, glWidget, &GLWidget::rotateMesh);
+    connect(rotateSlider, &QSlider::sliderReleased, rotatePanel, &RotatePanelWidget::resetSlider);
 }

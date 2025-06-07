@@ -221,7 +221,7 @@ void Mesh::fillHole(pmp::Halfedge h)
     // Copy the changed vertices to the original mesh
     for (pmp::Vertex v : subMesh.vertices()) {
         if (voriginal[v] != 0) {
-            surfaceMesh.position(holeVertices[voriginal[v]-1]) = subMesh.position(v);
+            surfaceMesh.position(holeVertices[voriginal[v] - 1]) = subMesh.position(v);
         }
     }
 
@@ -346,6 +346,13 @@ void Mesh::setScale(float scaleFactor)
     scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
 }
 
+void Mesh::setRotationAngle(float rotationAngle)
+{
+    this->rotationAngleDegrees = rotationAngle;
+    glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
+    rotateTransform = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), zAxis);
+}
+
 void Mesh::setScaleDirectional(float x, float y, float z)
 {
     directionalScaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, z));
@@ -364,6 +371,41 @@ void Mesh::updateMeshScale(glm::vec3 sceneCenter)
     pmp::face_normals(surfaceMesh);
     pmp::vertex_normals(surfaceMesh);
     scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    updateBuffers();
+}
+
+void Mesh::rotateMesh(glm::vec3 sceneCenter)
+{
+    // Get the center of the mesh (you could also use Utils::glmToPmpPoint(sceneCenter))
+    pmp::Point center = Utils::glmToPmpPoint(this->center);
+    // Define vertical axis (Y-axis)
+    glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
+
+    // Create a rotation matrix
+    float angleRadians = glm::radians((float)rotationAngleDegrees);
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angleRadians, zAxis);
+
+    // Apply rotation to each vertex
+    for (auto v : surfaceMesh.vertices()) {
+        pmp::Point p = surfaceMesh.position(v);
+        glm::vec3 pos = Utils::pmpPointToGlm(p);  // Convert to glm
+
+        // Translate to origin, rotate, translate back
+        pos -= glm::vec3(center[0], center[1], center[2]);
+        pos = glm::vec3(rotation * glm::vec4(pos, 1.0f));
+        pos += glm::vec3(center[0], center[1], center[2]);
+
+        surfaceMesh.position(v) = Utils::glmToPmpPoint(pos);
+    }
+
+    // Recalculate normals
+    pmp::face_normals(surfaceMesh);
+    pmp::vertex_normals(surfaceMesh);
+
+    // Update model transformation matrix (optional, for rendering)
+    rotateTransform = glm::mat4(1.0);
+
+    // Update GPU buffers
     updateBuffers();
 }
 
@@ -474,7 +516,8 @@ bool Mesh::testRayOBBIntersection(glm::vec3 ray_origin,     // Ray origin, in wo
     return true;
 }
 
-void Mesh::applyFreeDeformation(Brush& brush, bool isAdd) {
+void Mesh::applyFreeDeformation(Brush& brush, bool isAdd)
+{
     auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
     if (!surfaceMesh.has_vertex_property("v:normal")) {
         pmp::vertex_normals(surfaceMesh);
@@ -483,7 +526,7 @@ void Mesh::applyFreeDeformation(Brush& brush, bool isAdd) {
     std::vector<pmp::Vertex> vertices = brush.getVerticesInRadius(surfaceMesh);
     const float strengthMultiplier = 0.0001f;
     float adjustedStrength = brush.getStrength() * strengthMultiplier;
-    for (auto v : vertices){
+    for (auto v : vertices) {
         pmp::Point p = vpos[v];
         glm::vec3 vertexPos(p[0], p[1], p[2]);
 

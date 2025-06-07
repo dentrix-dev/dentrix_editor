@@ -71,7 +71,7 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh)
         // Scaling needs to happen at 0,0
         // Translate the mesh to origin using its center, scale it, translate it back
         glm::mat4 meshfinalTransform = glm::translate(glm::mat4(1.0f), meshes[i]->center) * meshes[i]->scaleTransform *
-                                       meshes[i]->directionalScaleTransform *
+                                       meshes[i]->directionalScaleTransform * meshes[i]->rotateTransform *
                                        glm::translate(glm::mat4(1.0f), -1.0f * meshes[i]->center);
 
         // Center the scene

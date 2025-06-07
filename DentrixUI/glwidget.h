@@ -77,7 +77,9 @@ signals:
 public slots:
     void onEditSceneClicked();
     void setSelectedMeshScale(int scale);
+    void setSelectedMeshRotationAngle(int rotationAngleDegrees);
     void updateMeshScale();
+    void rotateMesh();
 };
 
 #endif  // GLWIDGET_H

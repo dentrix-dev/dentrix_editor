@@ -22,6 +22,11 @@ public:
     SmoothPanelWidget* smoothPanel = nullptr;
 
     RotatePanelWidget* rotatePanel = nullptr;
+
+private:
+    void initRotatePanelSignals();
+
+    GLWidget* glWidget = nullptr;
 };
 
 #endif  // RIGHTPANELSTACKEDWIDGET_H
