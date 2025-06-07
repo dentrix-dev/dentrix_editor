@@ -16,6 +16,8 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
 
     deformationPanel = new DeformationPanelWidget(glWidget);
 
+    rotatePanel = new RotatePanelWidget();
+
     smoothPanel = new SmoothPanelWidget();
 
     // Add panels to the stack
@@ -23,6 +25,7 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
     this->addWidget(uniformScalePanel);      // index 1
     this->addWidget(directionalScalePanel);  // index 2
     this->addWidget(deformationPanel);       // index 3
+    this->addWidget(rotatePanel);            // index 4
     this->addWidget(smoothPanel);
 
     this->setFixedWidth(200);

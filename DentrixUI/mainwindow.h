@@ -28,6 +28,7 @@ public:
     static bool inUnformScale;
     static bool inDirectionalScale;
     static bool inFreeDeformation;
+    static bool inRotate;
 
 private:
     Ui::MainWindow* ui;

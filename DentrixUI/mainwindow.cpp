@@ -15,6 +15,7 @@
 bool MainWindow::inUnformScale = false;
 bool MainWindow::inDirectionalScale = false;
 bool MainWindow::inFreeDeformation = false;
+bool MainWindow::inRotate = false;
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr)
 {
@@ -102,17 +103,26 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
         MainWindow::inUnformScale = true;
         MainWindow::inDirectionalScale = false;
         MainWindow::inFreeDeformation = false;
+        MainWindow::inRotate = false;
         rightPanelStack->setCurrentIndex(1);
     } else if (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT) {
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = true;
         MainWindow::inFreeDeformation = false;
+        MainWindow::inRotate = false;
         rightPanelStack->setCurrentIndex(2);
     } else if (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT) {
         MainWindow::inUnformScale = false;
         MainWindow::inDirectionalScale = false;
         MainWindow::inFreeDeformation = true;
+        MainWindow::inRotate = false;
         rightPanelStack->setCurrentIndex(3);
+    } else if (actionText == ToolBarWidget::ROTATE_ACTION_TEXT) {
+        MainWindow::inUnformScale = false;
+        MainWindow::inDirectionalScale = false;
+        MainWindow::inFreeDeformation = false;
+        MainWindow::inRotate = true;
+        rightPanelStack->setCurrentIndex(4);
     }
     if (glWidget) {
         glWidget->updateCursor();
