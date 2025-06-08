@@ -17,6 +17,8 @@
 
 #include "Gizmo/gizmo.h"
 #include "Gizmo/gizmoComponent.h"
+#include "glm/ext/matrix_projection.hpp"
+#include "glm/fwd.hpp"
 #include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
@@ -164,8 +166,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         isRotating = true;
     }
     if (isDraggingGizmo && selectedGizmoComponent != nullptr) {
-        // TODO: Correctly project mouse offset to world coordinates instead of manually tuning
-        selectedGizmoComponent->onDrag(offsetX / 20.0f, -offsetY / 20.0f, selectedToothGizmoModelMatrix);
+        glm::ivec4 viewport = glm::ivec4(0, 0, GLWidget::width(), GLWidget::height());
+        glm::vec3 objScreen = glm::project(selectedMesh->center, view, projection, viewport);  // Get the mesh's depth
+
+        glm::vec3 worldPosPrev =
+            glm::unProject(glm::vec3(mousePosX, mousePosY, objScreen.z), view, projection, viewport);
+        glm::vec3 worldPos = glm::unProject(glm::vec3(event->position().x(), event->position().y(), objScreen.z), view,
+                                            projection, viewport);
+        glm::vec3 worldPosDelta = worldPos - worldPosPrev;
+        selectedGizmoComponent->onDrag(worldPosDelta.x, -worldPosDelta.y, selectedToothGizmoModelMatrix);
         myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
     } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
