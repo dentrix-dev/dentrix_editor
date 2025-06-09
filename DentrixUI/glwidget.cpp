@@ -15,9 +15,14 @@
 #include <glm/trigonometric.hpp>
 #include <iostream>
 
+#include "Gizmo/gizmo.h"
+#include "Gizmo/gizmoComponent.h"
+#include "glm/ext/matrix_projection.hpp"
+#include "glm/fwd.hpp"
 #include "mainwindow.h"
 #include "scene.h"
 #include "shader.h"
+#include "utils.h"
 
 GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path)
 {
@@ -82,6 +87,7 @@ void GLWidget::initializeGL()
     // std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
     // std::cout << currentScene->meshes[0]->normals.size() << std::endl;
     // std::cout << currentScene->meshes[0]->indices.size() << std::endl;
+    myGizmo = new Gizmo();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -98,7 +104,12 @@ void GLWidget::paintGL()
     view = camera.GetViewMatrix();
     shader->setMatrix4("view", glm::value_ptr(view));
 
-    currentScene->Draw(shader, selectedMesh);
+    currentScene->Draw(shader, selectedMesh, selectedToothGizmoModelMatrix);
+
+    if (selectedMesh != nullptr) {
+        glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
+        myGizmo->draw(shader, camera.distance);
+    }
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -110,6 +121,25 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     glm::vec3 rayDirection;
     Camera::ScreenPosToWorldRay(mousePosX, mousePosY, GLWidget::width(), GLWidget::height(), view, projection,
                                 rayDirection);
+
+    // Check if gizmo is clicked
+    bool gizmoIntersected = false;
+    for (GizmoComponent* c : myGizmo->components) {
+        // Check individual intersection with each gizmo component
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), myGizmo->position) * c->rotation;
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(camera.distance / 100.0f));
+
+        float intersection_distance;
+        gizmoIntersected = Utils::doesRayIntersectAABB(c->aabb_min, c->aabb_max, camera.position, rayDirection,
+                                                       modelMatrix, intersection_distance);
+        if (gizmoIntersected) {
+            isDraggingGizmo = true;
+            selectedGizmoComponent = c;
+            std::cout << c->color.x << c->color.y << c->color.z << std::endl;
+            return;
+        }
+    }
+
     Mesh *hitMesh = nullptr;
     pmp::Vertex hitVertexIndex;
     glm::vec3 intersectionPoint;
@@ -135,7 +165,18 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (abs(offsetX) > 3 || abs(offsetY) > 3) {
         isRotating = true;
     }
-    if (MainWindow::inFreeDeformation && shiftHeld) {
+    if (isDraggingGizmo && selectedGizmoComponent != nullptr) {
+        glm::ivec4 viewport = glm::ivec4(0, 0, GLWidget::width(), GLWidget::height());
+        glm::vec3 objScreen = glm::project(selectedMesh->center, view, projection, viewport);  // Get the mesh's depth
+
+        glm::vec3 worldPosPrev =
+            glm::unProject(glm::vec3(mousePosX, mousePosY, objScreen.z), view, projection, viewport);
+        glm::vec3 worldPos = glm::unProject(glm::vec3(event->position().x(), event->position().y(), objScreen.z), view,
+                                            projection, viewport);
+        glm::vec3 worldPosDelta = worldPos - worldPosPrev;
+        selectedGizmoComponent->onDrag(worldPosDelta.x, -worldPosDelta.y, selectedToothGizmoModelMatrix);
+        myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
+    } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
         Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(),
                                     view, projection, rayDirection);
@@ -163,6 +204,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (isDraggingGizmo) {
+        isDraggingGizmo = false;
+        for (pmp::Vertex v : selectedMesh->surfaceMesh.vertices()) {
+            glm::vec3 vertexPos = Utils::pmpPointToGlm(selectedMesh->surfaceMesh.position(v));
+            glm::vec3 translatedVertexPos = selectedToothGizmoModelMatrix * glm::vec4(vertexPos, 1.0f);
+            selectedMesh->surfaceMesh.position(v) = Utils::glmToPmpPoint(translatedVertexPos);
+        }
+        selectedMesh->updateBuffers();
+        // TODO: Abstract this to selectedMesh->translate(modelMatrix);
+        selectedMesh->aabb_min = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->aabb_min, 1.0f);
+        selectedMesh->aabb_max = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->aabb_max, 1.0f);
+        selectedMesh->center = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
+        selectedMesh->updateBoundingBoxBuffers();
+        selectedToothGizmoModelMatrix = glm::mat4(1.0f);
+    }
     if (!isRotating) {
         std::cout << __func__ << std::endl;
         float mouseX = event->position().x();
@@ -182,6 +238,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         if (intersection && intersectedMesh != nullptr) {
             std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
             selectedMesh = intersectedMesh;
+            myGizmo->position = intersectedMesh->center;
             if (inMainScene) emit meshSelectedInMainScene();
             // selectedMesh->setScale(1.2);
         } else {
