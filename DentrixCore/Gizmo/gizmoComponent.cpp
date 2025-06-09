@@ -1,13 +1,15 @@
 #include "gizmoComponent.h"
+
 #include "glm/ext/matrix_transform.hpp"
 
-GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation)
+GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, ComponentAxis axis)
 {
     initializeOpenGLFunctions();
+    this->axis = axis;
     this->rotation = rotation;
     this->color = color;
     aabb_min = glm::vec3(0.5f, -0.5f, -0.5f);
-    aabb_max = glm::vec3(6.0f,  0.5f,  0.5f);
+    aabb_max = glm::vec3(6.0f, 0.5f, 0.5f);
     const std::vector<float> vertices = {
         // positions
         0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
@@ -61,6 +63,17 @@ void GizmoComponent::draw()
     glBindVertexArray(0);
 }
 
-void GizmoComponent::onDrag(float xOffset, float yOffset, glm::mat4& target) {
-    target = glm::translate(target, glm::vec3(xOffset, yOffset, 0.0f));
+void GizmoComponent::onDrag(float xOffset, float yOffset, glm::mat4& target)
+{
+    switch (axis) {
+        case X:
+            target = glm::translate(target, glm::vec3(xOffset, 0.0f, 0.0f));
+            break;
+        case Y:
+            target = glm::translate(target, glm::vec3(0.0f, yOffset, 0.0f));
+            break;
+        case Z:
+            target = glm::translate(target, glm::vec3(xOffset, yOffset, 0.0f));
+            break;
+    }
 }

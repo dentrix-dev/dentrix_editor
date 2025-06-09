@@ -1,19 +1,26 @@
 #include "gizmo.h"
 
+#include "Gizmo/gizmoComponent.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 Gizmo::Gizmo()
 {
     position = glm::vec3(0.0f);
+
     glm::mat4 rotation = glm::mat4(1.0f);
-    GizmoComponent *xAxis = new GizmoComponent(glm::vec3(1.0f, 0.0f, 0.0f), rotation);
+    enum ComponentAxis axis = X;
+    GizmoComponent *xAxis = new GizmoComponent(glm::vec3(1.0f, 0.0f, 0.0f), rotation, axis);
     components.push_back(xAxis);
+
     rotation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    GizmoComponent *yAxis = new GizmoComponent(glm::vec3(0.0f, 1.0f, 0.0f), rotation);
+    axis = Y;
+    GizmoComponent *yAxis = new GizmoComponent(glm::vec3(0.0f, 1.0f, 0.0f), rotation, axis);
     components.push_back(yAxis);
+
     rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    GizmoComponent *zAxis = new GizmoComponent(glm::vec3(0.0f, 0.0f, 1.0f), rotation);
+    axis = Z;
+    GizmoComponent *zAxis = new GizmoComponent(glm::vec3(0.0f, 0.0f, 1.0f), rotation, axis);
     components.push_back(zAxis);
 }
 
