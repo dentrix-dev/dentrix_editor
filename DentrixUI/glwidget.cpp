@@ -124,18 +124,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     // Check if gizmo is clicked
     bool gizmoIntersected = false;
-    for (GizmoComponent c : myGizmo->components) {
+    for (GizmoComponent* c : myGizmo->components) {
         // Check individual intersection with each gizmo component
-        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), myGizmo->position) * c.rotation;
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), myGizmo->position) * c->rotation;
         modelMatrix = glm::scale(modelMatrix, glm::vec3(camera.distance / 100.0f));
 
         float intersection_distance;
-        gizmoIntersected = Utils::doesRayIntersectAABB(c.aabb_min, c.aabb_max, camera.position, rayDirection,
+        gizmoIntersected = Utils::doesRayIntersectAABB(c->aabb_min, c->aabb_max, camera.position, rayDirection,
                                                        modelMatrix, intersection_distance);
         if (gizmoIntersected) {
             isDraggingGizmo = true;
-            selectedGizmoComponent = &c;
-            std::cout << c.color.x << c.color.y << c.color.z << std::endl;
+            selectedGizmoComponent = c;
+            std::cout << c->color.x << c->color.y << c->color.z << std::endl;
             return;
         }
     }

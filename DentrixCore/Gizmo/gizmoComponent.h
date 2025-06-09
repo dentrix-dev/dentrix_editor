@@ -3,12 +3,10 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <glm/glm.hpp>
 
-class GizmoComponent
+class GizmoComponent : protected QOpenGLFunctions_3_3_Core
 {
-    QOpenGLFunctions_3_3_Core *gl;
     unsigned int VAO, VBO, EBO;
 
-    // TODO: Initalize opengl context within the class
     // TODO: Move buffer data to geometry class
 public:
     glm::vec3 color;
@@ -17,7 +15,7 @@ public:
     glm::mat4 rotation;
 
 public:
-    GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core *gl);
+    GizmoComponent(glm::vec3 color, glm::mat4 rotation);
     void draw();
     void onDrag(float xOffset, float yOffset, glm::mat4 &target);
 };

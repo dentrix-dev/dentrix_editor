@@ -1,11 +1,11 @@
 #include "gizmoComponent.h"
 #include "glm/ext/matrix_transform.hpp"
 
-GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunctions_3_3_Core* gl)
+GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation)
 {
+    initializeOpenGLFunctions();
     this->rotation = rotation;
     this->color = color;
-    this->gl = gl;
     aabb_min = glm::vec3(0.5f, -0.5f, -0.5f);
     aabb_max = glm::vec3(6.0f,  0.5f,  0.5f);
     const std::vector<float> vertices = {
@@ -33,32 +33,32 @@ GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, QOpenGLFunct
                                                // bottom
                                                4, 5, 1, 1, 0, 4};
 
-    gl->glGenVertexArrays(1, &VAO);
-    gl->glGenBuffers(1, &VBO);
-    gl->glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
-    gl->glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
-    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
-    gl->glEnableVertexAttribArray(0);
-    gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 
-    gl->glEnableVertexAttribArray(1);
-    gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
-    gl->glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void GizmoComponent::draw()
 {
-    gl->glBindVertexArray(VAO);
-    gl->glDrawElements(GL_TRIANGLES, 36 * sizeof(float), GL_UNSIGNED_INT, 0);
-    gl->glBindVertexArray(0);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 36 * sizeof(float), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 void GizmoComponent::onDrag(float xOffset, float yOffset, glm::mat4& target) {

@@ -13,7 +13,7 @@ class Gizmo
 
 public:
     glm::vec3 position;
-    std::vector<GizmoComponent> components;
+    std::vector<GizmoComponent*> components;
 
     Gizmo(QOpenGLFunctions_3_3_Core* gl);
     void draw(Shader* shader, float cameraDistance);
