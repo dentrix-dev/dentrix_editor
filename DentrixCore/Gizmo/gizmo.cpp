@@ -3,7 +3,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-Gizmo::Gizmo(QOpenGLFunctions_3_3_Core *gl)
+Gizmo::Gizmo()
 {
     position = glm::vec3(0.0f);
     glm::mat4 rotation = glm::mat4(1.0f);
