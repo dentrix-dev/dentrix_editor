@@ -66,62 +66,52 @@ void GizmoComponent::draw()
 }
 
 void GizmoComponent::onDrag(float oldMouseX, float oldMouseY, float mouseX, float mouseY, glm::vec3& objectPosition,
-                            glm::vec3& cameraPosition, glm::mat4& view, glm::mat4& projection, glm::ivec4& viewport,
-                            glm::mat4& model)
+                            glm::vec3& cameraPosition, glm::vec3& cameraForward, glm::mat4& view, glm::mat4& projection,
+                            glm::ivec4& viewport, glm::mat4& model)
 {
-    // Plane with which mouse intersection is calculated
-    glm::vec4 plane;  // vec4(normal, distance_from_origin)
-    // TODO: Improve how each component handles its own tranform logic
+    glm::vec3 dragAxis;
     switch (axis) {
         case X:
-            plane = glm::vec4(0.0f, 0.0f, 1.0f, objectPosition.x);
+            dragAxis = glm::vec3(1.0f, 0.0f, 0.0f);
             break;
         case Y:
-            plane = glm::vec4(1.0f, 0.0f, 0.0f, objectPosition.y);
+            dragAxis = glm::vec3(0.0f, 1.0f, 0.0f);
             break;
         case Z:
-            plane = glm::vec4(0.0f, 1.0f, 0.0f, objectPosition.z);
+            dragAxis = glm::vec3(0.0f, 0.0f, 1.0f);
             break;
     }
 
-    // Get old intersection with plane
-    glm::vec3 worldPos = glm::unProject(glm::vec3(oldMouseX, oldMouseY, 1.0f), view, projection, viewport);
-    glm::vec3 direction = glm::normalize(worldPos - cameraPosition);
+    // Plane perpendicular to the drag axis
+    // The mouse ray goes through the object, and is "caught" by the plane
+    // The mouse delta on the plane is projected onto the drag axis
+    glm::vec3 planeNormal = glm::normalize(glm::cross(glm::cross(dragAxis, cameraForward), dragAxis));
 
-    // TODO: Refactor this to Utils::intersectRayWithPlane
-    glm::vec3 normal = glm::vec3(plane);
-    float denom = glm::dot(normal, direction);
+    // Ray-plane intersection for old mouse position
+    glm::vec3 rayOld = glm::unProject(glm::vec3(oldMouseX, oldMouseY, 1.0f), view, projection, viewport);
+    glm::vec3 dirOld = glm::normalize(rayOld - cameraPosition);
 
-    if (glm::abs(denom) < 1e-6f) return;  // ray is parallel to the plane
+    float denom = glm::dot(planeNormal, dirOld);
+    if (glm::abs(denom) < 1e-6f) return;
 
-    float t = -(glm::dot(normal, cameraPosition) + plane.w) / denom;
-    if (t < 0.0f) return;  // intersection is behind the ray origin
-    glm::vec3 intersectionPoint = cameraPosition + t * direction;
+    float tOld = glm::dot(planeNormal, (objectPosition - cameraPosition)) / denom;
+    glm::vec3 intersectionOld = cameraPosition + tOld * dirOld;
 
-    // Get new intersection with plane
-    worldPos = glm::unProject(glm::vec3(mouseX, mouseY, 1.0f), view, projection, viewport);
-    direction = glm::normalize(worldPos - cameraPosition);
+    // Ray-plane intersection for new mouse position
+    glm::vec3 rayNew = glm::unProject(glm::vec3(mouseX, mouseY, 1.0f), view, projection, viewport);
+    glm::vec3 dirNew = glm::normalize(rayNew - cameraPosition);
 
-    normal = glm::vec3(plane);
-    denom = glm::dot(normal, direction);
+    denom = glm::dot(planeNormal, dirNew);
+    if (glm::abs(denom) < 1e-6f) return;
 
-    if (glm::abs(denom) < 1e-6f) return;  // ray is parallel to the plane
+    float tNew = glm::dot(planeNormal, (objectPosition - cameraPosition)) / denom;
+    glm::vec3 intersectionNew = cameraPosition + tNew * dirNew;
 
-    t = -(glm::dot(normal, cameraPosition) + plane.w) / denom;
-    if (t < 0.0f) return;  // intersection is behind the ray origin
-    glm::vec3 newIntersectionPoint = cameraPosition + t * direction;
+    // 4. Project movement onto the drag axis
+    glm::vec3 movement = intersectionNew - intersectionOld;
+    float movementAlongAxis = glm::dot(movement, dragAxis);
+    glm::vec3 delta = movementAlongAxis * dragAxis * glm::vec3(1.0f, -1.0f, 1.0f);
 
-    // Handle transformation
-    glm::vec3 delta = newIntersectionPoint - intersectionPoint;
-    switch (axis) {
-        case X:
-            model = glm::translate(model, glm::vec3(delta.x, 0.0f, 0.0f));
-            break;
-        case Y:
-            model = glm::translate(model, glm::vec3(0.0f, -delta.y, 0.0f));
-            break;
-        case Z:
-            model = glm::translate(model, glm::vec3(0.0f, 0.0f, delta.z));
-            break;
-    }
+    // 5. Translate model
+    model = glm::translate(model, delta);
 }

@@ -170,7 +170,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         glm::ivec4 viewport = glm::ivec4(0, 0, GLWidget::width(), GLWidget::height());
 
         selectedGizmoComponent->onDrag(mousePosX, mousePosY, newMousePosX, newMousePosY, selectedMesh->center,
-                                       camera.position, view, projection, viewport, selectedToothGizmoModelMatrix);
+                                       camera.position, camera.front, view, projection, viewport, selectedToothGizmoModelMatrix);
         myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
     } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
