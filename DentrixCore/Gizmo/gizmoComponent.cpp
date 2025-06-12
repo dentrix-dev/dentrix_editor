@@ -1,6 +1,8 @@
 #include "gizmoComponent.h"
 
+#include "glm/ext/matrix_projection.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/geometric.hpp"
 
 GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, ComponentAxis axis)
 {
@@ -63,17 +65,63 @@ void GizmoComponent::draw()
     glBindVertexArray(0);
 }
 
-void GizmoComponent::onDrag(float xOffset, float yOffset, glm::mat4& target)
+void GizmoComponent::onDrag(float oldMouseX, float oldMouseY, float mouseX, float mouseY, glm::vec3& objectPosition,
+                            glm::vec3& cameraPosition, glm::mat4& view, glm::mat4& projection, glm::ivec4& viewport,
+                            glm::mat4& model)
 {
+    // Plane with which mouse intersection is calculated
+    glm::vec4 plane;  // vec4(normal, distance_from_origin)
+    // TODO: Improve how each component handles its own tranform logic
     switch (axis) {
         case X:
-            target = glm::translate(target, glm::vec3(xOffset, 0.0f, 0.0f));
+            plane = glm::vec4(0.0f, 0.0f, 1.0f, objectPosition.x);
             break;
         case Y:
-            target = glm::translate(target, glm::vec3(0.0f, yOffset, 0.0f));
+            plane = glm::vec4(1.0f, 0.0f, 0.0f, objectPosition.y);
             break;
         case Z:
-            target = glm::translate(target, glm::vec3(xOffset, yOffset, 0.0f));
+            plane = glm::vec4(0.0f, 1.0f, 0.0f, objectPosition.z);
+            break;
+    }
+
+    // Get old intersection with plane
+    glm::vec3 worldPos = glm::unProject(glm::vec3(oldMouseX, oldMouseY, 1.0f), view, projection, viewport);
+    glm::vec3 direction = glm::normalize(worldPos - cameraPosition);
+
+    // TODO: Refactor this to Utils::intersectRayWithPlane
+    glm::vec3 normal = glm::vec3(plane);
+    float denom = glm::dot(normal, direction);
+
+    if (glm::abs(denom) < 1e-6f) return;  // ray is parallel to the plane
+
+    float t = -(glm::dot(normal, cameraPosition) + plane.w) / denom;
+    if (t < 0.0f) return;  // intersection is behind the ray origin
+    glm::vec3 intersectionPoint = cameraPosition + t * direction;
+
+    // Get new intersection with plane
+    worldPos = glm::unProject(glm::vec3(mouseX, mouseY, 1.0f), view, projection, viewport);
+    direction = glm::normalize(worldPos - cameraPosition);
+
+    normal = glm::vec3(plane);
+    denom = glm::dot(normal, direction);
+
+    if (glm::abs(denom) < 1e-6f) return;  // ray is parallel to the plane
+
+    t = -(glm::dot(normal, cameraPosition) + plane.w) / denom;
+    if (t < 0.0f) return;  // intersection is behind the ray origin
+    glm::vec3 newIntersectionPoint = cameraPosition + t * direction;
+
+    // Handle transformation
+    glm::vec3 delta = newIntersectionPoint - intersectionPoint;
+    switch (axis) {
+        case X:
+            model = glm::translate(model, glm::vec3(delta.x, 0.0f, 0.0f));
+            break;
+        case Y:
+            model = glm::translate(model, glm::vec3(0.0f, -delta.y, 0.0f));
+            break;
+        case Z:
+            model = glm::translate(model, glm::vec3(0.0f, 0.0f, delta.z));
             break;
     }
 }

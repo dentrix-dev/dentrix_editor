@@ -3,11 +3,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <glm/glm.hpp>
 
-enum ComponentAxis {
-    X,
-    Y,
-    Z
-};
+enum ComponentAxis { X, Y, Z };
 
 class GizmoComponent : protected QOpenGLFunctions_3_3_Core
 {
@@ -24,5 +20,7 @@ public:
 public:
     GizmoComponent(glm::vec3 color, glm::mat4 rotation, ComponentAxis axis);
     void draw();
-    void onDrag(float xOffset, float yOffset, glm::mat4 &target);
+    void onDrag(float oldMouseX, float oldMouseY, float mouseX, float mouseY, glm::vec3& objectPosition,
+                glm::vec3& cameraPosition, glm::mat4& view, glm::mat4& projection, glm::ivec4& viewport,
+                glm::mat4& model);
 };

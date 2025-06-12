@@ -17,7 +17,6 @@
 
 #include "Gizmo/gizmo.h"
 #include "Gizmo/gizmoComponent.h"
-#include "glm/ext/matrix_projection.hpp"
 #include "glm/fwd.hpp"
 #include "mainwindow.h"
 #include "scene.h"
@@ -124,7 +123,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     // Check if gizmo is clicked
     bool gizmoIntersected = false;
-    for (GizmoComponent* c : myGizmo->components) {
+    for (GizmoComponent *c : myGizmo->components) {
         // Check individual intersection with each gizmo component
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), myGizmo->position) * c->rotation;
         modelMatrix = glm::scale(modelMatrix, glm::vec3(camera.distance / 100.0f));
@@ -160,21 +159,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    float offsetX = event->position().x() - mousePosX;
-    float offsetY = event->position().y() - mousePosY;
+    float newMousePosX = event->position().x();
+    float newMousePosY = event->position().y();
+    float offsetX = newMousePosX - mousePosX;
+    float offsetY = newMousePosY - mousePosY;
     if (abs(offsetX) > 3 || abs(offsetY) > 3) {
         isRotating = true;
     }
     if (isDraggingGizmo && selectedGizmoComponent != nullptr) {
         glm::ivec4 viewport = glm::ivec4(0, 0, GLWidget::width(), GLWidget::height());
-        glm::vec3 objScreen = glm::project(selectedMesh->center, view, projection, viewport);  // Get the mesh's depth
 
-        glm::vec3 worldPosPrev =
-            glm::unProject(glm::vec3(mousePosX, mousePosY, objScreen.z), view, projection, viewport);
-        glm::vec3 worldPos = glm::unProject(glm::vec3(event->position().x(), event->position().y(), objScreen.z), view,
-                                            projection, viewport);
-        glm::vec3 worldPosDelta = worldPos - worldPosPrev;
-        selectedGizmoComponent->onDrag(worldPosDelta.x, -worldPosDelta.y, selectedToothGizmoModelMatrix);
+        selectedGizmoComponent->onDrag(mousePosX, mousePosY, newMousePosX, newMousePosY, selectedMesh->center,
+                                       camera.position, view, projection, viewport, selectedToothGizmoModelMatrix);
         myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
     } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
