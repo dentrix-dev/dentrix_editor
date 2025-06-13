@@ -1,5 +1,4 @@
 #pragma once
-#include <QOpenGLFunctions_3_3_Core>
 #include <string>
 #include <vector>
 
@@ -16,7 +15,7 @@ public:
     Scene();
     Scene(std::vector<Mesh*> meshes);
 
-    static std::vector<Mesh*> loadScene(std::string path, QOpenGLFunctions_3_3_Core* gl);
+    static std::vector<Mesh*> loadScene(std::string path);
     glm::vec3 getMeshesCenter();
     void Draw(Shader* shader, Mesh* selectedMesh, glm::mat4& selectedToothGizmoModelMatrix);
     bool Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 SceneMatrix, Mesh*& intersectedMesh);

@@ -10,7 +10,7 @@
 
 #include "Brush.h"
 
-class Mesh
+class Mesh : protected QOpenGLFunctions_3_3_Core
 {
 public:
     pmp::SurfaceMesh surfaceMesh;
@@ -26,7 +26,7 @@ public:
 
     static bool drawBoundingBox;
 
-    Mesh(pmp::SurfaceMesh& mesh, std::string name, QOpenGLFunctions_3_3_Core* gl);
+    Mesh(pmp::SurfaceMesh& mesh, std::string name);
     ~Mesh();
 
     void setScale(float scaleFactor);
@@ -46,7 +46,6 @@ private:
     unsigned int VAO, VBO, EBO;
     unsigned int VAO_BB, VBO_BB, EBO_BB;
     unsigned int numIndices;
-    QOpenGLFunctions_3_3_Core* gl;
     float currentScale = 1.0f;
     int rotationAngleDegrees = 0;
 
