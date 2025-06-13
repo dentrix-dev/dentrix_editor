@@ -14,14 +14,14 @@ GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, ComponentAxi
     aabb_max = glm::vec3(6.0f, 0.5f, 0.5f);
     const std::vector<float> vertices = {
         // positions
-        0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
-        0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // Top left +Z
-        6.0f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  // Top right +Z
-        6.0f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
-        0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // Top left -Z
-        6.0f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  // Top right -Z
-        6.0f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
+        0.15f, -0.15f, 0.15f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
+        0.15f, 0.15f,  0.15f,  1.0f, 1.0f, 1.0f,  // Top left +Z
+        6.0f, 0.15f,  0.15f,  1.0f, 1.0f, 1.0f,  // Top right +Z
+        6.0f, -0.15f, 0.15f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
+        0.15f, -0.15f, -0.15f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
+        0.15f, 0.15f,  -0.15f, 1.0f, 1.0f, 1.0f,  // Top left -Z
+        6.0f, 0.15f,  -0.15f, 1.0f, 1.0f, 1.0f,  // Top right -Z
+        6.0f, -0.15f, -0.15f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
     };
 
     const std::vector<unsigned int> indices = {// front face
