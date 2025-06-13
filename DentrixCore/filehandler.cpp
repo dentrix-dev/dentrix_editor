@@ -103,3 +103,8 @@ Mesh* FileHandler::readSTL(std::string& filepath, std::string& name, QOpenGLFunc
 
     return new Mesh(surfaceMesh, name, gl);
 }
+
+void FileHandler::writeMesh(std::string& filepath, pmp::SurfaceMesh& mesh)
+{
+    pmp::write(mesh, filepath);
+}
