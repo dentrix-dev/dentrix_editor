@@ -38,7 +38,7 @@ void GLWidget::loadModel(const std::string &path)
     // Delete references to previous meshes
     for (int i = 0; i < meshes.size(); i++) delete meshes[i];
 
-    meshes = Scene::loadScene(path, this);
+    meshes = Scene::loadScene(path);
 
     mainScene = Scene(meshes);
     currentScene = &mainScene;
@@ -54,7 +54,7 @@ void GLWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
 
     // Shaders
-    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs", this);
+    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs");
     shader->use();
 
     // Setup projection matrix
@@ -66,7 +66,7 @@ void GLWidget::initializeGL()
 
     // Load model
     auto modelLoadTime1 = std::chrono::steady_clock::now();
-    meshes = Scene::loadScene(initialFilePath, this);
+    meshes = Scene::loadScene(initialFilePath);
     auto modelLoadTime2 = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> ms_double = modelLoadTime2 - modelLoadTime1;
     // std::cout << "Model loaded in " << ms_double << std::endl;

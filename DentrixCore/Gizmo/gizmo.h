@@ -1,7 +1,6 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
-#include <QOpenGLFunctions_3_3_Core>
 #include <vector>
 
 #include "Gizmo/gizmoComponent.h"

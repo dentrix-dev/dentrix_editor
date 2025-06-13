@@ -103,9 +103,9 @@ glm::vec3 Scene::getMeshesCenter()
 
 // PMP doesn't support loading multiple separate objects from .obj files
 // Objects are loaded using a custom file loader and PMP meshes are constructed manually
-std::vector<Mesh *> Scene::loadScene(std::string path, QOpenGLFunctions_3_3_Core *gl)
+std::vector<Mesh *> Scene::loadScene(std::string path)
 {
-    std::vector<Mesh *> fileMeshes = FileHandler::readOBJ(path, gl);
+    std::vector<Mesh *> fileMeshes = FileHandler::readOBJ(path);
     std::cout << fileMeshes.size() << std::endl;
 
     // Translate all meshes to the center of the scene

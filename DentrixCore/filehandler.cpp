@@ -13,7 +13,7 @@ FileHandler::FileHandler() {}
 // o tooth0
 // v .. .. ..
 // f .. .. ..
-std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_3_3_Core* gl)
+std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath)
 {
     std::ifstream file(filepath);
     std::vector<Mesh*> meshes;
@@ -54,7 +54,7 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
 
                 if (name == "tooth0") surfaceMesh.add_vertex_property<bool>("v:selected");
 
-                meshes.push_back(new Mesh(surfaceMesh, name, gl));
+                meshes.push_back(new Mesh(surfaceMesh, name));
                 vhandles.clear();
                 vertices.clear();
                 indices.clear();
@@ -87,7 +87,7 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
             surfaceMesh.add_face(faceVertices);
         }
 
-        meshes.push_back(new Mesh(surfaceMesh, name, gl));
+        meshes.push_back(new Mesh(surfaceMesh, name));
         vertices.clear();
         indices.clear();
     }
@@ -96,12 +96,12 @@ std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath, QOpenGLFunctions_
     return meshes;
 }
 
-Mesh* FileHandler::readSTL(std::string& filepath, std::string& name, QOpenGLFunctions_3_3_Core* gl)
+Mesh* FileHandler::readSTL(std::string& filepath, std::string& name)
 {
     pmp::SurfaceMesh surfaceMesh;
     pmp::read(surfaceMesh, filepath);
 
-    return new Mesh(surfaceMesh, name, gl);
+    return new Mesh(surfaceMesh, name);
 }
 
 void FileHandler::writeMesh(std::string& filepath, pmp::SurfaceMesh& mesh)

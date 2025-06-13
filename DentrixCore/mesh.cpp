@@ -13,9 +13,9 @@
 
 bool Mesh::drawBoundingBox = true;
 
-Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name, QOpenGLFunctions_3_3_Core* gl)
+Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name)
 {
-    this->gl = gl;
+    initializeOpenGLFunctions();
     this->name = name;
     surfaceMesh = input_mesh;
 
@@ -77,29 +77,29 @@ void Mesh::setup()
     }
     numIndices = indices.size();
 
-    gl->glGenVertexArrays(1, &VAO);
-    gl->glGenBuffers(1, &VBO);
-    gl->glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
-    gl->glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
     // Vertices VBO
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
     // Position attribute
-    gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    gl->glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // Normal attribute
-    gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    gl->glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // --- Element Buffer
-    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    gl->glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void Mesh::setupBoundingBox()
@@ -128,33 +128,33 @@ void Mesh::setupBoundingBox()
     // Total 24 indices for 12 lines
 
     // 3. Generate and bind OpenGL objects
-    gl->glGenVertexArrays(1, &VAO_BB);
-    gl->glGenBuffers(1, &VBO_BB);
-    gl->glGenBuffers(1, &EBO_BB);
+    glGenVertexArrays(1, &VAO_BB);
+    glGenBuffers(1, &VBO_BB);
+    glGenBuffers(1, &EBO_BB);
 
-    gl->glBindVertexArray(VAO_BB);
+    glBindVertexArray(VAO_BB);
 
     // 4. Buffer vertex data (only positions)
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
     // Use bb_vertices data and size. Note the size calculation uses sizeof(glm::vec3)
-    gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
 
     // 5. Buffer index data
-    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_BB);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_BB);
     // Use bb_indices data and size
-    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, bb_indices.size() * sizeof(unsigned int), bb_indices.data(),
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, bb_indices.size() * sizeof(unsigned int), bb_indices.data(),
                      GL_STATIC_DRAW);
 
     // 6. Set up vertex attributes (only position)
-    gl->glEnableVertexAttribArray(0);
-    gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
     // 7. Unbind VAO (good practice)
-    gl->glBindVertexArray(0);
+    glBindVertexArray(0);
 
     // Optional: Unbind VBO and EBO after VAO is unbound. VAO remembers these bindings.
-    // gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 // Fills a hole in the mesh, defined by a halfedge that lies on the hole boundary
@@ -243,10 +243,10 @@ void Mesh::updateBoundingBoxBuffers()
     bb_vertices[6] = glm::vec3(aabb_max.x, aabb_max.y, aabb_max.z);  // 6 -=- Far top right
     bb_vertices[7] = glm::vec3(aabb_min.x, aabb_max.y, aabb_max.z);  // 7 --- Far top left
 
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_BB);
     // Use bb_vertices data and size. Note the size calculation uses sizeof(glm::vec3)
-    gl->glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
-    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBufferData(GL_ARRAY_BUFFER, bb_vertices.size() * sizeof(glm::vec3), bb_vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::updateVerticesBuffer()
@@ -270,11 +270,11 @@ void Mesh::updateVerticesBuffer()
         }
     }
     // Update position buffer
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), nullptr,
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), nullptr,
                      GL_DYNAMIC_DRAW);  // orphan old buffer
-    gl->glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
-    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::updateBuffers()
@@ -315,28 +315,28 @@ void Mesh::updateBuffers()
     numIndices = indices.size();
 
     // Update vertices buffer
-    gl->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
     // Update indices buffer
-    gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
     // Unbind buffers
-    gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::draw()
 {
-    gl->glBindVertexArray(VAO);
-    gl->glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
-    gl->glBindVertexArray(0);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     if (drawBoundingBox) {
-        gl->glBindVertexArray(VAO_BB);
+        glBindVertexArray(VAO_BB);
         // Draw 12 lines using the 24 indices provided
-        gl->glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
-        gl->glBindVertexArray(0);
+        glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
     }
 }
 
