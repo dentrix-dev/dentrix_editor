@@ -23,7 +23,8 @@
 #include "shader.h"
 #include "utils.h"
 
-GLWidget::GLWidget(QWidget *parent, std::string path, int jaw_index) : QOpenGLWidget(parent), initialFilePath(path), jaw_index(jaw_index)
+GLWidget::GLWidget(QWidget *parent, std::string path, int jaw_index)
+    : QOpenGLWidget(parent), initialFilePath(path), jaw_index(jaw_index)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -46,7 +47,7 @@ void GLWidget::loadModel(const std::string &path)
     update();  // Refresh the OpenGL view
 }
 
-void GLWidget::loadUpperJaw(const std::string& path)
+void GLWidget::loadUpperJaw(const std::string &path)
 {
     makeCurrent();
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
@@ -56,7 +57,7 @@ void GLWidget::loadUpperJaw(const std::string& path)
     update();
 }
 
-void GLWidget::loadLowerJaw(const std::string& path)
+void GLWidget::loadLowerJaw(const std::string &path)
 {
     makeCurrent();
     for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
@@ -70,13 +71,11 @@ void GLWidget::archAlign()
 {
     makeCurrent();
 
-    auto translate = [](std::vector<Mesh*>& jaw, const glm::vec3& offset) {
-        for (Mesh* mesh : jaw) {
+    auto translate = [](std::vector<Mesh *> &jaw, const glm::vec3 &offset) {
+        for (Mesh *mesh : jaw) {
             for (auto v : mesh->surfaceMesh.vertices()) {
                 pmp::Point pos = mesh->surfaceMesh.position(v);
-                mesh->surfaceMesh.position(v) = pmp::Point(pos[0] + offset.x,
-                                                           pos[1] + offset.y,
-                                                           pos[2] + offset.z);
+                mesh->surfaceMesh.position(v) = pmp::Point(pos[0] + offset.x, pos[1] + offset.y, pos[2] + offset.z);
             }
             mesh->recalculateBoundingBox();
             mesh->updateBuffers();
@@ -91,10 +90,9 @@ void GLWidget::archAlign()
     update();
 }
 
-
 void GLWidget::rebuildMainScene()
 {
-    std::vector<Mesh*> allMeshes;
+    std::vector<Mesh *> allMeshes;
     allMeshes.insert(allMeshes.end(), upperJawMeshes.begin(), upperJawMeshes.end());
     allMeshes.insert(allMeshes.end(), lowerJawMeshes.begin(), lowerJawMeshes.end());
 
@@ -104,7 +102,7 @@ void GLWidget::rebuildMainScene()
     // Calculate new scene center
     if (!allMeshes.empty()) {
         glm::vec3 sceneCenter(0.0f);
-        for (Mesh* mesh : allMeshes) {
+        for (Mesh *mesh : allMeshes) {
             sceneCenter += mesh->center;
         }
         sceneCenter /= (float)allMeshes.size();
@@ -133,9 +131,9 @@ void GLWidget::initializeGL()
     // Load model
 
     auto modelLoadTime1 = std::chrono::steady_clock::now();
-    if (jaw_index == 0){
+    if (jaw_index == 0) {
         loadLowerJaw(initialFilePath);
-    }else{
+    } else {
         loadUpperJaw(initialFilePath);
     }
     auto modelLoadTime2 = std::chrono::steady_clock::now();
@@ -239,7 +237,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         glm::ivec4 viewport = glm::ivec4(0, 0, GLWidget::width(), GLWidget::height());
 
         selectedGizmoComponent->onDrag(mousePosX, mousePosY, newMousePosX, newMousePosY, selectedMesh->center,
-                                       camera.position, camera.front, view, projection, viewport, selectedToothGizmoModelMatrix);
+                                       camera.position, camera.front, view, projection, viewport,
+                                       selectedToothGizmoModelMatrix);
         myGizmo->position = selectedToothGizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
     } else if (MainWindow::inFreeDeformation && shiftHeld) {
         glm::vec3 rayDirection;
