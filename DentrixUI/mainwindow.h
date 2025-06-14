@@ -8,7 +8,7 @@
 
 #include "Widgets/rightpanelstackedwidget.h"
 #include "Widgets/toolbarwidget.h"
-#include "Widgets/loadingbar.h"
+#include "Widgets/loadingtoolbar.h"
 #include "glwidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +30,7 @@ public:
     static bool inDirectionalScale;
     static bool inFreeDeformation;
     static bool inRotate;
+    void setupCentralUI(const std::string& modelPath, int loadMode);
 
 private:
     Ui::MainWindow* ui;
@@ -38,7 +39,7 @@ private:
     ToolBarWidget* toolbar;
     RightPanelStackedWidget* rightPanelStack;
     void createToolBar();
-    LoadingBar* loadingBar;
+    LoadingToolBar* loadingToolBar;
     bool upperLoaded = false;
     bool lowerLoaded = false;
 

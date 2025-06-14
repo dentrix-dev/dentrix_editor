@@ -1,20 +1,20 @@
-#ifndef LOADINGBAR_H
-#define LOADINGBAR_H
+#ifndef LOADINGTOOLBAR_H
+#define LOADINGTOOLBAR_H
 
 #include <QToolBar>
 #include <QAction>
 #include <iostream>
 
-class LoadingBar : public QToolBar
+class LoadingToolBar : public QToolBar
 {
     Q_OBJECT
 
 public:
-    explicit LoadingBar(QWidget* parent = nullptr);
+    explicit LoadingToolBar(QWidget* parent = nullptr);
 
     static const QString LOAD_UPPER_ACTION_TEXT;
     static const QString LOAD_LOWER_ACTION_TEXT;
-    static const QString ALIGN_JAWS_ACTION_TEXT;
+    static const QString ARCHES_ALIGNMENT_ACTION_TEXT;
 
 public slots:
     void setAlignEnabled(bool enabled);
@@ -30,4 +30,4 @@ private:
     QAction* alignJawsAction;
 };
 
-#endif  // LOADINGBAR_H
+#endif

@@ -62,8 +62,8 @@ set(PROJECT_SOURCES
     main.cpp
     ${UI_SOURCES}
     ${CORE_SOURCES}
-    DentrixUI/Widgets/loadingbar.cpp
-    DentrixUI/Widgets/loadingbar.h
+        DentrixUI/Widgets/loadingtoolbar.cpp
+        DentrixUI/Widgets/loadingtoolbar.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

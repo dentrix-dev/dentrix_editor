@@ -17,8 +17,8 @@ bool MainWindow::inDirectionalScale = false;
 bool MainWindow::inFreeDeformation = false;
 bool MainWindow::inRotate = false;
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr)
-{
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr), upperLoaded(false), lowerLoaded(false) {
     ui->setupUi(this);
     setWindowTitle("Dentrix Editor");
     resize(QApplication::primaryScreen()->geometry().width(), QApplication::primaryScreen()->geometry().height());
@@ -26,166 +26,127 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     createToolBar();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::createToolBar()
-{
+void MainWindow::createToolBar() {
     toolbar = new ToolBarWidget();
     addToolBar(Qt::LeftToolBarArea, toolbar);
     connect(toolbar->getActionGroup(), &QActionGroup::triggered, this, &MainWindow::onQActionGroupTriggered);
-    loadingBar = new LoadingBar(this);
-    addToolBar(Qt::TopToolBarArea, loadingBar);
-    connect(loadingBar, &LoadingBar::loadUpperRequested, this, &MainWindow::loadUpperJaw);
-    connect(loadingBar, &LoadingBar::loadLowerRequested, this, &MainWindow::loadLowerJaw);
-    connect(loadingBar, &LoadingBar::alignJawsRequested, this, &MainWindow::alignJaws);
+
+    loadingToolBar = new LoadingToolBar(this);
+    addToolBar(Qt::TopToolBarArea, loadingToolBar);
+    connect(loadingToolBar, &LoadingToolBar::loadUpperRequested, this, &MainWindow::loadUpperJaw);
+    connect(loadingToolBar, &LoadingToolBar::loadLowerRequested, this, &MainWindow::loadLowerJaw);
+    connect(loadingToolBar, &LoadingToolBar::alignJawsRequested, this, &MainWindow::alignJaws);
 }
 
-void MainWindow::loadModel()
-{
-    QString filePath =
-        QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
-    if (!filePath.isEmpty()) {
-        if (!glWidget) {
-            glWidget = new GLWidget(this, filePath.toStdString());
-            connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
-            connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
-            connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
-            connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
+void MainWindow::setupCentralUI(const std::string& modelPath, int loadMode) {
+    glWidget = new GLWidget(this, modelPath, loadMode);
+    connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
+    connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
+    connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
+    connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
 
-            // ... inside the if (!glWidget) section
-            // Create a horizontal layout for the central widget
-            QWidget* centralContainer = new QWidget(this);
-            QHBoxLayout* centralLayout = new QHBoxLayout(centralContainer);
-            centralLayout->setContentsMargins(0, 0, 0, 0);
+    QWidget* centralContainer = new QWidget(this);
+    QHBoxLayout* centralLayout = new QHBoxLayout(centralContainer);
+    centralLayout->setContentsMargins(0, 0, 0, 0);
 
-            // Add the glWidget to the left
-            centralLayout->addWidget(glWidget, 1);
+    centralLayout->addWidget(glWidget, 1);
 
-            rightPanelStack = new RightPanelStackedWidget(glWidget);
-            Q_ASSERT(rightPanelStack->uniformScalePanel);
-            Q_ASSERT(rightPanelStack->directionalScalePanel);
-            connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->uniformScalePanel,
-                    &UniformScalePanelWidget::onQActionGroupTriggered);
-            connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->directionalScalePanel,
-                    &DirectionalScalePanelWidget::onQActionGroupTriggered);
+    rightPanelStack = new RightPanelStackedWidget(glWidget);
+    Q_ASSERT(rightPanelStack->uniformScalePanel);
+    Q_ASSERT(rightPanelStack->directionalScalePanel);
 
-            // Add to layout
-            centralLayout->addWidget(rightPanelStack);
+    connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->uniformScalePanel,
+            &UniformScalePanelWidget::onQActionGroupTriggered);
+    connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->directionalScalePanel,
+            &DirectionalScalePanelWidget::onQActionGroupTriggered);
 
-            // Set the container as the central widget
-            setCentralWidget(centralContainer);
-        } else {
-            glWidget->loadModel(filePath.toStdString());
-            toolbar->set_edit_button_mode(ToolBarWidget::ButtonMode::Main_mode);
-            toolbar->set_edit_button_active(false);
-        }
-    }
+    centralLayout->addWidget(rightPanelStack);
+    setCentralWidget(centralContainer);
 }
 
-void MainWindow::onMeshSelectedInMainScene()
-{
-    std::cout << __func__ << std::endl;
-    toolbar->set_edit_button_active();
-}
+void MainWindow::loadModel() {
+    QString filePath = QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
+    if (filePath.isEmpty()) return;
 
-void MainWindow::onMovedToEditScene()
-{
-    toolbar->set_edit_button_mode(ToolBarWidget::Edit_mode);
-}
-
-void MainWindow::onMovedToMainScene()
-{
-    toolbar->set_edit_button_mode(ToolBarWidget::Main_mode);
-}
-
-void MainWindow::onQActionGroupTriggered(QAction* action)
-{
-    QString actionText = action->text();
-    if (actionText == ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT) {
-        MainWindow::inUnformScale = true;
-        MainWindow::inDirectionalScale = false;
-        MainWindow::inFreeDeformation = false;
-        MainWindow::inRotate = false;
-        rightPanelStack->setCurrentIndex(1);
-    } else if (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT) {
-        MainWindow::inUnformScale = false;
-        MainWindow::inDirectionalScale = true;
-        MainWindow::inFreeDeformation = false;
-        MainWindow::inRotate = false;
-        rightPanelStack->setCurrentIndex(2);
-    } else if (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT) {
-        MainWindow::inUnformScale = false;
-        MainWindow::inDirectionalScale = false;
-        MainWindow::inFreeDeformation = true;
-        MainWindow::inRotate = false;
-        rightPanelStack->setCurrentIndex(3);
-    } else if (actionText == ToolBarWidget::ROTATE_ACTION_TEXT) {
-        MainWindow::inUnformScale = false;
-        MainWindow::inDirectionalScale = false;
-        MainWindow::inFreeDeformation = false;
-        MainWindow::inRotate = true;
-        rightPanelStack->setCurrentIndex(4);
-    }
-    if (glWidget) {
-        glWidget->updateCursor();
+    if (!glWidget) {
+        setupCentralUI(filePath.toStdString(), 0);
+    } else {
+        glWidget->loadModel(filePath.toStdString());
+        toolbar->set_edit_button_mode(ToolBarWidget::ButtonMode::Main_mode);
+        toolbar->set_edit_button_active(false);
     }
 }
 
 void MainWindow::loadUpperJaw() {
     std::cout << "Loading upper jaw..." << std::endl;
     QString file = QFileDialog::getOpenFileName(this, "Load Upper Jaw", "../../models", "Model Files (*.stl *.obj)");
-    if (!file.isEmpty()) {
-        std::cout << "Upper jaw file selected: " << file.toStdString() << std::endl;
-        if (!glWidget) {
-            glWidget = new GLWidget(this, file.toStdString());
-            connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
-            connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
-            connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
-            connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
-            setCentralWidget(glWidget);
-        } else {
-            glWidget->loadModel(file.toStdString());
-        }
-        upperLoaded = true;
-        loadingBar->setAlignEnabled(upperLoaded && lowerLoaded);
-        std::cout << "Upper jaw loaded successfully" << std::endl;
+    if (file.isEmpty()) return;
+
+    if (!glWidget) {
+        setupCentralUI(file.toStdString(), 1);
     } else {
-        std::cout << "No upper jaw file selected" << std::endl;
+        glWidget->loadUpperJaw(file.toStdString());
     }
+    upperLoaded = true;
+    loadingToolBar->setAlignEnabled(upperLoaded && lowerLoaded);
+    toolbar->set_edit_button_mode(ToolBarWidget::Main_mode);
+    toolbar->set_edit_button_active(false);
 }
 
 void MainWindow::loadLowerJaw() {
     std::cout << "Loading lower jaw..." << std::endl;
     QString file = QFileDialog::getOpenFileName(this, "Load Lower Jaw", "../../models", "Model Files (*.stl *.obj)");
-    if (!file.isEmpty()) {
-        std::cout << "Lower jaw file selected: " << file.toStdString() << std::endl;
-        if (!glWidget) {
-            glWidget = new GLWidget(this, file.toStdString());
-            connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
-            connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
-            connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
-            connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
-            setCentralWidget(glWidget);
-        } else {
-            glWidget->loadModel(file.toStdString());
-        }
-        lowerLoaded = true;
-        loadingBar->setAlignEnabled(upperLoaded && lowerLoaded);
-        std::cout << "Lower jaw loaded successfully" << std::endl;
+    if (file.isEmpty()) return;
+
+    if (!glWidget) {
+        setupCentralUI(file.toStdString(), 0);
     } else {
-        std::cout << "No lower jaw file selected" << std::endl;
+        glWidget->loadLowerJaw(file.toStdString());
     }
+    lowerLoaded = true;
+    loadingToolBar->setAlignEnabled(upperLoaded && lowerLoaded);
+    toolbar->set_edit_button_mode(ToolBarWidget::Main_mode);
+    toolbar->set_edit_button_active(false);
 }
 
 void MainWindow::alignJaws() {
     std::cout << "Aligning jaws..." << std::endl;
     if (glWidget) {
-        // TODO: glWidget->alignJaws();
+        glWidget->archAlign();
         std::cout << "Jaws alignment requested" << std::endl;
-    } else {
-        std::cout << "Error: GLWidget not initialized" << std::endl;
     }
+}
+
+void MainWindow::onMeshSelectedInMainScene() {
+    std::cout << __func__ << std::endl;
+    toolbar->set_edit_button_active();
+}
+
+void MainWindow::onMovedToEditScene() {
+    toolbar->set_edit_button_mode(ToolBarWidget::Edit_mode);
+}
+
+void MainWindow::onMovedToMainScene() {
+    toolbar->set_edit_button_mode(ToolBarWidget::Main_mode);
+}
+
+void MainWindow::onQActionGroupTriggered(QAction* action) {
+    QString actionText = action->text();
+    inUnformScale = (actionText == ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
+    inDirectionalScale = (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
+    inFreeDeformation = (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
+    inRotate = (actionText == ToolBarWidget::ROTATE_ACTION_TEXT);
+
+    if (rightPanelStack) {
+        if (inUnformScale) rightPanelStack->setCurrentIndex(1);
+        else if (inDirectionalScale) rightPanelStack->setCurrentIndex(2);
+        else if (inFreeDeformation) rightPanelStack->setCurrentIndex(3);
+        else if (inRotate) rightPanelStack->setCurrentIndex(4);
+    }
+
+    if (glWidget) glWidget->updateCursor();
 }
