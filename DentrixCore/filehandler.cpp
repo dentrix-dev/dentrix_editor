@@ -9,11 +9,18 @@
 
 FileHandler::FileHandler() {}
 
+pmp::SurfaceMesh FileHandler::readOBJ(const std::string& filepath, std::vector<pmp::Face>* remap)
+{
+    pmp::SurfaceMesh mesh;
+    pmp::read(mesh, filepath, remap);
+    return mesh;
+}
+
 // This function expects a correctly formatted OBJ file
 // o tooth0
 // v .. .. ..
 // f .. .. ..
-std::vector<Mesh*> FileHandler::readOBJ(std::string& filepath)
+std::vector<Mesh*> FileHandler::readSegmentedOBJ(std::string& filepath)
 {
     std::ifstream file(filepath);
     std::vector<Mesh*> meshes;

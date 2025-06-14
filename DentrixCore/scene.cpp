@@ -105,7 +105,7 @@ glm::vec3 Scene::getMeshesCenter()
 // Objects are loaded using a custom file loader and PMP meshes are constructed manually
 std::vector<Mesh *> Scene::loadScene(std::string path)
 {
-    std::vector<Mesh *> fileMeshes = FileHandler::readOBJ(path);
+    std::vector<Mesh *> fileMeshes = FileHandler::readSegmentedOBJ(path);
     std::cout << fileMeshes.size() << std::endl;
 
     // Translate all meshes to the center of the scene
