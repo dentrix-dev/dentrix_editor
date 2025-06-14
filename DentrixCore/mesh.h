@@ -32,6 +32,7 @@ public:
     void setScale(float scaleFactor);
     void setRotationAngle(float rotationAngle);
     void setScaleDirectional(float x, float y, float z);
+    void translate(glm::mat4& translationMatrix);
 
     void fillHole(pmp::Halfedge h);
     void draw();
