@@ -23,7 +23,7 @@
 #include "shader.h"
 #include "utils.h"
 
-GLWidget::GLWidget(QWidget *parent, std::string path) : QOpenGLWidget(parent), initialFilePath(path)
+GLWidget::GLWidget(QWidget *parent, std::string path, int jaw_index) : QOpenGLWidget(parent), initialFilePath(path), jaw_index(jaw_index)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -46,6 +46,72 @@ void GLWidget::loadModel(const std::string &path)
     update();  // Refresh the OpenGL view
 }
 
+void GLWidget::loadUpperJaw(const std::string& path)
+{
+    makeCurrent();
+    for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
+    upperJawMeshes = Scene::loadScene(path);
+    upperJawLoaded = true;
+    rebuildMainScene();
+    update();
+}
+
+void GLWidget::loadLowerJaw(const std::string& path)
+{
+    makeCurrent();
+    for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
+    lowerJawMeshes = Scene::loadScene(path);
+    lowerJawLoaded = true;
+    rebuildMainScene();
+    update();
+}
+
+void GLWidget::archAlign()
+{
+    makeCurrent();
+
+    auto translate = [](std::vector<Mesh*>& jaw, const glm::vec3& offset) {
+        for (Mesh* mesh : jaw) {
+            for (auto v : mesh->surfaceMesh.vertices()) {
+                pmp::Point pos = mesh->surfaceMesh.position(v);
+                mesh->surfaceMesh.position(v) = pmp::Point(pos[0] + offset.x,
+                                                           pos[1] + offset.y,
+                                                           pos[2] + offset.z);
+            }
+            mesh->recalculateBoundingBox();
+            mesh->updateBuffers();
+            mesh->updateBoundingBoxBuffers();
+        }
+    };
+
+    translate(upperJawMeshes, glm::vec3(0.0f, 20.0f, 0.0f));
+    translate(lowerJawMeshes, glm::vec3(0.0f, -20.0f, 0.0f));
+
+    rebuildMainScene();
+    update();
+}
+
+
+void GLWidget::rebuildMainScene()
+{
+    std::vector<Mesh*> allMeshes;
+    allMeshes.insert(allMeshes.end(), upperJawMeshes.begin(), upperJawMeshes.end());
+    allMeshes.insert(allMeshes.end(), lowerJawMeshes.begin(), lowerJawMeshes.end());
+
+    mainScene = Scene(allMeshes);
+    currentScene = &mainScene;
+
+    // Calculate new scene center
+    if (!allMeshes.empty()) {
+        glm::vec3 sceneCenter(0.0f);
+        for (Mesh* mesh : allMeshes) {
+            sceneCenter += mesh->center;
+        }
+        sceneCenter /= (float)allMeshes.size();
+        mainScene.center = sceneCenter;
+    }
+}
+
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -65,15 +131,17 @@ void GLWidget::initializeGL()
     shader->setMatrix4("model", glm::value_ptr(model));
 
     // Load model
+
     auto modelLoadTime1 = std::chrono::steady_clock::now();
-    meshes = Scene::loadScene(initialFilePath);
+    if (jaw_index == 0){
+        loadLowerJaw(initialFilePath);
+    }else{
+        loadUpperJaw(initialFilePath);
+    }
     auto modelLoadTime2 = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> ms_double = modelLoadTime2 - modelLoadTime1;
     // std::cout << "Model loaded in " << ms_double << std::endl;
 
-    mainScene = Scene(meshes);
-    currentScene = &mainScene;
-    update();
     std::cout << "mesh loaded" << std::endl;
     std::cout << currentScene->meshes[0]->surfaceMesh.n_vertices() << std::endl;
     int bounds = 0;

@@ -20,10 +20,14 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 public:
-    explicit GLWidget(QWidget *parent, std::string path);
+    explicit GLWidget(QWidget *parent, std::string path, int jaw_index);
     ~GLWidget();
 
     void loadModel(const std::string &path);  // Function to load new model
+    void loadUpperJaw(const std::string& path);
+    void loadLowerJaw(const std::string& path);
+    void archAlign();
+    void rebuildMainScene();
     void setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive);
     void setFreeDeformAddMode(bool isAdd);
     void setDeformationStrength(int value);
@@ -50,6 +54,7 @@ protected:
 
 private:
     std::string initialFilePath;
+    int jaw_index;    // jaw_index = 0 means lower jaw, jaw_index =1 means upper jaw
 
     Shader *shader;
 
@@ -75,6 +80,10 @@ private:
     BrushMode currentBrushMode = BrushMode::Add;
     bool shiftHeld = false;
     bool ctrlHeld = false;
+    std::vector<Mesh*> upperJawMeshes;
+    std::vector<Mesh*> lowerJawMeshes;
+    bool upperJawLoaded = false;
+    bool lowerJawLoaded = false;
 
 signals:
     void meshSelectedInMainScene();
