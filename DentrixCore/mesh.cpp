@@ -18,21 +18,8 @@ Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name)
     initializeOpenGLFunctions();
     this->name = name;
     surfaceMesh = input_mesh;
-
-    // Calculate per-face normals for vertices
-    // (vertex has a normal for each face it's a part of)
     pmp::face_normals(surfaceMesh);
-
-    // Calculate mesh bounding box and center
-    pmp::BoundingBox aabb = pmp::bounds(surfaceMesh);
-    aabb_min = Utils::pmpPointToGlm(aabb.min());
-    aabb_max = Utils::pmpPointToGlm(aabb.max());
-    center = 0.5f * (aabb_min + aabb_max);
-
-    // Update bounding box
-    // aabb_min -= center;
-    // aabb_max -= center;
-
+    recalculateBoundingBox();
     setup();
     setupBoundingBox();
 }
@@ -442,4 +429,12 @@ void Mesh::applyFreeDeformation(Brush& brush, bool isAdd)
     pmp::vertex_normals(surfaceMesh);
     pmp::face_normals(surfaceMesh);
     updateBuffers();
+}
+
+void Mesh::recalculateBoundingBox()
+{
+    pmp::BoundingBox aabb = pmp::bounds(surfaceMesh);
+    aabb_min = Utils::pmpPointToGlm(aabb.min());
+    aabb_max = Utils::pmpPointToGlm(aabb.max());
+    center = 0.5f * (aabb_min + aabb_max);
 }

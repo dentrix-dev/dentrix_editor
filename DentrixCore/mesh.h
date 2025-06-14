@@ -41,6 +41,7 @@ public:
     void updateMeshScale(glm::vec3 sceneCenter);
     void rotateMesh(glm::vec3 sceneCenter);
     void applyFreeDeformation(Brush& brush, bool isAdd);
+    void recalculateBoundingBox();
 
 private:
     unsigned int VAO, VBO, EBO;
