@@ -129,8 +129,7 @@ void Mesh::setupBoundingBox()
     // 5. Buffer index data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_BB);
     // Use bb_indices data and size
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, bb_indices.size() * sizeof(unsigned int), bb_indices.data(),
-                     GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, bb_indices.size() * sizeof(unsigned int), bb_indices.data(), GL_STATIC_DRAW);
 
     // 6. Set up vertex attributes (only position)
     glEnableVertexAttribArray(0);
@@ -142,6 +141,20 @@ void Mesh::setupBoundingBox()
     // Optional: Unbind VBO and EBO after VAO is unbound. VAO remembers these bindings.
     // glBindBuffer(GL_ARRAY_BUFFER, 0);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Mesh::translate(glm::mat4& translationMatrix)
+{
+    for (pmp::Vertex v : surfaceMesh.vertices()) {
+        glm::vec3 vertexPos = Utils::pmpPointToGlm(surfaceMesh.position(v));
+        glm::vec3 translatedVertexPos = translationMatrix * glm::vec4(vertexPos, 1.0f);
+        surfaceMesh.position(v) = Utils::glmToPmpPoint(translatedVertexPos);
+    }
+    updateBuffers();
+    aabb_min = translationMatrix * glm::vec4(aabb_min, 1.0f);
+    aabb_max = translationMatrix * glm::vec4(aabb_max, 1.0f);
+    center = translationMatrix * glm::vec4(center, 1.0f);
+    updateBoundingBoxBuffers();
 }
 
 // Fills a hole in the mesh, defined by a halfedge that lies on the hole boundary
@@ -259,7 +272,7 @@ void Mesh::updateVerticesBuffer()
     // Update position buffer
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), nullptr,
-                     GL_DYNAMIC_DRAW);  // orphan old buffer
+                 GL_DYNAMIC_DRAW);  // orphan old buffer
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
