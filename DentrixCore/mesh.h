@@ -38,7 +38,7 @@ public:
     void updateVerticesBuffer();
     void updateBuffers();
     void updateBoundingBoxBuffers();
-    void updateMeshScale(glm::vec3 sceneCenter);
+    void updateMeshScale();
     void rotateMesh(glm::vec3 sceneCenter);
     void applyFreeDeformation(Brush& brush, bool isAdd);
 

@@ -343,7 +343,7 @@ void Mesh::draw()
 void Mesh::setScale(float scaleFactor)
 {
     currentScale = scaleFactor;
-    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
+    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor));
 }
 
 void Mesh::setRotationAngle(float rotationAngle)
@@ -358,20 +358,21 @@ void Mesh::setScaleDirectional(float x, float y, float z)
     directionalScaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(x, y, z));
 }
 
-void Mesh::updateMeshScale(glm::vec3 sceneCenter)
+void Mesh::updateMeshScale()
 {
-    pmp::Point center = pmp::centroid(surfaceMesh);
-    // pmp::Point center = Utils::glmToPmpPoint(sceneCenter);
+    pmp::Point pmpcenter = Utils::glmToPmpPoint(center);
     // Scale vertices around center
     for (auto v : surfaceMesh.vertices()) {
         pmp::Point p = surfaceMesh.position(v);
-        p = center + (p - center) * currentScale;
+        p = (p - pmpcenter) * currentScale + pmpcenter;
         surfaceMesh.position(v) = p;
     }
-    pmp::face_normals(surfaceMesh);
-    pmp::vertex_normals(surfaceMesh);
-    scaleTransform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    updateBuffers();
+    scaleTransform = glm::mat4(1.0f);
+    updateVerticesBuffer();
+
+    aabb_max = (aabb_max - center) * currentScale + center;
+    aabb_min = (aabb_min - center) * currentScale + center;
+    updateBoundingBoxBuffers();
 }
 
 void Mesh::rotateMesh(glm::vec3 sceneCenter)
