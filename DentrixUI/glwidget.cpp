@@ -171,6 +171,7 @@ void GLWidget::paintGL()
     view = camera.GetViewMatrix();
     shader->setMatrix4("view", glm::value_ptr(view));
 
+    shader->setBool("isFlatColor", false);
     currentScene->Draw(shader, selectedMesh, selectedToothGizmoModelMatrix);
 
     if (selectedMesh != nullptr) {

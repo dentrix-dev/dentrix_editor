@@ -1,6 +1,7 @@
 #version 330 core
 
 uniform vec3 color;
+uniform bool isFlatColor;
 
 in vec3 Normal;
 in vec3 FragPos;
@@ -8,6 +9,10 @@ in vec3 FragPos;
 out vec4 FragColor;
 
 void main() {
+    if (isFlatColor) {
+        FragColor = vec4(color, 1.0);
+        return;
+    }
     vec3 ambient = vec3(0.2f, 0.2f, 0.2f);
     vec3 lightPos = vec3(0.0f, 0.0f, 200.0f);
     vec3 lightColor = vec3(0.8f, 0.8f, 0.8f);

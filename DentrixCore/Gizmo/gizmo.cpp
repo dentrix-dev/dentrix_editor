@@ -10,23 +10,24 @@ Gizmo::Gizmo()
 
     glm::mat4 rotation = glm::mat4(1.0f);
     enum ComponentAxis axis = X;
-    GizmoComponent *xAxis = new GizmoComponent(glm::vec3(1.0f, 0.0f, 0.0f), rotation, axis);
+    GizmoComponent *xAxis = new GizmoComponent(glm::vec3(0.8f, 0.0f, 0.0f), rotation, axis);
     components.push_back(xAxis);
 
     rotation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     axis = Y;
-    GizmoComponent *yAxis = new GizmoComponent(glm::vec3(0.0f, 1.0f, 0.0f), rotation, axis);
+    GizmoComponent *yAxis = new GizmoComponent(glm::vec3(0.0f, 0.8f, 0.0f), rotation, axis);
     components.push_back(yAxis);
 
     rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     axis = Z;
-    GizmoComponent *zAxis = new GizmoComponent(glm::vec3(0.0f, 0.0f, 1.0f), rotation, axis);
+    GizmoComponent *zAxis = new GizmoComponent(glm::vec3(0.0f, 0.0f, 0.8f), rotation, axis);
     components.push_back(zAxis);
 }
 
 void Gizmo::draw(Shader *shader, float cameraDistance)
 {
     for (GizmoComponent *c : components) {
+        shader->setBool("isFlatColor", true);
         shader->setVec3("color", c->color.x, c->color.y, c->color.z);
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) * c->rotation;
         modelMatrix = glm::scale(modelMatrix, glm::vec3(cameraDistance / 100.0f));
