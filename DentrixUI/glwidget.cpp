@@ -414,7 +414,7 @@ void GLWidget::setSelectedMeshRotationAngle(int rotationAngleDegrees)
 void GLWidget::updateMeshScale()
 {
     if (selectedMesh != nullptr) {
-        selectedMesh->updateMeshScale(currentScene->center);
+        selectedMesh->updateMeshScale();
         update();
     }
 }

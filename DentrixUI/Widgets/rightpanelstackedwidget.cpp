@@ -36,7 +36,7 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
 
 void RightPanelStackedWidget::initDeformationPanelSignals()
 {
-    connect(deformationPanel->getModeGroup(), &QButtonGroup::idClicked, deformationPanel, [=](int id) {
+    connect(deformationPanel->getModeGroup(), &QButtonGroup::idClicked, deformationPanel, [=, this](int id) {
         bool isAdd = (id == 0);
         glWidget->setFreeDeformAddMode(isAdd);
     });
