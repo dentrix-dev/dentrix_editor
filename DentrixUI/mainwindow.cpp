@@ -36,6 +36,11 @@ void MainWindow::createToolBar()
     toolbar = new ToolBarWidget();
     addToolBar(Qt::LeftToolBarArea, toolbar);
     connect(toolbar->getActionGroup(), &QActionGroup::triggered, this, &MainWindow::onQActionGroupTriggered);
+    loadingBar = new LoadingBar(this);
+    addToolBar(Qt::TopToolBarArea, loadingBar);
+    connect(loadingBar, &LoadingBar::loadUpperRequested, this, &MainWindow::loadUpperJaw);
+    connect(loadingBar, &LoadingBar::loadLowerRequested, this, &MainWindow::loadLowerJaw);
+    connect(loadingBar, &LoadingBar::alignJawsRequested, this, &MainWindow::alignJaws);
 }
 
 void MainWindow::loadModel()
@@ -126,5 +131,61 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
     }
     if (glWidget) {
         glWidget->updateCursor();
+    }
+}
+
+void MainWindow::loadUpperJaw() {
+    std::cout << "Loading upper jaw..." << std::endl;
+    QString file = QFileDialog::getOpenFileName(this, "Load Upper Jaw", "../../models", "Model Files (*.stl *.obj)");
+    if (!file.isEmpty()) {
+        std::cout << "Upper jaw file selected: " << file.toStdString() << std::endl;
+        if (!glWidget) {
+            glWidget = new GLWidget(this, file.toStdString());
+            connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
+            connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
+            connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
+            connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
+            setCentralWidget(glWidget);
+        } else {
+            glWidget->loadModel(file.toStdString());
+        }
+        upperLoaded = true;
+        loadingBar->setAlignEnabled(upperLoaded && lowerLoaded);
+        std::cout << "Upper jaw loaded successfully" << std::endl;
+    } else {
+        std::cout << "No upper jaw file selected" << std::endl;
+    }
+}
+
+void MainWindow::loadLowerJaw() {
+    std::cout << "Loading lower jaw..." << std::endl;
+    QString file = QFileDialog::getOpenFileName(this, "Load Lower Jaw", "../../models", "Model Files (*.stl *.obj)");
+    if (!file.isEmpty()) {
+        std::cout << "Lower jaw file selected: " << file.toStdString() << std::endl;
+        if (!glWidget) {
+            glWidget = new GLWidget(this, file.toStdString());
+            connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
+            connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
+            connect(glWidget, &GLWidget::movedToMainScene, this, &MainWindow::onMovedToMainScene);
+            connect(toolbar->getEditButton(), &QPushButton::clicked, glWidget, &GLWidget::onEditSceneClicked);
+            setCentralWidget(glWidget);
+        } else {
+            glWidget->loadModel(file.toStdString());
+        }
+        lowerLoaded = true;
+        loadingBar->setAlignEnabled(upperLoaded && lowerLoaded);
+        std::cout << "Lower jaw loaded successfully" << std::endl;
+    } else {
+        std::cout << "No lower jaw file selected" << std::endl;
+    }
+}
+
+void MainWindow::alignJaws() {
+    std::cout << "Aligning jaws..." << std::endl;
+    if (glWidget) {
+        // TODO: glWidget->alignJaws();
+        std::cout << "Jaws alignment requested" << std::endl;
+    } else {
+        std::cout << "Error: GLWidget not initialized" << std::endl;
     }
 }

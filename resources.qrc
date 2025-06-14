@@ -4,5 +4,6 @@
         <file>DentrixUI/Icons/directional-scale.svg</file>
         <file>DentrixUI/Icons/free-deform.svg</file>
         <file>DentrixUI/Icons/uniform-scale.svg</file>
+        <file>DentrixUI/Icons/load-lower.svg</file>
     </qresource>
 </RCC>

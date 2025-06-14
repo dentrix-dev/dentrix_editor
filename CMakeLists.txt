@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include(cmake/CPM.cmake)
 
@@ -61,6 +62,8 @@ set(PROJECT_SOURCES
     main.cpp
     ${UI_SOURCES}
     ${CORE_SOURCES}
+    DentrixUI/Widgets/loadingbar.cpp
+    DentrixUI/Widgets/loadingbar.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -132,3 +135,10 @@ install(TARGETS dentrix_editor
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(dentrix_editor)
 endif()
+
+# Copy shaders to the build directory
+file(GLOB SHADERS "${CMAKE_SOURCE_DIR}/shaders/*")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/shaders")
+foreach(SHADER ${SHADERS})
+    configure_file(${SHADER} ${CMAKE_BINARY_DIR}/shaders COPYONLY)
+endforeach()

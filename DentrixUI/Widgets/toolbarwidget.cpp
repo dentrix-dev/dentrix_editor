@@ -10,6 +10,7 @@ const QString ToolBarWidget::ROTATE_ACTION_TEXT = "Rotate";
 
 ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
 {
+    setMovable(false);
     // Create Transformation Actions Group
     actionGroup = new QActionGroup(this);
     actionGroup->setExclusive(true);

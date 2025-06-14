@@ -54,7 +54,7 @@ void GLWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
 
     // Shaders
-    shader = new Shader("../../shaders/vertexShader.vs", "../../shaders/fragmentShader.fs");
+    shader = new Shader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
     shader->use();
 
     // Setup projection matrix

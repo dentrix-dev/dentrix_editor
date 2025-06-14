@@ -8,6 +8,7 @@
 
 #include "Widgets/rightpanelstackedwidget.h"
 #include "Widgets/toolbarwidget.h"
+#include "Widgets/loadingbar.h"
 #include "glwidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -37,6 +38,9 @@ private:
     ToolBarWidget* toolbar;
     RightPanelStackedWidget* rightPanelStack;
     void createToolBar();
+    LoadingBar* loadingBar;
+    bool upperLoaded = false;
+    bool lowerLoaded = false;
 
 private slots:
     void loadModel();
@@ -44,5 +48,9 @@ private slots:
     void onMovedToEditScene();
     void onMovedToMainScene();
     void onQActionGroupTriggered(QAction* action);
+    void loadUpperJaw();
+    void loadLowerJaw();
+    void alignJaws();
+
 };
 #endif  // MAINWINDOW_H
