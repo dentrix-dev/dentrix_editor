@@ -1,5 +1,8 @@
 #include "glwidget.h"
 
+#include <mcg/dental/arch_alignment.h>
+#include <mcg/dental/segmentation.h>
+#include <mcg/mesh_utils.h>
 #include <pmp/io/io.h>
 #include <pmp/surface_mesh.h>
 #include <qnamespace.h>
@@ -51,7 +54,14 @@ void GLWidget::loadUpperJaw(const std::string &path)
 {
     makeCurrent();
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
-    upperJawMeshes = Scene::loadScene(path);
+    upperJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
+    upperJawUnsegmented = pmp::read(path, &upperRemap);
+    upperArch = mcg::arch_segment(upperJawUnsegmented, upperJawLabelsPath.c_str(), upperRemap);
+    for (mcg::Tooth t : upperArch.teeth) {
+        pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
+        upperJawMeshes.push_back(new Mesh(tooth, ""));
+    }
+
     upperJawLoaded = true;
     rebuildMainScene();
     update();
@@ -61,7 +71,14 @@ void GLWidget::loadLowerJaw(const std::string &path)
 {
     makeCurrent();
     for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
-    lowerJawMeshes = Scene::loadScene(path);
+    lowerJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
+    lowerJawUnsegmented = pmp::read(path, &lowerRemap);
+    lowerArch = mcg::arch_segment(lowerJawUnsegmented, lowerJawLabelsPath.c_str(), lowerRemap);
+    for (mcg::Tooth t : lowerArch.teeth) {
+        pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
+        lowerJawMeshes.push_back(new Mesh(tooth, ""));
+    }
+
     lowerJawLoaded = true;
     rebuildMainScene();
     update();
@@ -71,20 +88,26 @@ void GLWidget::archAlign()
 {
     makeCurrent();
 
-    auto translate = [](std::vector<Mesh *> &jaw, const glm::vec3 &offset) {
-        for (Mesh *mesh : jaw) {
-            for (auto v : mesh->surfaceMesh.vertices()) {
-                pmp::Point pos = mesh->surfaceMesh.position(v);
-                mesh->surfaceMesh.position(v) = pmp::Point(pos[0] + offset.x, pos[1] + offset.y, pos[2] + offset.z);
-            }
-            mesh->recalculateBoundingBox();
-            mesh->updateBuffers();
-            mesh->updateBoundingBoxBuffers();
-        }
-    };
+    mcg::Segmentation_Result seg{};
+    seg.upper = upperArch;
+    seg.lower = lowerArch;
+    mcg::Alignment_Result res = mcg::arch_align_upper_and_lower(upperJawUnsegmented, lowerJawUnsegmented, seg);
 
-    translate(upperJawMeshes, glm::vec3(0.0f, 20.0f, 0.0f));
-    translate(lowerJawMeshes, glm::vec3(0.0f, -20.0f, 0.0f));
+    std::cout << res.upper_transform << std::endl;
+    std::cout << res.lower_transform << std::endl;
+
+    for (Mesh *m : upperJawMeshes) {
+        mcg::mesh_transform(m->surfaceMesh, res.upper_transform);
+        m->updateBuffers();
+        m->recalculateBoundingBox();
+        m->updateBoundingBoxBuffers();
+    }
+    for (Mesh *m : lowerJawMeshes) {
+        mcg::mesh_transform(m->surfaceMesh, res.lower_transform);
+        m->updateBuffers();
+        m->recalculateBoundingBox();
+        m->updateBoundingBoxBuffers();
+    }
 
     rebuildMainScene();
     update();
@@ -141,14 +164,14 @@ void GLWidget::initializeGL()
     // std::cout << "Model loaded in " << ms_double << std::endl;
 
     std::cout << "mesh loaded" << std::endl;
-    std::cout << currentScene->meshes[0]->surfaceMesh.n_vertices() << std::endl;
-    int bounds = 0;
-    for (pmp::Halfedge h : currentScene->meshes[0]->surfaceMesh.halfedges()) {
-        if (currentScene->meshes[0]->surfaceMesh.is_boundary(h)) {
-            bounds++;
-        }
-    }
-    std::cout << bounds << std::endl;
+    // std::cout << currentScene->meshes[0]->surfaceMesh.n_vertices() << std::endl;
+    // int bounds = 0;
+    // for (pmp::Halfedge h : currentScene->meshes[0]->surfaceMesh.halfedges()) {
+    //     if (currentScene->meshes[0]->surfaceMesh.is_boundary(h)) {
+    //         bounds++;
+    //     }
+    // }
+    // std::cout << bounds << std::endl;
     // std::cout << currentScene->meshes[0]->vertices.size() << std::endl;
     // std::cout << currentScene->meshes[0]->normals.size() << std::endl;
     // std::cout << currentScene->meshes[0]->indices.size() << std::endl;
