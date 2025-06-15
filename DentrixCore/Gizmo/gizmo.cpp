@@ -24,13 +24,18 @@ Gizmo::Gizmo()
     components.push_back(zAxis);
 }
 
-void Gizmo::draw(Shader *shader, float cameraDistance)
+void Gizmo::draw(Shader *shader, float cameraDistance, glm::vec3 &cameraPosition, glm::vec3 &cameraForward)
 {
+    shader->setBool("isFlatColor", true);
+
+    // Calculate distance to render the gizmo at a constant scale
+    glm::vec3 cameraToGizmo = position - cameraPosition;
+    float distance = glm::dot(cameraToGizmo, cameraForward);
+    float scale = distance * 0.01f;
     for (GizmoComponent *c : components) {
-        shader->setBool("isFlatColor", true);
         shader->setVec3("color", c->color.x, c->color.y, c->color.z);
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) * c->rotation;
-        modelMatrix = glm::scale(modelMatrix, glm::vec3(cameraDistance / 100.0f));
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(scale));
         shader->setMatrix4("model", glm::value_ptr(modelMatrix));
         c->draw();
     }

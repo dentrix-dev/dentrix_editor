@@ -174,7 +174,7 @@ void GLWidget::paintGL()
 
     if (selectedMesh != nullptr) {
         glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
-        myGizmo->draw(shader, camera.distance);
+        myGizmo->draw(shader, camera.distance, camera.position, camera.front);
     }
 }
 

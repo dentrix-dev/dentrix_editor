@@ -14,7 +14,7 @@ public:
     std::vector<GizmoComponent*> components;
 
     Gizmo();
-    void draw(Shader* shader, float cameraDistance);
+    void draw(Shader* shader, float cameraDistance, glm::vec3& cameraPosition, glm::vec3& cameraForward);
 };
 
 #endif  // GIZMO_H
