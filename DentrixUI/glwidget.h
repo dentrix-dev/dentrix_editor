@@ -13,6 +13,7 @@
 #include "Gizmo/gizmoComponent.h"
 #include "camera.h"
 #include "cursorFactory.h"
+#include "mcg/dental/segmentation.h"
 #include "scene.h"
 #include "shader.h"
 
@@ -84,6 +85,15 @@ private:
     std::vector<Mesh*> lowerJawMeshes;
     bool upperJawLoaded = false;
     bool lowerJawLoaded = false;
+    std::string upperJawLabelsPath;
+    std::string lowerJawLabelsPath;
+    pmp::SurfaceMesh upperJawUnsegmented;
+    pmp::SurfaceMesh lowerJawUnsegmented;
+    std::vector<pmp::Face> upperRemap;
+    std::vector<pmp::Face> lowerRemap;
+    mcg::Arch upperArch;
+    mcg::Arch lowerArch;
+
 
 signals:
     void meshSelectedInMainScene();
