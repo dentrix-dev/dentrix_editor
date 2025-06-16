@@ -13,10 +13,10 @@
 
 bool Mesh::drawBoundingBox = true;
 
-Mesh::Mesh(pmp::SurfaceMesh& input_mesh, std::string name)
+Mesh::Mesh(pmp::SurfaceMesh& input_mesh, unsigned int tooth_number)
 {
     initializeOpenGLFunctions();
-    this->name = name;
+    this->tooth_number = tooth_number;
     surfaceMesh = input_mesh;
     pmp::face_normals(surfaceMesh);
     recalculateBoundingBox();

@@ -61,7 +61,7 @@ std::vector<Mesh*> FileHandler::readSegmentedOBJ(std::string& filepath)
 
                 if (name == "tooth0") surfaceMesh.add_vertex_property<bool>("v:selected");
 
-                meshes.push_back(new Mesh(surfaceMesh, name));
+                meshes.push_back(new Mesh(surfaceMesh, 0));
                 vhandles.clear();
                 vertices.clear();
                 indices.clear();
@@ -94,7 +94,7 @@ std::vector<Mesh*> FileHandler::readSegmentedOBJ(std::string& filepath)
             surfaceMesh.add_face(faceVertices);
         }
 
-        meshes.push_back(new Mesh(surfaceMesh, name));
+        meshes.push_back(new Mesh(surfaceMesh, 0));
         vertices.clear();
         indices.clear();
     }
@@ -108,7 +108,7 @@ Mesh* FileHandler::readSTL(std::string& filepath, std::string& name)
     pmp::SurfaceMesh surfaceMesh;
     pmp::read(surfaceMesh, filepath);
 
-    return new Mesh(surfaceMesh, name);
+    return new Mesh(surfaceMesh, 0);
 }
 
 void FileHandler::writeMesh(std::string& filepath, pmp::SurfaceMesh& mesh)

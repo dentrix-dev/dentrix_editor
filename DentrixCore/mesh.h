@@ -6,7 +6,6 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <string>
 
 #include "Brush.h"
 
@@ -14,7 +13,7 @@ class Mesh : protected QOpenGLFunctions_3_3_Core
 {
 public:
     pmp::SurfaceMesh surfaceMesh;
-    std::string name;
+    unsigned int tooth_number;
     // Needed to reset model back to origin
     glm::vec3 center;
     // Axis Aligned Bounding box
@@ -26,7 +25,7 @@ public:
 
     static bool drawBoundingBox;
 
-    Mesh(pmp::SurfaceMesh& mesh, std::string name);
+    Mesh(pmp::SurfaceMesh& mesh, unsigned int tooth_number);
     ~Mesh();
 
     void setScale(float scaleFactor);

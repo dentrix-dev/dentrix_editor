@@ -22,6 +22,7 @@
 #include "Gizmo/gizmoComponent.h"
 #include "glm/fwd.hpp"
 #include "mainwindow.h"
+#include "pmp/algorithms/utilities.h"
 #include "scene.h"
 #include "shader.h"
 #include "utils.h"
@@ -55,20 +56,46 @@ void GLWidget::loadUpperJaw(const std::string &path)
     makeCurrent();
     // Delete previous meshes
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
+    upperJawMeshes.clear();
 
-    // Read labels file and segment jaw
+    // Read mesh and label files
     upperJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
     upperJawUnsegmented = pmp::read(path, &upperRemap);
+
+    // Calculate jaw center
+    pmp::Point jawCenter(0.0f);
+    int noOfMeshes = 0;
+
+    // Segment jaw and teeth
     upperArch = mcg::arch_segment(upperJawUnsegmented, upperJawLabelsPath.c_str(), upperRemap);
 
     // Push gum to mesh array
     pmp::SurfaceMesh upperGum = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
-    upperJawMeshes.push_back(new Mesh(upperGum, ""));
+    upperJawMeshes.push_back(new Mesh(upperGum, 0));
+
+    pmp::BoundingBox aabb = pmp::bounds(upperGum);
+    jawCenter += 0.5f * (aabb.max() + aabb.min());
+    noOfMeshes++;
 
     // Push teeth to mesh array
     for (mcg::Tooth t : upperArch.teeth) {
-        pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
-        upperJawMeshes.push_back((new Mesh(tooth, "")));
+        if (t.is_present) {
+            pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
+            upperJawMeshes.push_back(new Mesh(tooth, t.name));
+            aabb = pmp::bounds(tooth);
+            jawCenter += 0.5f * (aabb.max() + aabb.min());
+            noOfMeshes++;
+        }
+    }
+
+    // Translate jaw to center
+    jawCenter /= (float)noOfMeshes;
+    for (pmp::Vertex v : upperGum.vertices()) upperGum.position(v) -= jawCenter;
+    for (Mesh *m : upperJawMeshes) {
+        for (pmp::Vertex v : m->surfaceMesh.vertices()) m->surfaceMesh.position(v) -= jawCenter;
+        m->updateBuffers();
+        m->recalculateBoundingBox();
+        m->updateBoundingBoxBuffers();
     }
 
     upperJawLoaded = true;
@@ -81,20 +108,46 @@ void GLWidget::loadLowerJaw(const std::string &path)
     makeCurrent();
     // Delete previous meshes
     for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
+    lowerJawMeshes.clear();
 
-    // Read labels file and segment jaw
+    // Read mesh and label files
     lowerJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
     lowerJawUnsegmented = pmp::read(path, &lowerRemap);
+
+    // Calculate jaw center
+    pmp::Point jawCenter(0.0f);
+    int noOfMeshes = 0;
+
+    // Segment jaw and teeth
     lowerArch = mcg::arch_segment(lowerJawUnsegmented, lowerJawLabelsPath.c_str(), lowerRemap);
 
     // Push gum to mesh array
     pmp::SurfaceMesh lowerGum = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
-    lowerJawMeshes.push_back(new Mesh(lowerGum, ""));
+    lowerJawMeshes.push_back(new Mesh(lowerGum, 0));
+
+    pmp::BoundingBox aabb = pmp::bounds(lowerGum);
+    jawCenter += 0.5f * (aabb.max() + aabb.min());
+    noOfMeshes++;
 
     // Push teeth to mesh array
     for (mcg::Tooth t : lowerArch.teeth) {
-        pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
-        lowerJawMeshes.push_back(new Mesh(tooth, ""));
+        if (t.is_present) {
+            pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
+            lowerJawMeshes.push_back(new Mesh(tooth, t.name));
+            aabb = pmp::bounds(tooth);
+            jawCenter += 0.5f * (aabb.max() + aabb.min());
+            noOfMeshes++;
+        }
+    }
+
+    // Translate jaw to center
+    jawCenter /= (float)noOfMeshes;
+    for (pmp::Vertex v : lowerGum.vertices()) lowerGum.position(v) -= jawCenter;
+    for (Mesh *m : lowerJawMeshes) {
+        for (pmp::Vertex v : m->surfaceMesh.vertices()) m->surfaceMesh.position(v) -= jawCenter;
+        m->updateBuffers();
+        m->recalculateBoundingBox();
+        m->updateBoundingBoxBuffers();
     }
 
     lowerJawLoaded = true;
@@ -121,22 +174,24 @@ void GLWidget::archAlign()
 
     // std::cout << res.upper_transform << std::endl;
     // std::cout << res.lower_transform << std::endl;
+    for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
+    for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
     upperJawMeshes.clear();
     lowerJawMeshes.clear();
     for (mcg::Tooth t : upperArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
-        upperJawMeshes.push_back(new Mesh(tooth, ""));
+        upperJawMeshes.push_back(new Mesh(tooth, t.name));
     }
 
     auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
-    upperJawMeshes.push_back(new Mesh(upperGumMesh, ""));
+    upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));
 
     for (mcg::Tooth t : lowerArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
-        lowerJawMeshes.push_back(new Mesh(tooth, ""));
+        lowerJawMeshes.push_back(new Mesh(tooth, t.name));
     }
     auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
-    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, ""));
+    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 0));
 
     rebuildMainScene();
     update();
@@ -156,9 +211,11 @@ void GLWidget::rebuildMainScene()
         glm::vec3 sceneCenter(0.0f);
         for (Mesh *mesh : allMeshes) {
             sceneCenter += mesh->center;
+            std::cout << mesh->tooth_number << std::endl;
         }
         sceneCenter /= (float)allMeshes.size();
         mainScene.center = sceneCenter;
+        std::cout << sceneCenter[0] << " " << sceneCenter[1] << " " << sceneCenter[2] << std::endl;
     }
 }
 
@@ -264,7 +321,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, hitVertexIndex,
                                                          intersectionPoint);
     if (intersection) {
-        std::cout << "Hit Mesh: " << hitMesh->name << std::endl;
+        std::cout << "Hit Mesh: " << hitMesh->tooth_number << std::endl;
         std::cout << "Vertex index: " << hitVertexIndex << std::endl;
         std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " "
                   << intersectionPoint.z << std::endl;
@@ -342,7 +399,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
         std::cout << "intersection: " << intersection << std::endl;
         if (intersection && intersectedMesh != nullptr) {
-            std::cout << "mesh pointer name: " << intersectedMesh->name << std::endl;
+            std::cout << "mesh pointer name: " << intersectedMesh->tooth_number << std::endl;
             selectedMesh = intersectedMesh;
             myGizmo->position = intersectedMesh->center;
             if (inMainScene) emit meshSelectedInMainScene();
@@ -396,38 +453,38 @@ void GLWidget::setSelectedMeshDirectionalScale(int val, bool xActive, bool yActi
 
 void GLWidget::onEditSceneClicked()
 {
-    if (selectedMesh != nullptr && inMainScene) {
-        camera.resetPosition();
-        std::string neighbor1Name = "";
-        std::string neighbor2Name = "";
-        Scene::GetNeighboringMeshNames(selectedMesh->name, neighbor1Name, neighbor2Name);
-
-        std::vector<Mesh *> editMeshes = {selectedMesh};
-
-        // Add neighboring teeth meshes
-        if (neighbor1Name != "") {
-            for (int i = 0; i < meshes.size(); i++) {
-                if (meshes[i]->name == neighbor1Name) {
-                    editMeshes.push_back(meshes[i]);
-                }
-            }
-        }
-        if (neighbor2Name != "") {
-            for (int i = 0; i < meshes.size(); i++) {
-                if (meshes[i]->name == neighbor2Name) editMeshes.push_back(meshes[i]);
-            }
-        }
-
-        editScene = Scene(editMeshes);
-        editScene.center = selectedMesh->center;
-        currentScene = &editScene;
-        emit movedToEditScene();
-        inMainScene = false;
-    } else if (!inMainScene) {
-        saveEditSceneAndReturnToMainScene();
-        emit movedToMainScene();
-    }
-    update();
+    // if (selectedMesh != nullptr && inMainScene) {
+    //     camera.resetPosition();
+    //     std::string neighbor1Name = "";
+    //     std::string neighbor2Name = "";
+    //     Scene::GetNeighboringMeshNames(selectedMesh->tooth_number, neighbor1Name, neighbor2Name);
+    //
+    //     std::vector<Mesh *> editMeshes = {selectedMesh};
+    //
+    //     // Add neighboring teeth meshes
+    //     if (neighbor1Name != "") {
+    //         for (int i = 0; i < meshes.size(); i++) {
+    //             if (meshes[i]->tooth_number == neighbor1Name) {
+    //                 editMeshes.push_back(meshes[i]);
+    //             }
+    //         }
+    //     }
+    //     if (neighbor2Name != "") {
+    //         for (int i = 0; i < meshes.size(); i++) {
+    //             if (meshes[i]->tooth_number == neighbor2Name) editMeshes.push_back(meshes[i]);
+    //         }
+    //     }
+    //
+    //     editScene = Scene(editMeshes);
+    //     editScene.center = selectedMesh->center;
+    //     currentScene = &editScene;
+    //     emit movedToEditScene();
+    //     inMainScene = false;
+    // } else if (!inMainScene) {
+    //     saveEditSceneAndReturnToMainScene();
+    //     emit movedToMainScene();
+    // }
+    // update();
 }
 
 void GLWidget::setSelectedMeshScale(int scale)
