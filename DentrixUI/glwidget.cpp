@@ -53,17 +53,24 @@ void GLWidget::loadModel(const std::string &path)
 void GLWidget::loadUpperJaw(const std::string &path)
 {
     makeCurrent();
+    // Delete previous meshes
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
+
+    // Read labels file and segment jaw
     upperJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
     upperJawUnsegmented = pmp::read(path, &upperRemap);
     upperArch = mcg::arch_segment(upperJawUnsegmented, upperJawLabelsPath.c_str(), upperRemap);
+
+    // Push gum to mesh array
+    pmp::SurfaceMesh upperGum = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
+    upperJawMeshes.push_back(new Mesh(upperGum, ""));
+
+    // Push teeth to mesh array
     for (mcg::Tooth t : upperArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
-        (new Mesh(tooth, ""));
+        upperJawMeshes.push_back((new Mesh(tooth, "")));
     }
 
-    auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
-    upperJawMeshes.push_back(new Mesh(upperGumMesh,""));
     upperJawLoaded = true;
     rebuildMainScene();
     update();
@@ -72,16 +79,24 @@ void GLWidget::loadUpperJaw(const std::string &path)
 void GLWidget::loadLowerJaw(const std::string &path)
 {
     makeCurrent();
+    // Delete previous meshes
     for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
+
+    // Read labels file and segment jaw
     lowerJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
     lowerJawUnsegmented = pmp::read(path, &lowerRemap);
     lowerArch = mcg::arch_segment(lowerJawUnsegmented, lowerJawLabelsPath.c_str(), lowerRemap);
+
+    // Push gum to mesh array
+    pmp::SurfaceMesh lowerGum = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
+    lowerJawMeshes.push_back(new Mesh(lowerGum, ""));
+
+    // Push teeth to mesh array
     for (mcg::Tooth t : lowerArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
         lowerJawMeshes.push_back(new Mesh(tooth, ""));
     }
-    auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
-    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, ""));
+
     lowerJawLoaded = true;
     rebuildMainScene();
     update();
@@ -97,7 +112,7 @@ void GLWidget::archAlign()
 
     pmp::mat4 t = pmp::rotation_matrix_x(10.0f) * pmp::rotation_matrix_y(67.0f) * pmp::rotation_matrix_z(103.0f);
     t = pmp::translation_matrix(pmp::vec3{5.0f, 2.3f, -4.2}) * t;
-    mcg::mesh_transform(upperJawUnsegmented, t); 
+    mcg::mesh_transform(upperJawUnsegmented, t);
 
     mcg::Alignment_Result res = mcg::arch_align_upper_and_lower(upperJawUnsegmented, lowerJawUnsegmented, seg);
 
@@ -108,15 +123,15 @@ void GLWidget::archAlign()
     // std::cout << res.lower_transform << std::endl;
     upperJawMeshes.clear();
     lowerJawMeshes.clear();
-    for(mcg::Tooth t : upperArch.teeth) {
+    for (mcg::Tooth t : upperArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
         upperJawMeshes.push_back(new Mesh(tooth, ""));
     }
 
     auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
-    upperJawMeshes.push_back(new Mesh(upperGumMesh,""));
-   
-    for(mcg::Tooth t : lowerArch.teeth) {
+    upperJawMeshes.push_back(new Mesh(upperGumMesh, ""));
+
+    for (mcg::Tooth t : lowerArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
         lowerJawMeshes.push_back(new Mesh(tooth, ""));
     }
