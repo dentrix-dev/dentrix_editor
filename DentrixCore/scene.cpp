@@ -62,7 +62,7 @@ Scene::Scene(std::vector<Mesh *> meshes)
 void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGizmoModelMatrix)
 {
     for (int i = 0; i < meshes.size(); i++) {
-        if (selectedMesh && meshes[i]->name == selectedMesh->name) {
+        if (selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) {
             shader->setVec3("color", 0.8f, 0.8f, 0.8f);
         } else {
             shader->setVec3("color", 0.5f, 0.5f, 0.5f);
@@ -80,7 +80,7 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGiz
         meshfinalTransform = glm::translate(glm::mat4(1.0f), -1.0f * center) * meshfinalTransform;
 
         // Apply gizmo transformation
-        if (selectedMesh && meshes[i]->name == selectedMesh->name) {
+        if (selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) {
             meshfinalTransform = selectedToothGizmoModelMatrix * meshfinalTransform;
         }
 
@@ -172,21 +172,21 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
     float minDistance = 0.0f;
     for (int i = 0; i < meshes.size(); i++) {
         // Skip gingiv mesh
-        if (meshes[i]->name == "tooth0") {
+        if (meshes[i]->tooth_number == 0) {
             continue;
         }
         if (Utils::doesRayIntersectAABB(meshes[i]->aabb_min, meshes[i]->aabb_max, ray_origin, ray_direction,
                                         ModelMatrix, distance)) {
-            std::cout << meshes[i]->name << std::endl;
+            std::cout << meshes[i]->tooth_number << std::endl;
             if (!intersectionFound) {  // First intersection found
                 intersectionFound = true;
                 minDistance = distance;
-                meshName = meshes[i]->name;
+                meshName = meshes[i]->tooth_number;
                 intersectedMesh = meshes[i];
             } else {  // Check if new intersection is closer
                 if (distance < minDistance) {
                     minDistance = distance;
-                    meshName = meshes[i]->name;
+                    meshName = meshes[i]->tooth_number;
                     intersectedMesh = meshes[i];
                 }
             }
@@ -210,7 +210,7 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
     ray_direction_world = glm::normalize(ray_direction_world);
 
     for (Mesh *mesh : meshes) {
-        if (mesh->name == "tooth0") {
+        if (mesh->tooth_number == 0) {
             continue;
         }
 
