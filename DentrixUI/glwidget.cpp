@@ -59,9 +59,11 @@ void GLWidget::loadUpperJaw(const std::string &path)
     upperArch = mcg::arch_segment(upperJawUnsegmented, upperJawLabelsPath.c_str(), upperRemap);
     for (mcg::Tooth t : upperArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
-        upperJawMeshes.push_back(new Mesh(tooth, ""));
+        (new Mesh(tooth, ""));
     }
 
+    auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
+    upperJawMeshes.push_back(new Mesh(upperGumMesh,""));
     upperJawLoaded = true;
     rebuildMainScene();
     update();
@@ -78,7 +80,8 @@ void GLWidget::loadLowerJaw(const std::string &path)
         pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
         lowerJawMeshes.push_back(new Mesh(tooth, ""));
     }
-
+    auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
+    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, ""));
     lowerJawLoaded = true;
     rebuildMainScene();
     update();
@@ -91,23 +94,34 @@ void GLWidget::archAlign()
     mcg::Segmentation_Result seg{};
     seg.upper = upperArch;
     seg.lower = lowerArch;
+
+    pmp::mat4 t = pmp::rotation_matrix_x(10.0f) * pmp::rotation_matrix_y(67.0f) * pmp::rotation_matrix_z(103.0f);
+    t = pmp::translation_matrix(pmp::vec3{5.0f, 2.3f, -4.2}) * t;
+    mcg::mesh_transform(upperJawUnsegmented, t); 
+
     mcg::Alignment_Result res = mcg::arch_align_upper_and_lower(upperJawUnsegmented, lowerJawUnsegmented, seg);
 
-    std::cout << res.upper_transform << std::endl;
-    std::cout << res.lower_transform << std::endl;
+    mcg::mesh_transform(lowerJawUnsegmented, res.lower_transform);
+    mcg::mesh_transform(upperJawUnsegmented, res.upper_transform);
 
-    for (Mesh *m : upperJawMeshes) {
-        mcg::mesh_transform(m->surfaceMesh, res.upper_transform);
-        m->updateBuffers();
-        m->recalculateBoundingBox();
-        m->updateBoundingBoxBuffers();
+    // std::cout << res.upper_transform << std::endl;
+    // std::cout << res.lower_transform << std::endl;
+    upperJawMeshes.clear();
+    lowerJawMeshes.clear();
+    for(mcg::Tooth t : upperArch.teeth) {
+        pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
+        upperJawMeshes.push_back(new Mesh(tooth, ""));
     }
-    for (Mesh *m : lowerJawMeshes) {
-        mcg::mesh_transform(m->surfaceMesh, res.lower_transform);
-        m->updateBuffers();
-        m->recalculateBoundingBox();
-        m->updateBoundingBoxBuffers();
+
+    auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
+    upperJawMeshes.push_back(new Mesh(upperGumMesh,""));
+   
+    for(mcg::Tooth t : lowerArch.teeth) {
+        pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
+        lowerJawMeshes.push_back(new Mesh(tooth, ""));
     }
+    auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
+    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, ""));
 
     rebuildMainScene();
     update();
