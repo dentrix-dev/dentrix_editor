@@ -23,6 +23,7 @@
 #include "glm/fwd.hpp"
 #include "mainwindow.h"
 #include "pmp/algorithms/utilities.h"
+#include "pmp/mat_vec.h"
 #include "scene.h"
 #include "shader.h"
 #include "utils.h"
@@ -171,6 +172,8 @@ void GLWidget::archAlign()
 
     mcg::mesh_transform(lowerJawUnsegmented, res.lower_transform);
     mcg::mesh_transform(upperJawUnsegmented, res.upper_transform);
+    t = pmp::translation_matrix(pmp::vec3(0.0f, 0.0f, 20.0f));
+    mcg::mesh_transform(upperJawUnsegmented, t);
 
     // std::cout << res.upper_transform << std::endl;
     // std::cout << res.lower_transform << std::endl;
@@ -178,20 +181,24 @@ void GLWidget::archAlign()
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
     upperJawMeshes.clear();
     lowerJawMeshes.clear();
-    for (mcg::Tooth t : upperArch.teeth) {
-        pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
-        upperJawMeshes.push_back(new Mesh(tooth, t.name));
-    }
 
     auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
     upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));
-
-    for (mcg::Tooth t : lowerArch.teeth) {
-        pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
-        lowerJawMeshes.push_back(new Mesh(tooth, t.name + 16));
+    for (mcg::Tooth t : upperArch.teeth) {
+        if (t.is_present) {
+            pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);
+            upperJawMeshes.push_back(new Mesh(tooth, t.name));
+        }
     }
+
     auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
     lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 0));
+    for (mcg::Tooth t : lowerArch.teeth) {
+        if (t.is_present) {
+            pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
+            lowerJawMeshes.push_back(new Mesh(tooth, t.name + 16));
+        }
+    }
 
     rebuildMainScene();
     update();
@@ -389,11 +396,6 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         glm::vec3 rayDirection;
         Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection,
                                     rayDirection);
-        std::cout << "Camera position: " << camera.position.x << " " << camera.position.y << " " << camera.position.z
-                  << std::endl;
-        std::cout << "Camera front: " << camera.front.x << " " << camera.front.y << " " << camera.front.z << std::endl;
-        std::cout << "Direction position: " << rayDirection.x << " " << rayDirection.y << " " << rayDirection.z
-                  << std::endl;
 
         Mesh *intersectedMesh = nullptr;
         bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
