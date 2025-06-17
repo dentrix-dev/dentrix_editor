@@ -77,7 +77,7 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGiz
         // Center the scene
         // In mainScene, this has no effect since the vertices are already centered on first load
         // In editScene, this centers the new mesh array
-        meshfinalTransform = glm::translate(glm::mat4(1.0f), -1.0f * center) * meshfinalTransform;
+        // meshfinalTransform = glm::translate(glm::mat4(1.0f), -1.0f * center) * meshfinalTransform;
 
         // Apply gizmo transformation
         if (selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) {
