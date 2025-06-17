@@ -170,19 +170,22 @@ void GLWidget::archAlign()
 
     mcg::Alignment_Result res = mcg::arch_align_upper_and_lower(upperJawUnsegmented, lowerJawUnsegmented, seg);
 
+    // Apply arch alignment
     mcg::mesh_transform(lowerJawUnsegmented, res.lower_transform);
     mcg::mesh_transform(upperJawUnsegmented, res.upper_transform);
-    t = pmp::translation_matrix(pmp::vec3(0.0f, 0.0f, 20.0f));
-    mcg::mesh_transform(upperJawUnsegmented, t);
 
-    // std::cout << res.upper_transform << std::endl;
-    // std::cout << res.lower_transform << std::endl;
+    // Rotate towards camera and separate the two jaws
+    t = pmp::rotation_matrix_x(-90.0f);
+    mcg::mesh_transform(upperJawUnsegmented, t);
+    t = pmp::rotation_matrix_x(-90.0f);
+    mcg::mesh_transform(lowerJawUnsegmented, t);
+
     for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
     upperJawMeshes.clear();
     lowerJawMeshes.clear();
 
-    auto upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
+    pmp::SurfaceMesh upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
     upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));
     for (mcg::Tooth t : upperArch.teeth) {
         if (t.is_present) {
@@ -191,7 +194,7 @@ void GLWidget::archAlign()
         }
     }
 
-    auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
+    pmp::SurfaceMesh lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
     lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 0));
     for (mcg::Tooth t : lowerArch.teeth) {
         if (t.is_present) {
