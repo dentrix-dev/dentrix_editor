@@ -133,7 +133,7 @@ void GLWidget::loadLowerJaw(const std::string &path)
     for (mcg::Tooth t : lowerArch.teeth) {
         if (t.is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
-            lowerJawMeshes.push_back(new Mesh(tooth, t.name));
+            lowerJawMeshes.push_back(new Mesh(tooth, t.name + 16));
             aabb = pmp::bounds(tooth);
             jawCenter += 0.5f * (aabb.max() + aabb.min());
             noOfMeshes++;
@@ -188,7 +188,7 @@ void GLWidget::archAlign()
 
     for (mcg::Tooth t : lowerArch.teeth) {
         pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
-        lowerJawMeshes.push_back(new Mesh(tooth, t.name));
+        lowerJawMeshes.push_back(new Mesh(tooth, t.name + 16));
     }
     auto lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
     lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 0));
