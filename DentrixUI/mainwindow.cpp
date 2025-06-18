@@ -16,9 +16,11 @@ bool MainWindow::inUnformScale = false;
 bool MainWindow::inDirectionalScale = false;
 bool MainWindow::inFreeDeformation = false;
 bool MainWindow::inRotate = false;
+bool MainWindow::inMoveTooth = false;
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr), upperLoaded(false), lowerLoaded(false) {
+    : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr), upperLoaded(false), lowerLoaded(false)
+{
     ui->setupUi(this);
     setWindowTitle("Dentrix Editor");
     resize(QApplication::primaryScreen()->geometry().width(), QApplication::primaryScreen()->geometry().height());
@@ -26,11 +28,13 @@ MainWindow::MainWindow(QWidget* parent)
     createToolBar();
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-void MainWindow::createToolBar() {
+void MainWindow::createToolBar()
+{
     toolbar = new ToolBarWidget();
     addToolBar(Qt::LeftToolBarArea, toolbar);
     connect(toolbar->getActionGroup(), &QActionGroup::triggered, this, &MainWindow::onQActionGroupTriggered);
@@ -42,7 +46,8 @@ void MainWindow::createToolBar() {
     connect(loadingToolBar, &LoadingToolBar::alignJawsRequested, this, &MainWindow::alignJaws);
 }
 
-void MainWindow::setupCentralUI(const std::string& modelPath, int loadMode) {
+void MainWindow::setupCentralUI(const std::string& modelPath, int loadMode)
+{
     glWidget = new GLWidget(this, modelPath, loadMode);
     connect(glWidget, &GLWidget::meshSelectedInMainScene, this, &MainWindow::onMeshSelectedInMainScene);
     connect(glWidget, &GLWidget::movedToEditScene, this, &MainWindow::onMovedToEditScene);
@@ -68,8 +73,10 @@ void MainWindow::setupCentralUI(const std::string& modelPath, int loadMode) {
     setCentralWidget(centralContainer);
 }
 
-void MainWindow::loadModel() {
-    QString filePath = QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
+void MainWindow::loadModel()
+{
+    QString filePath =
+        QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
     if (filePath.isEmpty()) return;
 
     if (!glWidget) {
@@ -81,7 +88,8 @@ void MainWindow::loadModel() {
     }
 }
 
-void MainWindow::loadUpperJaw() {
+void MainWindow::loadUpperJaw()
+{
     std::cout << "Loading upper jaw..." << std::endl;
     QString file = QFileDialog::getOpenFileName(this, "Load Upper Jaw", "../../models", "Model Files (*.stl *.obj)");
     if (file.isEmpty()) return;
@@ -97,7 +105,8 @@ void MainWindow::loadUpperJaw() {
     toolbar->set_edit_button_active(false);
 }
 
-void MainWindow::loadLowerJaw() {
+void MainWindow::loadLowerJaw()
+{
     std::cout << "Loading lower jaw..." << std::endl;
     QString file = QFileDialog::getOpenFileName(this, "Load Lower Jaw", "../../models", "Model Files (*.stl *.obj)");
     if (file.isEmpty()) return;
@@ -113,7 +122,8 @@ void MainWindow::loadLowerJaw() {
     toolbar->set_edit_button_active(false);
 }
 
-void MainWindow::alignJaws() {
+void MainWindow::alignJaws()
+{
     std::cout << "Aligning jaws..." << std::endl;
     if (glWidget) {
         glWidget->archAlign();
@@ -121,31 +131,42 @@ void MainWindow::alignJaws() {
     }
 }
 
-void MainWindow::onMeshSelectedInMainScene() {
+void MainWindow::onMeshSelectedInMainScene()
+{
     std::cout << __func__ << std::endl;
     toolbar->set_edit_button_active();
 }
 
-void MainWindow::onMovedToEditScene() {
+void MainWindow::onMovedToEditScene()
+{
     toolbar->set_edit_button_mode(ToolBarWidget::Edit_mode);
 }
 
-void MainWindow::onMovedToMainScene() {
+void MainWindow::onMovedToMainScene()
+{
     toolbar->set_edit_button_mode(ToolBarWidget::Main_mode);
 }
 
-void MainWindow::onQActionGroupTriggered(QAction* action) {
+void MainWindow::onQActionGroupTriggered(QAction* action)
+{
     QString actionText = action->text();
     inUnformScale = (actionText == ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
     inDirectionalScale = (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
     inFreeDeformation = (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
     inRotate = (actionText == ToolBarWidget::ROTATE_ACTION_TEXT);
+    inMoveTooth = (actionText == ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
 
     if (rightPanelStack) {
-        if (inUnformScale) rightPanelStack->setCurrentIndex(1);
-        else if (inDirectionalScale) rightPanelStack->setCurrentIndex(2);
-        else if (inFreeDeformation) rightPanelStack->setCurrentIndex(3);
-        else if (inRotate) rightPanelStack->setCurrentIndex(4);
+        if (inUnformScale)
+            rightPanelStack->setCurrentIndex(1);
+        else if (inDirectionalScale)
+            rightPanelStack->setCurrentIndex(2);
+        else if (inFreeDeformation)
+            rightPanelStack->setCurrentIndex(3);
+        else if (inRotate)
+            rightPanelStack->setCurrentIndex(4);
+        else if (inMoveTooth)
+            rightPanelStack->setCurrentIndex(6);
     }
 
     if (glWidget) glWidget->updateCursor();

@@ -6,9 +6,9 @@
 #include <QPushButton>
 #include <QStackedWidget>
 
+#include "Widgets/loadingtoolbar.h"
 #include "Widgets/rightpanelstackedwidget.h"
 #include "Widgets/toolbarwidget.h"
-#include "Widgets/loadingtoolbar.h"
 #include "glwidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +30,7 @@ public:
     static bool inDirectionalScale;
     static bool inFreeDeformation;
     static bool inRotate;
+    static bool inMoveTooth;
     void setupCentralUI(const std::string& modelPath, int loadMode);
 
 private:
@@ -52,6 +53,5 @@ private slots:
     void loadUpperJaw();
     void loadLowerJaw();
     void alignJaws();
-
 };
 #endif  // MAINWINDOW_H

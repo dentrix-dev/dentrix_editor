@@ -7,6 +7,7 @@ const QString ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT = "Uniform Scale";
 const QString ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT = "Directional Scale";
 const QString ToolBarWidget::FREE_DEFORM_ACTION_TEXT = "Free Deformation";
 const QString ToolBarWidget::ROTATE_ACTION_TEXT = "Rotate";
+const QString ToolBarWidget::MOVE_TOOTH_ACTION_TEXT = "Move Tooth";
 
 ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
 {
@@ -40,6 +41,12 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     freeDeformAction->setToolTip(ToolBarWidget::ROTATE_ACTION_TEXT);
     actionGroup->addAction(rotateAction);
 
+    QAction *moveToothAction = new QAction(ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
+    moveToothAction->setCheckable(true);
+    moveToothAction->setIcon(QIcon());
+    moveToothAction->setToolTip(ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
+    actionGroup->addAction(moveToothAction);
+
     // Add a spacer widget to push following widgets to the bottom
     QWidget *spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -57,6 +64,7 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     this->addAction(directionalScaleAction);
     this->addAction(freeDeformAction);
     this->addAction(rotateAction);
+    this->addAction(moveToothAction);
     this->addSeparator();
     this->addAction(spacerAction);
     this->addAction(editAction);
