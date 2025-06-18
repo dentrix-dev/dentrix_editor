@@ -30,13 +30,18 @@ glm::vec3 Brush::getPosition(){
 
 std::vector<pmp::Vertex> Brush::getVerticesInRadius(const pmp::SurfaceMesh& mesh) {
     std::vector<pmp::Vertex> verticesInRadius;
-    if (!kdtree_built) {
+    
+    // Check if we need to rebuild the KD-tree for this mesh
+    if (!kdtree_built || !kdtree || &mesh != current_mesh_ptr) {
         kdtree = std::make_unique<mcg::Mesh_KDTree>(mcg::Mesh_KDTree::build(mesh, 16));
         kdtree_built = true;
+        current_mesh_ptr = &mesh;
     }
+    
     if (!kdtree_built || !kdtree) {
         return verticesInRadius;
     }
+    
     pmp::Point query_point(position.x, position.y, position.z);
     float search_radius = radius * 0.05f;
     auto neighbors = kdtree->point_neighbors_in_radius(query_point, search_radius);

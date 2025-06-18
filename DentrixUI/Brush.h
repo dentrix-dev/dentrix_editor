@@ -25,4 +25,5 @@ private:
     glm::vec3 position;
     std::unique_ptr<mcg::Mesh_KDTree> kdtree;
     bool kdtree_built = false;
+    const pmp::SurfaceMesh* current_mesh_ptr = nullptr;
 };
