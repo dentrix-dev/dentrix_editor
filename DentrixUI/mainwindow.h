@@ -48,6 +48,7 @@ private:
 
 private slots:
     void loadModel();
+    void saveModel();
     void onMeshSelectedInMainScene();
     void onMovedToEditScene();
     void onMovedToMainScene();
@@ -55,5 +56,6 @@ private slots:
     void loadUpperJaw();
     void loadLowerJaw();
     void alignJaws();
+    void on_actionSave_Model_triggered();
 };
 #endif  // MAINWINDOW_H

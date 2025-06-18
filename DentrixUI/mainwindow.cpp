@@ -5,12 +5,14 @@
 #include <QCheckBox>
 #include <QFileDialog>
 #include <QLabel>
+#include <QMessageBox>
 #include <QSlider>
 #include <QToolBar>
 #include <QWidgetAction>
 #include <iostream>
 
 #include "./ui_mainwindow.h"
+#include "Widgets/Dialogs/savemodeldialog.h"
 
 bool MainWindow::inUnformScale = false;
 bool MainWindow::inDirectionalScale = false;
@@ -87,6 +89,11 @@ void MainWindow::loadModel()
         toolbar->set_edit_button_mode(ToolBarWidget::ButtonMode::Main_mode);
         toolbar->set_edit_button_active(false);
     }
+}
+
+void MainWindow::saveModel()
+{
+    std::cout << "hello from save model";
 }
 
 void MainWindow::loadUpperJaw()
@@ -174,4 +181,15 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
     }
 
     if (glWidget) glWidget->onToolChange();
+}
+
+void MainWindow::on_actionSave_Model_triggered()
+{
+    SaveModelDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QString savePath = dialog.getPath();
+        // implement save stuff here
+        // for example, saveFile(savePath);
+        QMessageBox::information(this, "Saved", "File would be saved to:\n" + savePath);
+    }
 }
