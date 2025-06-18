@@ -180,7 +180,7 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
     float minDistance = 0.0f;
     for (int i = 0; i < meshes.size(); i++) {
         // Skip gingiv mesh
-        if (meshes[i]->tooth_number == 0 && skipGum == true) {
+        if ((meshes[i]->tooth_number == 0 || meshes[i]->tooth_number == 33) && skipGum == true) {
             continue;
         }
         if (Utils::doesRayIntersectAABB(meshes[i]->aabb_min, meshes[i]->aabb_max, ray_origin, ray_direction,
@@ -218,7 +218,7 @@ bool Scene::IntersectTriangles(glm::vec3 ray_origin_world, glm::vec3 ray_directi
     ray_direction_world = glm::normalize(ray_direction_world);
 
     for (Mesh *mesh : meshes) {
-        if (mesh->tooth_number == 0) {
+        if (mesh->tooth_number == 0 || mesh->tooth_number == 33) {
             continue;
         }
 
