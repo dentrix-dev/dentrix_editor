@@ -3,12 +3,12 @@
 #include <QActionGroup>
 #include <QWidgetAction>
 
-const QString ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT = "Uniform Scale";
-const QString ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT = "Directional Scale";
-const QString ToolBarWidget::FREE_DEFORM_ACTION_TEXT = "Free Deformation";
+const QString ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT = "Uniform\nScale";
+const QString ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT = "Directional\nScale";
+const QString ToolBarWidget::FREE_DEFORM_ACTION_TEXT = "Free\nDeform";
 const QString ToolBarWidget::ROTATE_ACTION_TEXT = "Rotate";
-const QString ToolBarWidget::MOVE_TOOTH_ACTION_TEXT = "Move Tooth";
-const QString ToolBarWidget::MOVE_JAW_ACTION_TEXT = "Move Jaw";
+const QString ToolBarWidget::MOVE_TOOTH_ACTION_TEXT = "Move\nTooth";
+const QString ToolBarWidget::MOVE_JAW_ACTION_TEXT = "Move\nJaw";
 
 ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
 {
@@ -18,40 +18,28 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     actionGroup->setExclusive(true);
 
     // Create actions (buttons) to add to the toolbar
-    QAction *uniformScaleAction = new QAction(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
+    QAction *uniformScaleAction = new QAction(QIcon(":/DentrixUI/Icons/uniform-scale.svg"), UNIFORM_SCALE_ACTION_TEXT, this);
     uniformScaleAction->setCheckable(true);
-    uniformScaleAction->setIcon(QIcon(":/DentrixUI/Icons/uniform-scale.svg"));
-    uniformScaleAction->setToolTip(ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
     actionGroup->addAction(uniformScaleAction);
 
-    QAction *directionalScaleAction = new QAction(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
+    QAction *directionalScaleAction = new QAction(QIcon(":/DentrixUI/Icons/directional-scale.svg"), DIRECTIONAL_SCALE_ACTION_TEXT, this);
     directionalScaleAction->setCheckable(true);
-    directionalScaleAction->setIcon(QIcon(":/DentrixUI/Icons/directional-scale.svg"));
-    directionalScaleAction->setToolTip(ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
     actionGroup->addAction(directionalScaleAction);
 
-    QAction *freeDeformAction = new QAction(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
+    QAction *freeDeformAction = new QAction(QIcon(":/DentrixUI/Icons/free-deform.svg"), FREE_DEFORM_ACTION_TEXT, this);
     freeDeformAction->setCheckable(true);
-    freeDeformAction->setIcon(QIcon(":/DentrixUI/Icons/free-deform.svg"));
-    freeDeformAction->setToolTip(ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
     actionGroup->addAction(freeDeformAction);
 
-    QAction *rotateAction = new QAction(ToolBarWidget::ROTATE_ACTION_TEXT);
+    QAction *rotateAction = new QAction(QIcon(), ROTATE_ACTION_TEXT, this);
     rotateAction->setCheckable(true);
-    rotateAction->setIcon(QIcon());
-    freeDeformAction->setToolTip(ToolBarWidget::ROTATE_ACTION_TEXT);
     actionGroup->addAction(rotateAction);
 
-    QAction *moveToothAction = new QAction(ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
+    QAction *moveToothAction = new QAction(QIcon(), MOVE_TOOTH_ACTION_TEXT, this);
     moveToothAction->setCheckable(true);
-    moveToothAction->setIcon(QIcon());
-    moveToothAction->setToolTip(ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
     actionGroup->addAction(moveToothAction);
 
-    QAction *moveJawAction = new QAction(ToolBarWidget::MOVE_JAW_ACTION_TEXT);
+    QAction *moveJawAction = new QAction(QIcon(), MOVE_JAW_ACTION_TEXT, this);
     moveJawAction->setCheckable(true);
-    moveJawAction->setIcon(QIcon());
-    moveJawAction->setToolTip(ToolBarWidget::MOVE_JAW_ACTION_TEXT);
     actionGroup->addAction(moveJawAction);
 
     // Add a spacer widget to push following widgets to the bottom
@@ -76,10 +64,8 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     this->addSeparator();
     this->addAction(spacerAction);
     this->addAction(editAction);
-    this->setIconSize(QSize(24, 24));
-    this->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-    // Add toolbar to the left side
+    this->setIconSize(QSize(32, 32));
+    this->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 }
 
 QActionGroup *ToolBarWidget::getActionGroup() const

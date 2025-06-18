@@ -2,25 +2,22 @@
 
 #include <QIcon>
 
-const QString LoadingToolBar::LOAD_UPPER_ACTION_TEXT = "Load Upper Jaw";
-const QString LoadingToolBar::LOAD_LOWER_ACTION_TEXT = "Load Lower Jaw";
-const QString LoadingToolBar::ARCHES_ALIGNMENT_ACTION_TEXT = "Arches Alignment";
+const QString LoadingToolBar::LOAD_UPPER_ACTION_TEXT = "Load\nUpper Jaw";
+const QString LoadingToolBar::LOAD_LOWER_ACTION_TEXT = "Load\nLower Jaw";
+const QString LoadingToolBar::ARCHES_ALIGNMENT_ACTION_TEXT = "Arches\nAlignment";
 
 LoadingToolBar::LoadingToolBar(QWidget* parent)
     : QToolBar("Loading Bar", parent)
 {
     setMovable(false);
-    setIconSize(QSize(24, 24));
-    setToolButtonStyle(Qt::ToolButtonIconOnly);
+    setIconSize(QSize(28, 28));
+    setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     loadUpperAction = new QAction(QIcon(":/DentrixUI/Icons/load-upper.svg"), LOAD_UPPER_ACTION_TEXT, this);
-    loadUpperAction->setToolTip(LOAD_UPPER_ACTION_TEXT);
 
     loadLowerAction = new QAction(QIcon(":/DentrixUI/Icons/load-lower.png"), LOAD_LOWER_ACTION_TEXT, this);
-    loadLowerAction->setToolTip(LOAD_LOWER_ACTION_TEXT);
 
     alignJawsAction = new QAction(QIcon(":/DentrixUI/Icons/alignment.svg"), ARCHES_ALIGNMENT_ACTION_TEXT, this);
-    alignJawsAction->setToolTip(ARCHES_ALIGNMENT_ACTION_TEXT);
     alignJawsAction->setEnabled(false);  // will be enabled whe two jaws loaded
 
     addAction(loadUpperAction);
