@@ -103,9 +103,11 @@ void MainWindow::loadUpperJaw()
     if (file.isEmpty()) return;
 
     if (!glWidget) {
+        std::cout << "setup central ui" << std::endl;
         setupCentralUI(file.toStdString(), 1);
     } else {
-        glWidget->loadUpperJaw(file.toStdString());
+        std::cout << "loaded upper jaw async" << std::endl;
+        glWidget->loadUpperJawAsync(file);
     }
     upperLoaded = true;
     loadingToolBar->setAlignEnabled(upperLoaded && lowerLoaded);

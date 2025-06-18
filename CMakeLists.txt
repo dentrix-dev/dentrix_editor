@@ -81,6 +81,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 		DentrixUI/Widgets/ToolPanelWidgets/movetoothpanelwidget.h DentrixUI/Widgets/ToolPanelWidgets/movetoothpanelwidget.cpp
 		DentrixUI/Widgets/ToolPanelWidgets/movejawpanelwidget.h DentrixUI/Widgets/ToolPanelWidgets/movejawpanelwidget.cpp
 		DentrixUI/Widgets/Dialogs/savemodeldialog.h DentrixUI/Widgets/Dialogs/savemodeldialog.cpp
+		DentrixUI/Workers/jawloaderworker.h DentrixUI/Workers/jawloaderworker.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET dentrix_editor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

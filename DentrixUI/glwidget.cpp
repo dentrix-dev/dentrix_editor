@@ -7,6 +7,7 @@
 #include <pmp/surface_mesh.h>
 #include <qnamespace.h>
 
+#include <QThread>
 #include <chrono>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -32,6 +33,7 @@ GLWidget::GLWidget(QWidget *parent, std::string path, int jaw_index)
     : QOpenGLWidget(parent), initialFilePath(path), jaw_index(jaw_index)
 {
     setFocusPolicy(Qt::StrongFocus);
+    loadUpperJawAsync(QString::fromStdString(path));
 }
 
 GLWidget::~GLWidget() {}
@@ -54,14 +56,25 @@ void GLWidget::loadModel(const std::string &path)
 
 void GLWidget::loadUpperJaw(const std::string &path)
 {
+    using clock = std::chrono::high_resolution_clock;
+    auto startTotal = clock::now();
+
+    auto t0 = clock::now();
+    // opengl
     makeCurrent();
+    auto t1 = clock::now();
+
     // Delete previous meshes
     for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
+    // opengl
     upperJawMeshes.clear();
+    auto t2 = clock::now();
 
     // Read mesh and label files
+    // non-opengl
     upperJawLabelsPath = path.substr(0, path.size() - 4) + ".txt";
     upperJawUnsegmented = pmp::read(path, &upperRemap);
+    auto t3 = clock::now();
 
     // Calculate jaw center
     pmp::Point jawCenter(0.0f);
@@ -69,6 +82,7 @@ void GLWidget::loadUpperJaw(const std::string &path)
 
     // Segment jaw and teeth
     upperArch = mcg::arch_segment(upperJawUnsegmented, upperJawLabelsPath.c_str(), upperRemap);
+    auto t4 = clock::now();
 
     // Push gum to mesh array
     pmp::SurfaceMesh upperGum = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
@@ -77,6 +91,7 @@ void GLWidget::loadUpperJaw(const std::string &path)
     pmp::BoundingBox aabb = pmp::bounds(upperGum);
     jawCenter += 0.5f * (aabb.max() + aabb.min());
     noOfMeshes++;
+    auto t5 = clock::now();
 
     // Push teeth to mesh array
     for (mcg::Tooth t : upperArch.teeth) {
@@ -88,12 +103,84 @@ void GLWidget::loadUpperJaw(const std::string &path)
             noOfMeshes++;
         }
     }
+    auto t6 = clock::now();
 
     // Translate jaw to center
     jawCenter /= (float)noOfMeshes;
     for (pmp::Vertex v : upperGum.vertices()) upperGum.position(v) -= jawCenter;
     for (Mesh *m : upperJawMeshes) {
         for (pmp::Vertex v : m->surfaceMesh.vertices()) m->surfaceMesh.position(v) -= jawCenter;
+        m->updateBuffers();
+        m->recalculateBoundingBox();
+        m->updateBoundingBoxBuffers();
+    }
+    auto t7 = clock::now();
+
+    upperJawLoaded = true;
+    rebuildMainScene();
+    update();
+    auto t8 = clock::now();
+
+    // Timing prints
+    auto ms = [](auto d) { return std::chrono::duration_cast<std::chrono::milliseconds>(d).count(); };
+
+    std::cout << "Timing (ms):\n";
+    std::cout << "  makeCurrent:       " << ms(t1 - t0) << "\n";
+    std::cout << "  clear meshes:      " << ms(t2 - t1) << "\n";
+    std::cout << "  read mesh:         " << ms(t3 - t2) << "\n";
+    std::cout << "  segment:           " << ms(t4 - t3) << "\n";
+    std::cout << "  extract gum:       " << ms(t5 - t4) << "\n";
+    std::cout << "  extract teeth:     " << ms(t6 - t5) << "\n";
+    std::cout << "  center + buffers:  " << ms(t7 - t6) << "\n";
+    std::cout << "  rebuild + update:  " << ms(t8 - t7) << "\n";
+    std::cout << "  Total:             " << ms(t8 - startTotal) << "\n";
+}
+
+void GLWidget::loadUpperJawAsync(const QString &path)
+{
+    auto *thread = new QThread;
+    auto *worker = new JawLoaderWorker(path);
+
+    worker->moveToThread(thread);
+    std::cout << "created worker thread" << std::endl;
+
+    connect(thread, &QThread::started, worker, &JawLoaderWorker::run);
+    connect(worker, &JawLoaderWorker::finished, this, [this, worker, thread](const JawLoadResult &result) {
+        applyUpperJawResult(result);  // Now run on main thread
+        worker->deleteLater();
+        thread->quit();
+        thread->deleteLater();
+    });
+    std::cout << "about to start worker thread" << std::endl;
+    thread->start();
+    std::cout << "started worker thread" << std::endl;
+}
+
+void GLWidget::applyUpperJawResult(const JawLoadResult &result)
+{
+    makeCurrent();
+
+    this->upperRemap = result.remap;
+
+    // Clear previous
+    for (auto *m : upperJawMeshes) delete m;
+    upperJawMeshes.clear();
+
+    // Center gum
+    pmp::SurfaceMesh gum = result.gum;
+    for (pmp::Vertex v : gum.vertices()) gum.position(v) -= result.center;
+
+    upperJawMeshes.push_back(new Mesh(gum, 0));
+
+    // Center teeth
+    for (const auto &[mesh, id] : result.teeth) {
+        pmp::SurfaceMesh m = mesh;
+        for (pmp::Vertex v : m.vertices()) m.position(v) -= result.center;
+
+        upperJawMeshes.push_back(new Mesh(m, id));
+    }
+
+    for (Mesh *m : upperJawMeshes) {
         m->updateBuffers();
         m->recalculateBoundingBox();
         m->updateBoundingBoxBuffers();
@@ -253,7 +340,10 @@ void GLWidget::initializeGL()
     if (jaw_index == 0) {
         loadLowerJaw(initialFilePath);
     } else {
-        loadUpperJaw(initialFilePath);
+        std::cout << "from init gl before load upper async" << std::endl;
+        // loadUpperJawAsync(QString::fromStdString(initialFilePath));
+        // loadUpperJaw(initialFilePath);
+        std::cout << "from after load async" << std::endl;
     }
     auto modelLoadTime2 = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> ms_double = modelLoadTime2 - modelLoadTime1;
@@ -288,6 +378,10 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     shader->setBool("isFlatColor", false);
+    if (currentScene == nullptr)
+        return;
+    else
+        std::cout << "current sceene is not a nullptr" << std::endl;
     currentScene->Draw(shader, selectedMesh, selectedToothGizmoModelMatrix);
 
     if (toothGizmo != nullptr && selectedMesh != nullptr) {

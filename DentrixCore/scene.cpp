@@ -61,6 +61,10 @@ Scene::Scene(std::vector<Mesh *> meshes)
 
 void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGizmoModelMatrix)
 {
+    // if(meshes){
+    // 	std::cout<<"MESHES ARE NULLLLLLLLLL"<<std::endl;
+    // 	return;
+    // }
     for (int i = 0; i < meshes.size(); i++) {
         if (selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) {
             shader->setVec3("color", 0.8f, 0.8f, 0.8f);

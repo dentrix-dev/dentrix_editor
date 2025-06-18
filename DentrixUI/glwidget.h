@@ -11,6 +11,7 @@
 #include "Brush.h"
 #include "Gizmo/gizmo.h"
 #include "Gizmo/gizmoComponent.h"
+#include "Workers/jawloaderworker.h"
 #include "camera.h"
 #include "cursorFactory.h"
 #include "mcg/dental/segmentation.h"
@@ -25,8 +26,10 @@ public:
     ~GLWidget();
 
     void loadModel(const std::string &path);  // Function to load new model
-    void loadUpperJaw(const std::string& path);
-    void loadLowerJaw(const std::string& path);
+    void loadUpperJaw(const std::string &path);
+    void loadUpperJawAsync(const QString &path);
+    void applyUpperJawResult(const JawLoadResult &result);
+    void loadLowerJaw(const std::string &path);
     void archAlign();
     void rebuildMainScene();
     void setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive);
@@ -44,7 +47,7 @@ protected:
     // Focused scene that contains the selected tooth (and optionally surrounding teeth)
     Scene editScene;
     // Currently rendered scene
-    Scene *currentScene;
+    Scene *currentScene = nullptr;
     bool inMainScene = true;
     void initializeGL() override;          // Runs once when opengl initializes
     void resizeGL(int w, int h) override;  // Handles resizing
@@ -56,7 +59,7 @@ protected:
 
 private:
     std::string initialFilePath;
-    int jaw_index;    // jaw_index = 0 means lower jaw, jaw_index =1 means upper jaw
+    int jaw_index;  // jaw_index = 0 means lower jaw, jaw_index =1 means upper jaw
 
     Shader *shader;
 
@@ -82,8 +85,8 @@ private:
     BrushMode currentBrushMode = BrushMode::Add;
     bool shiftHeld = false;
     bool ctrlHeld = false;
-    std::vector<Mesh*> upperJawMeshes;
-    std::vector<Mesh*> lowerJawMeshes;
+    std::vector<Mesh *> upperJawMeshes;
+    std::vector<Mesh *> lowerJawMeshes;
     bool upperJawLoaded = false;
     bool lowerJawLoaded = false;
     std::string upperJawLabelsPath;
@@ -94,7 +97,6 @@ private:
     std::vector<pmp::Face> lowerRemap;
     mcg::Arch upperArch;
     mcg::Arch lowerArch;
-
 
 signals:
     void meshSelectedInMainScene();
