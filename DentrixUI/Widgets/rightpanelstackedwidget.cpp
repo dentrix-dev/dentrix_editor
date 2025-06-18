@@ -25,6 +25,8 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
 
     moveToothPanel = new MoveToothPanelWidget();
 
+    moveJawPanel = new MoveJawPanelWidget();
+
     // Add panels to the stack
     this->addWidget(emptyPanel);             // index 0
     this->addWidget(uniformScalePanel);      // index 1
@@ -33,6 +35,7 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
     this->addWidget(rotatePanel);            // index 4
     this->addWidget(smoothPanel);            // index 5
     this->addWidget(moveToothPanel);         // index 6
+    this->addWidget(moveJawPanel);           //	index 7
 
     this->setFixedWidth(200);
 }

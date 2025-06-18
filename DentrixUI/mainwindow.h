@@ -31,6 +31,8 @@ public:
     static bool inFreeDeformation;
     static bool inRotate;
     static bool inMoveTooth;
+    static bool inMoveJaw;
+
     void setupCentralUI(const std::string& modelPath, int loadMode);
 
 private:

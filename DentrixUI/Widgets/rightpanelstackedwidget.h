@@ -3,6 +3,7 @@
 #include "QStackedWidget"
 #include "Widgets/ToolPanelWidgets/deformationpanelwidget.h"
 #include "Widgets/ToolPanelWidgets/directionalscalepanelwidget.h"
+#include "Widgets/ToolPanelWidgets/movejawpanelwidget.h"
 #include "Widgets/ToolPanelWidgets/movetoothpanelwidget.h"
 #include "Widgets/ToolPanelWidgets/rotatepanelwidget.h"
 #include "Widgets/ToolPanelWidgets/smoothpanelwidget.h"
@@ -25,6 +26,8 @@ public:
     RotatePanelWidget* rotatePanel = nullptr;
 
     MoveToothPanelWidget* moveToothPanel = nullptr;
+
+    MoveJawPanelWidget* moveJawPanel = nullptr;
 
 private:
     void initDeformationPanelSignals();

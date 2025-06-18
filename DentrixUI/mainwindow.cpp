@@ -17,6 +17,7 @@ bool MainWindow::inDirectionalScale = false;
 bool MainWindow::inFreeDeformation = false;
 bool MainWindow::inRotate = false;
 bool MainWindow::inMoveTooth = false;
+bool MainWindow::inMoveJaw = false;
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr), upperLoaded(false), lowerLoaded(false)
@@ -155,6 +156,7 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
     inFreeDeformation = (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
     inRotate = (actionText == ToolBarWidget::ROTATE_ACTION_TEXT);
     inMoveTooth = (actionText == ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
+    inMoveJaw = (actionText == ToolBarWidget::MOVE_JAW_ACTION_TEXT);
 
     if (rightPanelStack) {
         if (inUnformScale)
@@ -167,6 +169,8 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
             rightPanelStack->setCurrentIndex(4);
         else if (inMoveTooth)
             rightPanelStack->setCurrentIndex(6);
+        else if (inMoveJaw)
+            rightPanelStack->setCurrentIndex(7);
     }
 
     if (glWidget) glWidget->updateCursor();

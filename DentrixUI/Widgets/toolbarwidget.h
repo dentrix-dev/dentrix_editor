@@ -25,6 +25,7 @@ public:
     static const QString FREE_DEFORM_ACTION_TEXT;
     static const QString ROTATE_ACTION_TEXT;
     static const QString MOVE_TOOTH_ACTION_TEXT;
+    static const QString MOVE_JAW_ACTION_TEXT;
 
     QPushButton *getEditButton();
     QString getEditButtonInactiveStyleSheet() const;
