@@ -173,5 +173,5 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
             rightPanelStack->setCurrentIndex(7);
     }
 
-    if (glWidget) glWidget->updateCursor();
+    if (glWidget) glWidget->onToolChange();
 }

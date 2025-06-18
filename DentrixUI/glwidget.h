@@ -34,6 +34,7 @@ public:
     void setDeformationStrength(int value);
     void setBrushSize(int value);
     void updateCursor();
+    void onToolChange();
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 
@@ -70,7 +71,7 @@ private:
     Mesh *selectedMesh = nullptr;
     bool isRotating = false;
 
-    Gizmo *myGizmo;
+    Gizmo *toothGizmo = nullptr;
     bool isDraggingGizmo = false;
     GizmoComponent *selectedGizmoComponent = nullptr;
     glm::mat4 selectedToothGizmoModelMatrix = glm::mat4(1.0f);

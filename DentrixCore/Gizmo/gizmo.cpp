@@ -24,6 +24,11 @@ Gizmo::Gizmo()
     components.push_back(zAxis);
 }
 
+Gizmo::~Gizmo()
+{
+    for (int i = 0; i < components.size(); i++) delete components[i];
+}
+
 void Gizmo::draw(Shader *shader, float cameraDistance, glm::vec3 &cameraPosition, glm::vec3 &cameraForward)
 {
     shader->setBool("isFlatColor", true);
