@@ -17,8 +17,8 @@ public:
 
     static std::vector<Mesh*> loadScene(std::string path);
     glm::vec3 getMeshesCenter();
-    void Draw(Shader* shader, Mesh* selectedMesh, glm::mat4& selectedToothGizmoModelMatrix);
-    bool Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 SceneMatrix, Mesh*& intersectedMesh);
+    void Draw(Shader* shader, Mesh* selectedMesh, glm::mat4& selectedToothGizmoModelMatrix, bool isUpperJawSelected, bool isLowerJawSelected);
+    bool Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 SceneMatrix, Mesh*& intersectedMesh, bool skipGum);
 
     bool IntersectTriangles(glm::vec3 ray_origin_world,      // Ray origin in world space
                             glm::vec3 ray_direction_world,   // Ray direction in world space (normalized)

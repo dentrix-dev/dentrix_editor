@@ -211,7 +211,7 @@ void GLWidget::loadLowerJaw(const std::string &path)
 
     // Push gum to mesh array
     pmp::SurfaceMesh lowerGum = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
-    lowerJawMeshes.push_back(new Mesh(lowerGum, 0));
+    lowerJawMeshes.push_back(new Mesh(lowerGum, 33));
 
     pmp::BoundingBox aabb = pmp::bounds(lowerGum);
     jawCenter += 0.5f * (aabb.max() + aabb.min());
@@ -282,7 +282,7 @@ void GLWidget::archAlign()
     }
 
     pmp::SurfaceMesh lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
-    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 0));
+    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 33));
     for (mcg::Tooth t : lowerArch.teeth) {
         if (t.is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, t.faces);
@@ -382,7 +382,7 @@ void GLWidget::paintGL()
         return;
     else
         std::cout << "current sceene is not a nullptr" << std::endl;
-    currentScene->Draw(shader, selectedMesh, selectedToothGizmoModelMatrix);
+    currentScene->Draw(shader, selectedMesh, selectedToothGizmoModelMatrix, isUpperJawSelected, isLowerJawSelected);
 
     if (toothGizmo != nullptr && selectedMesh != nullptr) {
         glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth buffer to always render gizmo on top
@@ -495,19 +495,38 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection,
                                     rayDirection);
 
-        Mesh *intersectedMesh = nullptr;
-        bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh);
-        std::cout << "intersection: " << intersection << std::endl;
-        if (intersection && intersectedMesh != nullptr) {
-            std::cout << "mesh pointer name: " << intersectedMesh->tooth_number << std::endl;
-            selectedMesh = intersectedMesh;
-            if (toothGizmo != nullptr) toothGizmo->position = intersectedMesh->center;
-            if (inMainScene) emit meshSelectedInMainScene();
-            // selectedMesh->setScale(1.2);
+        if (!MainWindow::inMoveJaw) {
+            Mesh *intersectedMesh = nullptr;
+            bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh, true);
+            std::cout << "intersection: " << intersection << std::endl;
+            if (intersection && intersectedMesh != nullptr) {
+                std::cout << "mesh pointer name: " << intersectedMesh->tooth_number << std::endl;
+                selectedMesh = intersectedMesh;
+                if (toothGizmo != nullptr) toothGizmo->position = intersectedMesh->center;
+                if (inMainScene) emit meshSelectedInMainScene();
+                // selectedMesh->setScale(1.2);
+            } else {
+                std::cout << "nullpointer" << std::endl;
+            }
+            update();
         } else {
-            std::cout << "nullpointer" << std::endl;
+            Mesh *intersectedMesh = nullptr;
+            bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh, false);
+            if (intersection) {
+                if (intersectedMesh->tooth_number < 17) {
+                    isLowerJawSelected = false;
+                    isUpperJawSelected = true;
+                }
+                if (intersectedMesh->tooth_number >= 17) {
+                    isLowerJawSelected = true;
+                    isUpperJawSelected = false;
+                }
+            } else {
+                isLowerJawSelected = false;
+                isUpperJawSelected = false;
+            }
+            update();
         }
-        update();
     }
 }
 
@@ -662,11 +681,16 @@ void GLWidget::onToolChange()
     makeCurrent();
 
     if (MainWindow::inMoveTooth) {
+        isUpperJawSelected = false;
+        isLowerJawSelected = false;
         toothGizmo = new Gizmo();
         if (selectedMesh != nullptr) toothGizmo->position = selectedMesh->center;
     } else {
         delete toothGizmo;
         toothGizmo = nullptr;
+    }
+    if (MainWindow::inMoveJaw) {
+        selectedMesh = nullptr;
     }
     updateCursor();
     update();
