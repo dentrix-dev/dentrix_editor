@@ -72,7 +72,8 @@ private:
 
     std::vector<Mesh *> meshes;
     Mesh *selectedMesh = nullptr;
-    bool isRotating = false;
+    bool isUpperJawSelected = false;
+    bool isLowerJawSelected = false;
 
     Gizmo *toothGizmo = nullptr;
     bool isDraggingGizmo = false;
@@ -80,6 +81,7 @@ private:
     glm::mat4 selectedToothGizmoModelMatrix = glm::mat4(1.0f);
 
     void saveEditSceneAndReturnToMainScene();
+    bool isRotating = false;
     bool freeDeformAddMode = true;
     Brush brush;
     BrushMode currentBrushMode = BrushMode::Add;

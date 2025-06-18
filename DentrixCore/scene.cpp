@@ -59,14 +59,17 @@ Scene::Scene(std::vector<Mesh *> meshes)
     this->meshes = meshes;
 }
 
-void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGizmoModelMatrix)
+void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGizmoModelMatrix, bool isUpperJawSelected,
+                 bool isLowerJawSelected)
 {
     // if(meshes){
     // 	std::cout<<"MESHES ARE NULLLLLLLLLL"<<std::endl;
     // 	return;
     // }
     for (int i = 0; i < meshes.size(); i++) {
-        if (selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) {
+        if ((selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) ||  // Single tooth selected
+            (isUpperJawSelected && meshes[i]->tooth_number < 17) ||                     // Upper jaw selected
+            (isLowerJawSelected && meshes[i]->tooth_number >= 17)) {                    // Lower jaw selected
             shader->setVec3("color", 0.8f, 0.8f, 0.8f);
         } else {
             shader->setVec3("color", 0.5f, 0.5f, 0.5f);
@@ -168,7 +171,8 @@ bool Scene::RayTriangleIntersect(const glm::vec3 &rayOrigin, const glm::vec3 &ra
         return false;
 }
 
-bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 ModelMatrix, Mesh *&intersectedMesh)
+bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 ModelMatrix, Mesh *&intersectedMesh,
+                      bool skipGum)
 {
     std::string meshName = "none";
     bool intersectionFound = false;
@@ -176,7 +180,7 @@ bool Scene::Intersect(glm::vec3 ray_origin, glm::vec3 ray_direction, glm::mat4 M
     float minDistance = 0.0f;
     for (int i = 0; i < meshes.size(); i++) {
         // Skip gingiv mesh
-        if (meshes[i]->tooth_number == 0) {
+        if (meshes[i]->tooth_number == 0 && skipGum == true) {
             continue;
         }
         if (Utils::doesRayIntersectAABB(meshes[i]->aabb_min, meshes[i]->aabb_max, ray_origin, ray_direction,
