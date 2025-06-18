@@ -76,9 +76,10 @@ private:
     bool isLowerJawSelected = false;
 
     Gizmo *toothGizmo = nullptr;
+    bool isGizmoEnabled = false;
     bool isDraggingGizmo = false;
     GizmoComponent *selectedGizmoComponent = nullptr;
-    glm::mat4 selectedToothGizmoModelMatrix = glm::mat4(1.0f);
+    glm::mat4 gizmoModelMatrix = glm::mat4(1.0f);
 
     void saveEditSceneAndReturnToMainScene();
     bool isRotating = false;
@@ -99,6 +100,8 @@ private:
     std::vector<pmp::Face> lowerRemap;
     mcg::Arch upperArch;
     mcg::Arch lowerArch;
+    glm::vec3 upperJawCenter = glm::vec3(0.0f);
+    glm::vec3 lowerJawCenter = glm::vec3(0.0f);
 
 signals:
     void meshSelectedInMainScene();

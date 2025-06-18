@@ -59,7 +59,7 @@ Scene::Scene(std::vector<Mesh *> meshes)
     this->meshes = meshes;
 }
 
-void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGizmoModelMatrix, bool isUpperJawSelected,
+void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &gizmoModelMatrix, bool isUpperJawSelected,
                  bool isLowerJawSelected)
 {
     // if(meshes){
@@ -88,7 +88,12 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &selectedToothGiz
 
         // Apply gizmo transformation
         if (selectedMesh && meshes[i]->tooth_number == selectedMesh->tooth_number) {
-            meshfinalTransform = selectedToothGizmoModelMatrix * meshfinalTransform;
+            meshfinalTransform = gizmoModelMatrix * meshfinalTransform;
+        }
+
+        if ((isUpperJawSelected && meshes[i]->tooth_number < 17) ||
+            (isLowerJawSelected && meshes[i]->tooth_number >= 17)) {
+            meshfinalTransform = gizmoModelMatrix * meshfinalTransform;
         }
 
         // Send per-mesh model matrix to the shader
