@@ -681,8 +681,6 @@ void GLWidget::onToolChange()
     makeCurrent();
 
     if (MainWindow::inMoveTooth) {
-        isUpperJawSelected = false;
-        isLowerJawSelected = false;
         toothGizmo = new Gizmo();
         if (selectedMesh != nullptr) toothGizmo->position = selectedMesh->center;
     } else {
@@ -691,6 +689,9 @@ void GLWidget::onToolChange()
     }
     if (MainWindow::inMoveJaw) {
         selectedMesh = nullptr;
+    } else {
+        isUpperJawSelected = false;
+        isLowerJawSelected = false;
     }
     updateCursor();
     update();
