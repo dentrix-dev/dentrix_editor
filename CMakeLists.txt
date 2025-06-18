@@ -78,6 +78,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         DentrixUI/Widgets/rightpanelstackedwidget.h DentrixUI/Widgets/rightpanelstackedwidget.cpp
         DentrixUI/Widgets/toolbarwidget.h DentrixUI/Widgets/toolbarwidget.cpp
 		DentrixUI/Widgets/ToolPanelWidgets/rotatepanelwidget.h DentrixUI/Widgets/ToolPanelWidgets/rotatepanelwidget.cpp
+		DentrixUI/Widgets/ToolPanelWidgets/movetoothpanelwidget.h DentrixUI/Widgets/ToolPanelWidgets/movetoothpanelwidget.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET dentrix_editor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
