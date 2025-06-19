@@ -695,7 +695,25 @@ void GLWidget::onEditSceneClicked()
 
 void GLWidget::onResetJawClicked()
 {
-    std::cout << "reset jaw" << std::endl;
+    // Reset upper jaw to left of origin
+    glm::mat4 mat = glm::translate(glm::mat4(1.0f), -upperJawCenter);
+    mat = glm::translate(mat, glm::vec3(-40.0f, 0.0f, 0.0f));  // TODO: Use AABB width instead of hardcoded value
+    for (Mesh *m : upperJawMeshes) {
+        m->translate(mat);
+    }
+    upperJawCenter = mat * glm::vec4(upperJawCenter, 1.0f);
+    if (isGizmoEnabled && isUpperJawSelected) toothGizmo->position = mat * glm::vec4(toothGizmo->position, 1.0f);
+
+    // Reset lower jaw to right of origin
+    mat = glm::translate(glm::mat4(1.0f), -lowerJawCenter);
+    mat = glm::translate(mat, glm::vec3(40.0f, 0.0f, 0.0f));
+    for (Mesh *m : lowerJawMeshes) {
+        m->translate(mat);
+    }
+    lowerJawCenter = mat * glm::vec4(lowerJawCenter, 1.0f);
+    if (isGizmoEnabled && isLowerJawSelected) toothGizmo->position = mat * glm::vec4(toothGizmo->position, 1.0f);
+
+    update();
 }
 
 void GLWidget::setSelectedMeshScale(int scale)
