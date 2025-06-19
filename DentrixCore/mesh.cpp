@@ -150,6 +150,7 @@ void Mesh::translate(glm::mat4& translationMatrix)
         glm::vec3 translatedVertexPos = translationMatrix * glm::vec4(vertexPos, 1.0f);
         surfaceMesh.position(v) = Utils::glmToPmpPoint(translatedVertexPos);
     }
+    pmp::face_normals(surfaceMesh);
     updateBuffers();
     aabb_min = translationMatrix * glm::vec4(aabb_min, 1.0f);
     aabb_max = translationMatrix * glm::vec4(aabb_max, 1.0f);
