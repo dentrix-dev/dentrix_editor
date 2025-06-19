@@ -103,6 +103,7 @@ private:
     mcg::Arch lowerArch;
     glm::vec3 upperJawCenter = glm::vec3(0.0f);
     glm::vec3 lowerJawCenter = glm::vec3(0.0f);
+    bool areArchesAligned = false;
 
 signals:
     void meshSelectedInMainScene();

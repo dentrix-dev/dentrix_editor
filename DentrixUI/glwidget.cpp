@@ -274,7 +274,7 @@ void GLWidget::archAlign()
     mcg::mesh_transform(lowerJawUnsegmented, res.lower_transform);
     mcg::mesh_transform(upperJawUnsegmented, res.upper_transform);
 
-    // Rotate towards camera and separate the two jaws
+    // Rotate towards camera
     t = pmp::rotation_matrix_x(-90.0f);
     mcg::mesh_transform(upperJawUnsegmented, t);
     t = pmp::rotation_matrix_x(-90.0f);
@@ -305,6 +305,7 @@ void GLWidget::archAlign()
 
     upperJawCenter = Utils::pmpPointToGlm(pmp::centroid(upperJawUnsegmented));
     lowerJawCenter = Utils::pmpPointToGlm(pmp::centroid(lowerJawUnsegmented));
+    areArchesAligned = true;
 
     rebuildMainScene();
     update();
@@ -638,8 +639,15 @@ void GLWidget::onEditSceneClicked()
 void GLWidget::onResetJawClicked()
 {
     // Reset upper jaw to left of origin
-    glm::mat4 mat = glm::translate(glm::mat4(1.0f), -upperJawCenter);
-    mat = glm::translate(mat, glm::vec3(-40.0f, 0.0f, 0.0f));  // TODO: Use AABB width instead of hardcoded value
+    glm::mat4 mat(1.0f);
+    float direction = 1.0f;
+    if (areArchesAligned) {
+        mat = glm::rotate(mat, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        mat = glm::rotate(mat, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        direction = -1.0f;
+    }
+    mat = glm::translate(mat, -upperJawCenter);
+    mat = glm::translate(mat, glm::vec3(direction * -40.0f, 0.0f, 0.0f));  // TODO: Use AABB width instead of hardcoded value
     for (Mesh *m : upperJawMeshes) {
         m->translate(mat);
     }
@@ -647,7 +655,9 @@ void GLWidget::onResetJawClicked()
     if (isGizmoEnabled && isUpperJawSelected) toothGizmo->position = mat * glm::vec4(toothGizmo->position, 1.0f);
 
     // Reset lower jaw to right of origin
-    mat = glm::translate(glm::mat4(1.0f), -lowerJawCenter);
+    mat = glm::mat4(1.0f);
+    if (areArchesAligned) mat = glm::rotate(mat, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    mat = glm::translate(mat, -lowerJawCenter);
     mat = glm::translate(mat, glm::vec3(40.0f, 0.0f, 0.0f));
     for (Mesh *m : lowerJawMeshes) {
         m->translate(mat);
@@ -655,6 +665,7 @@ void GLWidget::onResetJawClicked()
     lowerJawCenter = mat * glm::vec4(lowerJawCenter, 1.0f);
     if (isGizmoEnabled && isLowerJawSelected) toothGizmo->position = mat * glm::vec4(toothGizmo->position, 1.0f);
 
+    areArchesAligned = false;
     update();
 }
 
