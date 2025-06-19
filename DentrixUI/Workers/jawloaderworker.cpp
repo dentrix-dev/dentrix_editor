@@ -11,6 +11,7 @@ void JawLoaderWorker::run()
     std::vector<pmp::Face> remap;
 
     pmp::SurfaceMesh unsegmented = pmp::read(pathStr, &remap);
+    result.upperJawUnsegmented = unsegmented;
     auto arch = mcg::arch_segment(unsegmented, labelPath.c_str(), remap);
 
     pmp::SurfaceMesh gum = mcg::mesh_extract(unsegmented, arch.gum_faces);

@@ -18,6 +18,7 @@ struct JawLoadResult {
     std::vector<std::pair<pmp::SurfaceMesh, int>> teeth;  // mesh and tooth ID
     pmp::Point center;
     std::vector<pmp::Face> remap;  // <- include this
+    pmp::SurfaceMesh upperJawUnsegmented;
 };
 
 class JawLoaderWorker : public QObject

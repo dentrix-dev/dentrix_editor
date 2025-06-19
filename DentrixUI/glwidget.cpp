@@ -162,6 +162,7 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
     makeCurrent();
 
     this->upperRemap = result.remap;
+    this->upperJawUnsegmented = result.upperJawUnsegmented;
 
     // Clear previous
     for (auto *m : upperJawMeshes) delete m;
@@ -187,6 +188,9 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
         m->updateBoundingBoxBuffers();
     }
 
+    std::cout << "upper jaw meshes size from applyUpperJawResults" << upperJawMeshes.size() << std::endl;
+    std::cout << "number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
+              << upperJawUnsegmented.n_vertices() << std::endl;
     upperJawLoaded = true;
     rebuildMainScene();
     update();
@@ -239,6 +243,9 @@ void GLWidget::loadLowerJaw(const std::string &path)
         m->updateBoundingBoxBuffers();
     }
 
+    std::cout << " from lower jaw load number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
+              << upperJawUnsegmented.n_vertices() << std::endl;
+
     lowerJawLoaded = true;
     rebuildMainScene();
     update();
@@ -246,6 +253,9 @@ void GLWidget::loadLowerJaw(const std::string &path)
 
 void GLWidget::archAlign()
 {
+    std::cout << "from align number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
+              << upperJawUnsegmented.n_vertices() << std::endl;
+
     makeCurrent();
 
     mcg::Segmentation_Result seg{};
