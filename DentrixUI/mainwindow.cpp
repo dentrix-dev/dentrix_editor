@@ -70,11 +70,14 @@ void MainWindow::setupCentralUI(const std::string& modelPath, int loadMode)
     rightPanelStack = new RightPanelStackedWidget(glWidget);
     Q_ASSERT(rightPanelStack->uniformScalePanel);
     Q_ASSERT(rightPanelStack->directionalScalePanel);
+    Q_ASSERT(rightPanelStack->moveJawPanel);
 
     connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->uniformScalePanel,
             &UniformScalePanelWidget::onQActionGroupTriggered);
     connect(toolbar->getActionGroup(), &QActionGroup::triggered, rightPanelStack->directionalScalePanel,
             &DirectionalScalePanelWidget::onQActionGroupTriggered);
+    connect(rightPanelStack->moveJawPanel->getResetButton(), &QPushButton::clicked, glWidget,
+            &GLWidget::onResetJawClicked);
 
     centralLayout->addWidget(rightPanelStack);
     setCentralWidget(centralContainer);

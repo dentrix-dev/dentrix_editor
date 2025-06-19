@@ -111,6 +111,7 @@ signals:
 
 public slots:
     void onEditSceneClicked();
+    void onResetJawClicked();
     void setSelectedMeshScale(int scale);
     void setSelectedMeshRotationAngle(int rotationAngleDegrees);
     void updateMeshScale();

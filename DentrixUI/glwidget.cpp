@@ -635,6 +635,11 @@ void GLWidget::onEditSceneClicked()
     // update();
 }
 
+void GLWidget::onResetJawClicked()
+{
+    std::cout << "reset jaw" << std::endl;
+}
+
 void GLWidget::setSelectedMeshScale(int scale)
 {
     // std::cout<<"scale :"<<scale<<std::end;
