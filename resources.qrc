@@ -7,5 +7,7 @@
         <file>DentrixUI/Icons/load-lower.png</file>
         <file>DentrixUI/Icons/load-upper.svg</file>
         <file>DentrixUI/Icons/alignment.svg</file>
+        <file>DentrixUI/Icons/move.svg</file>
+        <file>DentrixUI/Icons/rotate.svg</file>
     </qresource>
 </RCC>

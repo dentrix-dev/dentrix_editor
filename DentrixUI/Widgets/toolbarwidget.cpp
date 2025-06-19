@@ -30,15 +30,15 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     freeDeformAction->setCheckable(true);
     actionGroup->addAction(freeDeformAction);
 
-    QAction *rotateAction = new QAction(QIcon(), ROTATE_ACTION_TEXT, this);
+    QAction *rotateAction = new QAction(QIcon(":/DentrixUI/Icons/rotate.svg"), ROTATE_ACTION_TEXT, this);
     rotateAction->setCheckable(true);
     actionGroup->addAction(rotateAction);
 
-    QAction *moveToothAction = new QAction(QIcon(), MOVE_TOOTH_ACTION_TEXT, this);
+    QAction *moveToothAction = new QAction(QIcon(":/DentrixUI/Icons/move.svg"), MOVE_TOOTH_ACTION_TEXT, this);
     moveToothAction->setCheckable(true);
     actionGroup->addAction(moveToothAction);
 
-    QAction *moveJawAction = new QAction(QIcon(), MOVE_JAW_ACTION_TEXT, this);
+    QAction *moveJawAction = new QAction(QIcon(":/DentrixUI/Icons/move.svg"), MOVE_JAW_ACTION_TEXT, this);
     moveJawAction->setCheckable(true);
     actionGroup->addAction(moveJawAction);
 
