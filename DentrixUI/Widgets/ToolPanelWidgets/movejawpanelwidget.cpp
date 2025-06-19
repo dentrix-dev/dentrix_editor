@@ -12,3 +12,8 @@ MoveJawPanelWidget::MoveJawPanelWidget(QWidget *parent) : QWidget{parent}
     layout->addWidget(resetButton);
     layout->addStretch();
 }
+
+QPushButton *MoveJawPanelWidget::getResetButton()
+{
+    return resetButton;
+}

@@ -11,6 +11,8 @@ class MoveJawPanelWidget : public QWidget
 public:
     explicit MoveJawPanelWidget(QWidget* parent = nullptr);
 
+    QPushButton* getResetButton();
+
 signals:
 
 private:
