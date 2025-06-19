@@ -198,6 +198,46 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
     update();
 }
 
+void GLWidget::applyLowerJawResult(const JawLoadResult &result)
+{
+    makeCurrent();
+
+    this->lowerRemap = result.remap;
+    this->lowerJawUnsegmented = result.upperJawUnsegmented;
+    this->lowerArch = result.arch;
+
+    // Clear previous
+    for (auto *m : lowerJawMeshes) delete m;
+    lowerJawMeshes.clear();
+
+    // Center gum
+    pmp::SurfaceMesh gum = result.gum;
+    for (pmp::Vertex v : gum.vertices()) gum.position(v) -= result.center;
+
+    lowerJawMeshes.push_back(new Mesh(gum, 0));
+
+    // Center teeth
+    for (const auto &[mesh, id] : result.teeth) {
+        pmp::SurfaceMesh m = mesh;
+        for (pmp::Vertex v : m.vertices()) m.position(v) -= result.center;
+
+        lowerJawMeshes.push_back(new Mesh(m, id));
+    }
+
+    for (Mesh *m : lowerJawMeshes) {
+        m->updateBuffers();
+        m->recalculateBoundingBox();
+        m->updateBoundingBoxBuffers();
+    }
+
+    std::cout << "upper jaw meshes size from applyUpperJawResults" << upperJawMeshes.size() << std::endl;
+    std::cout << "number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
+              << upperJawUnsegmented.n_vertices() << std::endl;
+    lowerJawLoaded = true;
+    rebuildMainScene();
+    update();
+}
+
 void GLWidget::loadLowerJaw(const std::string &path)
 {
     makeCurrent();
@@ -251,6 +291,27 @@ void GLWidget::loadLowerJaw(const std::string &path)
     lowerJawLoaded = true;
     rebuildMainScene();
     update();
+}
+
+// todo: merge both into one async load
+void GLWidget::loadLowerJawAsync(const QString &path)
+{
+    auto *thread = new QThread;
+    auto *worker = new JawLoaderWorker(path);
+
+    worker->moveToThread(thread);
+    std::cout << "created worker thread" << std::endl;
+
+    connect(thread, &QThread::started, worker, &JawLoaderWorker::run);
+    connect(worker, &JawLoaderWorker::finished, this, [this, worker, thread](const JawLoadResult &result) {
+        applyLowerJawResult(result);  // Now run on main thread
+        worker->deleteLater();
+        thread->quit();
+        thread->deleteLater();
+    });
+    std::cout << "about to start worker thread" << std::endl;
+    thread->start();
+    std::cout << "started worker thread" << std::endl;
 }
 
 void GLWidget::archAlign()
@@ -354,12 +415,9 @@ void GLWidget::initializeGL()
 
     auto modelLoadTime1 = std::chrono::steady_clock::now();
     if (jaw_index == 0) {
-        loadLowerJaw(initialFilePath);
+        loadLowerJawAsync(QString::fromStdString(initialFilePath));
     } else {
-        std::cout << "from init gl before load upper async" << std::endl;
         loadUpperJawAsync(QString::fromStdString(initialFilePath));
-        // loadUpperJaw(initialFilePath);
-        std::cout << "from after load async" << std::endl;
     }
     auto modelLoadTime2 = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> ms_double = modelLoadTime2 - modelLoadTime1;

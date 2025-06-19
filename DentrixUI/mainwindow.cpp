@@ -131,7 +131,7 @@ void MainWindow::loadLowerJaw()
     if (!glWidget) {
         setupCentralUI(file.toStdString(), 0);
     } else {
-        glWidget->loadLowerJaw(file.toStdString());
+        glWidget->loadLowerJawAsync(file);
     }
     lowerLoaded = true;
     loadingToolBar->setAlignEnabled(upperLoaded && lowerLoaded);

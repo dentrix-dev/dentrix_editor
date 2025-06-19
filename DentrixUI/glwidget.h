@@ -34,7 +34,9 @@ public:
     void loadUpperJaw(const std::string &path);
     void loadUpperJawAsync(const QString &path);
     void applyUpperJawResult(const JawLoadResult &result);
+    void applyLowerJawResult(const JawLoadResult &result);
     void loadLowerJaw(const std::string &path);
+    void loadLowerJawAsync(const QString &path);
     void archAlign();
     void rebuildMainScene();
     void setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive);
