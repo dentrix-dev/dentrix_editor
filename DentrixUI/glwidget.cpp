@@ -386,11 +386,9 @@ void GLWidget::rebuildMainScene()
         glm::vec3 sceneCenter(0.0f);
         for (Mesh *mesh : allMeshes) {
             sceneCenter += mesh->center;
-            std::cout << mesh->tooth_number << std::endl;
         }
         sceneCenter /= (float)allMeshes.size();
         mainScene.center = sceneCenter;
-        std::cout << sceneCenter[0] << " " << sceneCenter[1] << " " << sceneCenter[2] << std::endl;
     }
 }
 
