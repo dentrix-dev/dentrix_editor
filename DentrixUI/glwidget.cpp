@@ -170,16 +170,21 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
     for (auto *m : upperJawMeshes) delete m;
     upperJawMeshes.clear();
 
+    pmp::Point center = result.center;
+    if (lowerJawLoaded) {
+        center = pmp::Point(center[0] + 80.0f, center[1], center[2]);
+    }
+
     // Center gum
     pmp::SurfaceMesh gum = result.gum;
-    for (pmp::Vertex v : gum.vertices()) gum.position(v) -= result.center;
+    for (pmp::Vertex v : gum.vertices()) gum.position(v) -= center;
 
     upperJawMeshes.push_back(new Mesh(gum, 0));
 
     // Center teeth
     for (const auto &[mesh, id] : result.teeth) {
         pmp::SurfaceMesh m = mesh;
-        for (pmp::Vertex v : m.vertices()) m.position(v) -= result.center;
+        for (pmp::Vertex v : m.vertices()) m.position(v) -= center;
 
         upperJawMeshes.push_back(new Mesh(m, id));
     }
@@ -210,16 +215,21 @@ void GLWidget::applyLowerJawResult(const JawLoadResult &result)
     for (auto *m : lowerJawMeshes) delete m;
     lowerJawMeshes.clear();
 
+    pmp::Point center = result.center;
+    if (upperJawLoaded) {
+        center = pmp::Point(center[0] - 80.0f, center[1], center[2]);
+    }
+
     // Center gum
     pmp::SurfaceMesh gum = result.gum;
-    for (pmp::Vertex v : gum.vertices()) gum.position(v) -= result.center;
+    for (pmp::Vertex v : gum.vertices()) gum.position(v) -= center;
 
     lowerJawMeshes.push_back(new Mesh(gum, 0));
 
     // Center teeth
     for (const auto &[mesh, id] : result.teeth) {
         pmp::SurfaceMesh m = mesh;
-        for (pmp::Vertex v : m.vertices()) m.position(v) -= result.center;
+        for (pmp::Vertex v : m.vertices()) m.position(v) -= center;
 
         lowerJawMeshes.push_back(new Mesh(m, id));
     }
@@ -703,7 +713,8 @@ void GLWidget::onResetJawClicked()
         direction = -1.0f;
     }
     mat = glm::translate(mat, -upperJawCenter);
-    mat = glm::translate(mat, glm::vec3(direction * -40.0f, 0.0f, 0.0f));  // TODO: Use AABB width instead of hardcoded value
+    mat = glm::translate(mat,
+                         glm::vec3(direction * -40.0f, 0.0f, 0.0f));  // TODO: Use AABB width instead of hardcoded value
     for (Mesh *m : upperJawMeshes) {
         m->translate(mat);
     }
