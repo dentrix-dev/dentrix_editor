@@ -19,6 +19,7 @@ struct JawLoadResult {
     pmp::Point center;
     std::vector<pmp::Face> remap;  // <- include this
     pmp::SurfaceMesh upperJawUnsegmented;
+    mcg::Arch arch;
 };
 
 class JawLoaderWorker : public QObject

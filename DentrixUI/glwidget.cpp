@@ -34,7 +34,8 @@ GLWidget::GLWidget(QWidget *parent, std::string path, int jaw_index)
     : QOpenGLWidget(parent), initialFilePath(path), jaw_index(jaw_index)
 {
     setFocusPolicy(Qt::StrongFocus);
-    loadUpperJawAsync(QString::fromStdString(path));
+    // loadUpperJawAsync(QString::fromStdString(path));
+    // loadUpperJaw(path);
 }
 
 GLWidget::~GLWidget() {}
@@ -163,6 +164,7 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
 
     this->upperRemap = result.remap;
     this->upperJawUnsegmented = result.upperJawUnsegmented;
+    this->upperArch = result.arch;
 
     // Clear previous
     for (auto *m : upperJawMeshes) delete m;
@@ -355,7 +357,7 @@ void GLWidget::initializeGL()
         loadLowerJaw(initialFilePath);
     } else {
         std::cout << "from init gl before load upper async" << std::endl;
-        // loadUpperJawAsync(QString::fromStdString(initialFilePath));
+        loadUpperJawAsync(QString::fromStdString(initialFilePath));
         // loadUpperJaw(initialFilePath);
         std::cout << "from after load async" << std::endl;
     }

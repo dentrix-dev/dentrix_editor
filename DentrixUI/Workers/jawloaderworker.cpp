@@ -13,6 +13,7 @@ void JawLoaderWorker::run()
     pmp::SurfaceMesh unsegmented = pmp::read(pathStr, &remap);
     result.upperJawUnsegmented = unsegmented;
     auto arch = mcg::arch_segment(unsegmented, labelPath.c_str(), remap);
+    result.arch = arch;
 
     pmp::SurfaceMesh gum = mcg::mesh_extract(unsegmented, arch.gum_faces);
     result.gum = gum;
