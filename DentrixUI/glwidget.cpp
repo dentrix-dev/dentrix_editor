@@ -385,10 +385,8 @@ void GLWidget::paintGL()
     shader->setMatrix4("view", glm::value_ptr(view));
 
     shader->setBool("isFlatColor", false);
-    if (currentScene == nullptr)
-        return;
-    else
-        std::cout << "current sceene is not a nullptr" << std::endl;
+
+    if (currentScene == nullptr) return;
     currentScene->Draw(shader, selectedMesh, gizmoModelMatrix, isUpperJawSelected, isLowerJawSelected);
 
     if (isGizmoEnabled) {
