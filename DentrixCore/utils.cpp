@@ -12,8 +12,8 @@ glm::vec3 Utils::pmpPointToGlm(pmp::Point pmpPoint)
     return glm::vec3(pmpPoint[0], pmpPoint[1], pmpPoint[2]);
 }
 
-bool Utils::doesRayIntersectAABB(glm::vec3 aabb_min, glm::vec3 aabb_max, glm::vec3 ray_origin,
-                                   glm::vec3 ray_direction, glm::mat4 ModelMatrix, float& intersection_distance)
+bool Utils::doesRayIntersectAABB(glm::vec3 aabb_min, glm::vec3 aabb_max, glm::vec3 ray_origin, glm::vec3 ray_direction,
+                                 glm::mat4 ModelMatrix, float& intersection_distance)
 {
     // Intersection method from Real-Time Rendering and Essential Mathematics for Games
 
@@ -111,4 +111,26 @@ bool Utils::doesRayIntersectAABB(glm::vec3 aabb_min, glm::vec3 aabb_max, glm::ve
 
     intersection_distance = tMin;
     return true;
+}
+
+pmp::SurfaceMesh Utils::mergeMeshes(std::vector<Mesh*>& meshes)
+{
+    pmp::SurfaceMesh combined;
+
+    for (const Mesh* mesh : meshes) {
+        std::map<pmp::Vertex, pmp::Vertex> vmap;
+
+        for (pmp::Vertex v : mesh->surfaceMesh.vertices()) {
+            pmp::Vertex new_v = combined.add_vertex(mesh->surfaceMesh.position(v));
+            vmap[v] = new_v;
+        }
+
+        for (pmp::Face f : mesh->surfaceMesh.faces()) {
+            std::vector<pmp::Vertex> face_vertices;
+            for (pmp::Vertex v : mesh->surfaceMesh.vertices(f)) face_vertices.push_back(vmap[v]);
+            combined.add_face(face_vertices);
+        }
+    }
+
+    return combined;
 }

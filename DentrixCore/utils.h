@@ -1,7 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include "glm/glm.hpp"
-#include "pmp/types.h"
+#include <mesh.h>
 
 class Utils
 {
@@ -18,6 +17,8 @@ public:
         glm::mat4 ModelMatrix,        // Transformation applied to the mesh
         float& intersection_distance  // Output : distance between ray_origin and the intersection with the OBB
     );
+
+    static pmp::SurfaceMesh mergeMeshes(std::vector<Mesh*>& meshes);
 };
 
 #endif  // UTILS_H

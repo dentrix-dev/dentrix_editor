@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include <qnamespace.h>
+
 #include <QActionGroup>
 #include <QBoxLayout>
 #include <QCheckBox>
@@ -13,6 +15,8 @@
 
 #include "./ui_mainwindow.h"
 #include "Widgets/Dialogs/savemodeldialog.h"
+#include "filehandler.h"
+#include "utils.h"
 
 bool MainWindow::inUnformScale = false;
 bool MainWindow::inDirectionalScale = false;
@@ -188,10 +192,30 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
 void MainWindow::on_actionSave_Model_triggered()
 {
     SaveModelDialog dialog(this);
-    if (dialog.exec() == QDialog::Accepted) {
-        QString savePath = dialog.getPath();
-        // implement save stuff here
-        // for example, saveFile(savePath);
-        QMessageBox::information(this, "Saved", "File would be saved to:\n" + savePath);
+    if (dialog.exec() != QDialog::Accepted || glWidget == nullptr) return;
+
+    QString savePath = dialog.getPath();
+    // Remove .obj as it will be added to the specific jaw filename
+    if (savePath.endsWith(".obj", Qt::CaseInsensitive)) savePath.chop(4);
+    std::cout << "Saving to: " << savePath.toStdString() << std::endl;
+
+    // Meshes are merged into one as PMP doesn't support writing multiple meshes
+    // If an existing file with the same name exists, is it overwritten
+    pmp::SurfaceMesh mergedMesh;
+    if (glWidget->upperJawLoaded) {
+        mergedMesh = Utils::mergeMeshes(glWidget->upperJawMeshes);
+
+        std::string filePath = (savePath + "_upper.obj").toStdString();
+        FileHandler::writeMesh(filePath, mergedMesh);
+        std::cout << "Saved upper jaw" << std::endl;
     }
+    if (glWidget->lowerJawLoaded) {
+        mergedMesh = Utils::mergeMeshes(glWidget->lowerJawMeshes);
+
+        std::string filePath = (savePath + "_lower.obj").toStdString();
+        FileHandler::writeMesh(filePath, mergedMesh);
+        std::cout << "Saved lower jaw" << std::endl;
+    }
+
+    QMessageBox::information(this, "Saved", "File would be saved to:\n" + savePath);
 }

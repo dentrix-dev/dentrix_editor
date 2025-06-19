@@ -25,6 +25,11 @@ public:
     explicit GLWidget(QWidget *parent, std::string path, int jaw_index);
     ~GLWidget();
 
+    bool upperJawLoaded = false;
+    bool lowerJawLoaded = false;
+    std::vector<Mesh *> upperJawMeshes;
+    std::vector<Mesh *> lowerJawMeshes;
+
     void loadModel(const std::string &path);  // Function to load new model
     void loadUpperJaw(const std::string &path);
     void loadUpperJawAsync(const QString &path);
@@ -88,10 +93,6 @@ private:
     BrushMode currentBrushMode = BrushMode::Add;
     bool shiftHeld = false;
     bool ctrlHeld = false;
-    std::vector<Mesh *> upperJawMeshes;
-    std::vector<Mesh *> lowerJawMeshes;
-    bool upperJawLoaded = false;
-    bool lowerJawLoaded = false;
     std::string upperJawLabelsPath;
     std::string lowerJawLabelsPath;
     pmp::SurfaceMesh upperJawUnsegmented;
