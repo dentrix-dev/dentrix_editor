@@ -33,7 +33,7 @@ public:
     void setScaleDirectional(float x, float y, float z);
     void translate(glm::mat4& translationMatrix);
 
-    void fillHole(pmp::Halfedge h);
+    void fillHoles();
     void draw();
     void updateVerticesBuffer();
     void updateBuffers();
@@ -52,6 +52,8 @@ private:
 
     void setup();
     void setupBoundingBox();
+
+    void fillHole(pmp::Halfedge h);
 };
 
 #endif  // MESH_H
