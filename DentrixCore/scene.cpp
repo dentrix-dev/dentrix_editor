@@ -25,35 +25,6 @@ static void printMat4(const glm::mat4 &mat)
 
 Scene::Scene() {}
 
-void Scene::fillHoles(std::vector<Mesh *> &fileMeshes)
-{
-    // ========================== Hole filling =========================
-    // Fill all holes in the gum mesh
-    pmp::SurfaceMesh &mesh = fileMeshes[0]->surfaceMesh;
-    std::vector<std::vector<pmp::Halfedge>> boundary_loops;
-    std::unordered_set<int> visited;
-
-    for (auto he : mesh.halfedges()) {
-        if (mesh.is_boundary(he) && visited.find(he.idx()) == visited.end()) {
-            std::vector<pmp::Halfedge> loop;
-            pmp::Halfedge start = he;
-            pmp::Halfedge current = he;
-
-            do {
-                loop.push_back(current);
-                visited.insert(current.idx());
-                current = mesh.next_halfedge(current);
-            } while (current != start);
-
-            boundary_loops.push_back(loop);
-        }
-    }
-
-    for (auto vec : boundary_loops) {
-        fileMeshes[0]->fillHole(vec[0]);
-    }
-}
-
 Scene::Scene(std::vector<Mesh *> meshes)
 {
     this->meshes = meshes;
@@ -99,6 +70,7 @@ void Scene::Draw(Shader *shader, Mesh *selectedMesh, glm::mat4 &gizmoModelMatrix
         // Send per-mesh model matrix to the shader
         shader->setMatrix4("model", glm::value_ptr(meshfinalTransform));
 
+        // if (meshes[i]->tooth_number == 0 || meshes[i]->tooth_number == 33)
         meshes[i]->draw();
     }
 }

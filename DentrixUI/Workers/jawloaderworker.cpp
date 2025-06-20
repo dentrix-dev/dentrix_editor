@@ -16,6 +16,7 @@ void JawLoaderWorker::run()
     result.arch = arch;
 
     pmp::SurfaceMesh gum = mcg::mesh_extract(unsegmented, arch.gum_faces);
+    gum.add_vertex_property<bool>("v:selected");
     result.gum = gum;
 
     pmp::BoundingBox aabb = pmp::bounds(gum);
