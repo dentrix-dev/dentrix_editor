@@ -473,10 +473,10 @@ void GLWidget::archAlignAsync()
 
     connect(thread, &QThread::started, worker, &ArchAlignWorker::run);
     connect(worker, &ArchAlignWorker::finished, this, [this, worker, thread](const ArchAlignData &result) {
-        applyArchAlignResult(result);  // Now run on main thread
         worker->deleteLater();
         thread->quit();
         thread->deleteLater();
+        applyArchAlignResult(result);  // Now run on main thread
     });
     thread->start();
 }
@@ -499,13 +499,15 @@ void GLWidget::applyArchAlignResult(const ArchAlignData &result)
     lowerJawMeshes.clear();
 
     upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));  // leftttt hereee
-    for (std::pair<pmp::SurfaceMesh, mcg::Tooth_Name> upperPair : toothWithNameUpper) {
-        upperJawMeshes.push_back(new Mesh(upperPair.first, upperPair.second));
+    for (int i = 0; i < toothWithNameUpper.size(); i++) {
+        std::pair<pmp::SurfaceMesh, mcg::Tooth_Name> upperPair = toothWithNameUpper[i];
+        upperJawMeshes.push_back(new Mesh(upperPair.first, i + 1));
     }
 
     lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 33));  // leftttt hereee
-    for (std::pair<pmp::SurfaceMesh, mcg::Tooth_Name> lowerPair : toothWithNameLower) {
-        lowerJawMeshes.push_back(new Mesh(lowerPair.first, lowerPair.second + 16));
+    for (int i = 0; i < toothWithNameLower.size(); i++) {
+        std::pair<pmp::SurfaceMesh, mcg::Tooth_Name> lowerPair = toothWithNameLower[i];
+        lowerJawMeshes.push_back(new Mesh(lowerPair.first, i + 17));
     }
 
     upperJawCenter = Utils::pmpPointToGlm(pmp::centroid(upperJawUnsegmented));
