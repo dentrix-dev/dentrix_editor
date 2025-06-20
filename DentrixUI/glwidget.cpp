@@ -431,25 +431,12 @@ void GLWidget::archAlign()
     lowerJawMeshes.clear();                                                    // op on member with pointers
     /////
 
-<<<<<<< HEAD
     pmp::SurfaceMesh upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
     upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));
     for (int idx = 0; idx < upperArch.teeth.size() && idx < 16; idx++) {
         if (upperArch.teeth[idx].is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, upperArch.teeth[idx].faces);
             upperJawMeshes.push_back(new Mesh(tooth, idx + 1));
-=======
-    // to worker 3ady
-    pmp::SurfaceMesh upperGumMesh =
-        mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);  // op upperJawUnsegmented
-    upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));              // leftttt hereee
-    for (mcg::Tooth t : upperArch.teeth) {                            // get from meber upperArch
-        if (t.is_present) {
-            // to worker 3ady
-            pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);  // op on mem
-            // leave
-            upperJawMeshes.push_back(new Mesh(tooth, t.name));  // op on mem with pointer
->>>>>>> eb591a8 (make jaw alignment async)
         }
     }
     // same but for lower
