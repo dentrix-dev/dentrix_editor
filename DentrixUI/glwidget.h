@@ -11,6 +11,7 @@
 #include "Brush.h"
 #include "Gizmo/gizmo.h"
 #include "Gizmo/gizmoComponent.h"
+#include "Workers/archalignworker.h"
 #include "Workers/jawloaderworker.h"
 #include "camera.h"
 #include "cursorFactory.h"
@@ -38,6 +39,8 @@ public:
     void loadLowerJaw(const std::string &path);
     void loadLowerJawAsync(const QString &path);
     void archAlign();
+    void archAlignAsync();
+    void applyArchAlignResult(const ArchAlignData &result);
     void rebuildMainScene();
     void setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive);
     void setFreeDeformAddMode(bool isAdd);

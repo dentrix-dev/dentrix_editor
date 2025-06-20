@@ -143,7 +143,7 @@ void MainWindow::alignJaws()
 {
     std::cout << "Aligning jaws..." << std::endl;
     if (glWidget) {
-        glWidget->archAlign();
+        glWidget->archAlignAsync();
         std::cout << "Jaws alignment requested" << std::endl;
     }
 }

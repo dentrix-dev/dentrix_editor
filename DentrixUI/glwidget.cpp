@@ -402,10 +402,7 @@ void GLWidget::loadLowerJawAsync(const QString &path)
 
 void GLWidget::archAlign()
 {
-    std::cout << "from align number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
-              << upperJawUnsegmented.n_vertices() << std::endl;
-
-    makeCurrent();
+    makeCurrent();  // opengl
 
     mcg::Segmentation_Result seg{};
     seg.upper = upperArch;
@@ -413,34 +410,49 @@ void GLWidget::archAlign()
 
     pmp::mat4 t = pmp::rotation_matrix_x(10.0f) * pmp::rotation_matrix_y(67.0f) * pmp::rotation_matrix_z(103.0f);
     t = pmp::translation_matrix(pmp::vec3{5.0f, 2.3f, -4.2}) * t;
-    mcg::mesh_transform(upperJawUnsegmented, t);
-
+    mcg::mesh_transform(upperJawUnsegmented, t);  // operation on a member upperJawUnsegmented
+    // operation on two members upperJawUnsegmented lowerJawUnsegmented
     mcg::Alignment_Result res = mcg::arch_align_upper_and_lower(upperJawUnsegmented, lowerJawUnsegmented, seg);
 
     // Apply arch alignment
-    mcg::mesh_transform(lowerJawUnsegmented, res.lower_transform);
-    mcg::mesh_transform(upperJawUnsegmented, res.upper_transform);
+    mcg::mesh_transform(lowerJawUnsegmented, res.lower_transform);  // operation on member lowerJawUnsegmented
+    mcg::mesh_transform(upperJawUnsegmented, res.upper_transform);  /// operation on member upperJawUnsegmented
 
     // Rotate towards camera
     t = pmp::rotation_matrix_x(-90.0f);
-    mcg::mesh_transform(upperJawUnsegmented, t);
+    mcg::mesh_transform(upperJawUnsegmented, t);  // operation on a member upperJawUnsegmented
     t = pmp::rotation_matrix_x(-90.0f);
-    mcg::mesh_transform(lowerJawUnsegmented, t);
+    mcg::mesh_transform(lowerJawUnsegmented, t);  // op on a member lowerJawUnsegmented
 
-    for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
-    for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
-    upperJawMeshes.clear();
-    lowerJawMeshes.clear();
+    // this block is left here
+    for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];  // op on member with pointers
+    for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];  // op on member with pointers
+    upperJawMeshes.clear();                                                    // op on member with pointers
+    lowerJawMeshes.clear();                                                    // op on member with pointers
+    /////
 
+<<<<<<< HEAD
     pmp::SurfaceMesh upperGumMesh = mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);
     upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));
     for (int idx = 0; idx < upperArch.teeth.size() && idx < 16; idx++) {
         if (upperArch.teeth[idx].is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, upperArch.teeth[idx].faces);
             upperJawMeshes.push_back(new Mesh(tooth, idx + 1));
+=======
+    // to worker 3ady
+    pmp::SurfaceMesh upperGumMesh =
+        mcg::mesh_extract(upperJawUnsegmented, upperArch.gum_faces);  // op upperJawUnsegmented
+    upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));              // leftttt hereee
+    for (mcg::Tooth t : upperArch.teeth) {                            // get from meber upperArch
+        if (t.is_present) {
+            // to worker 3ady
+            pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, t.faces);  // op on mem
+            // leave
+            upperJawMeshes.push_back(new Mesh(tooth, t.name));  // op on mem with pointer
+>>>>>>> eb591a8 (make jaw alignment async)
         }
     }
-
+    // same but for lower
     pmp::SurfaceMesh lowerGumMesh = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.gum_faces);
     lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 33));
     for (int idx = 0; idx < lowerArch.teeth.size() && idx < 16; idx++) {
@@ -448,6 +460,65 @@ void GLWidget::archAlign()
             pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.teeth[idx].faces);
             lowerJawMeshes.push_back(new Mesh(tooth, idx + 17));
         }
+    }
+
+    // set new center, and some stuff leave for after async function
+    upperJawCenter = Utils::pmpPointToGlm(pmp::centroid(upperJawUnsegmented));
+    lowerJawCenter = Utils::pmpPointToGlm(pmp::centroid(lowerJawUnsegmented));
+    areArchesAligned = true;
+
+    rebuildMainScene();
+    update();
+}
+
+void GLWidget::archAlignAsync()
+{
+    auto *thread = new QThread;
+    ArchAlignData data;
+    data.upperJawUnsegmented = upperJawUnsegmented;
+    data.lowerJawUnsegmented = lowerJawUnsegmented;
+    data.upperArch = upperArch;
+    data.lowerArch = lowerArch;
+    auto *worker = new ArchAlignWorker(data);
+
+    worker->moveToThread(thread);
+    std::cout << "created arch align worker thread" << std::endl;
+
+    connect(thread, &QThread::started, worker, &ArchAlignWorker::run);
+    connect(worker, &ArchAlignWorker::finished, this, [this, worker, thread](const ArchAlignData &result) {
+        applyArchAlignResult(result);  // Now run on main thread
+        worker->deleteLater();
+        thread->quit();
+        thread->deleteLater();
+    });
+    thread->start();
+}
+
+void GLWidget::applyArchAlignResult(const ArchAlignData &result)
+{
+    makeCurrent();
+
+    // unpack results
+    upperJawUnsegmented = result.upperJawUnsegmented;
+    lowerJawUnsegmented = result.lowerJawUnsegmented;
+    std::vector<std::pair<pmp::SurfaceMesh, mcg::Tooth_Name>> toothWithNameUpper = result.toothWithNameUpper;
+    std::vector<std::pair<pmp::SurfaceMesh, mcg::Tooth_Name>> toothWithNameLower = result.toothWithNameLower;
+    pmp::SurfaceMesh upperGumMesh = result.upperGumMesh;
+    pmp::SurfaceMesh lowerGumMesh = result.lowerGumMesh;
+
+    for (int i = 0; i < lowerJawMeshes.size(); i++) delete lowerJawMeshes[i];
+    for (int i = 0; i < upperJawMeshes.size(); i++) delete upperJawMeshes[i];
+    upperJawMeshes.clear();
+    lowerJawMeshes.clear();
+
+    upperJawMeshes.push_back(new Mesh(upperGumMesh, 0));  // leftttt hereee
+    for (std::pair<pmp::SurfaceMesh, mcg::Tooth_Name> upperPair : toothWithNameUpper) {
+        upperJawMeshes.push_back(new Mesh(upperPair.first, upperPair.second));
+    }
+
+    lowerJawMeshes.push_back(new Mesh(lowerGumMesh, 33));  // leftttt hereee
+    for (std::pair<pmp::SurfaceMesh, mcg::Tooth_Name> lowerPair : toothWithNameLower) {
+        lowerJawMeshes.push_back(new Mesh(lowerPair.first, lowerPair.second + 16));
     }
 
     upperJawCenter = Utils::pmpPointToGlm(pmp::centroid(upperJawUnsegmented));
