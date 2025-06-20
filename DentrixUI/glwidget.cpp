@@ -98,7 +98,7 @@ void GLWidget::loadUpperJaw(const std::string &path)
     for (int idx = 0; idx < upperArch.teeth.size() && idx < 16; idx++) {
         if (upperArch.teeth[idx].is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, upperArch.teeth[idx].faces);
-            upperJawMeshes.push_back(new Mesh(tooth, idx + 1));  
+            upperJawMeshes.push_back(new Mesh(tooth, idx + 1));
             aabb = pmp::bounds(tooth);
             jawCenter += 0.5f * (aabb.max() + aabb.min());
             noOfMeshes++;
@@ -218,12 +218,12 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
     // upperJawMeshes[0]->fillHoles();
 
     // Center teeth
-    for (const auto &[mesh, id] : result.teeth) {
+    for (int i = 0; i < result.teeth.size(); i++) {
+        const auto &mesh = result.teeth[i].first;
         pmp::SurfaceMesh m = mesh;
         for (pmp::Vertex v : m.vertices()) m.position(v) -= center;
 
-        std::cout << id << std::endl;
-        upperJawMeshes.push_back(new Mesh(m, id));
+        upperJawMeshes.push_back(new Mesh(m, i + 1));
     }
 
     for (Mesh *m : upperJawMeshes) {
@@ -302,12 +302,12 @@ void GLWidget::applyLowerJawResult(const JawLoadResult &result)
     // lowerJawMeshes[0]->fillHoles();
 
     // Center teeth
-    for (const auto &[mesh, id] : result.teeth) {
+    for (int i = 0; i < result.teeth.size(); i++) {
+        const auto &mesh = result.teeth[i].first;
         pmp::SurfaceMesh m = mesh;
         for (pmp::Vertex v : m.vertices()) m.position(v) -= center;
 
-        std::cout << id << std::endl;
-        lowerJawMeshes.push_back(new Mesh(m, id));
+        lowerJawMeshes.push_back(new Mesh(m, i + 17));
     }
 
     for (Mesh *m : lowerJawMeshes) {
@@ -354,7 +354,7 @@ void GLWidget::loadLowerJaw(const std::string &path)
     for (int idx = 0; idx < lowerArch.teeth.size() && idx < 16; idx++) {
         if (lowerArch.teeth[idx].is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.teeth[idx].faces);
-            lowerJawMeshes.push_back(new Mesh(tooth, idx + 17)); 
+            lowerJawMeshes.push_back(new Mesh(tooth, idx + 17));
             aabb = pmp::bounds(tooth);
             jawCenter += 0.5f * (aabb.max() + aabb.min());
             noOfMeshes++;
@@ -437,8 +437,7 @@ void GLWidget::archAlign()
     for (int idx = 0; idx < upperArch.teeth.size() && idx < 16; idx++) {
         if (upperArch.teeth[idx].is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(upperJawUnsegmented, upperArch.teeth[idx].faces);
-            upperJawMeshes.push_back(new Mesh(tooth, idx + 1));  
-
+            upperJawMeshes.push_back(new Mesh(tooth, idx + 1));
         }
     }
 
@@ -447,7 +446,7 @@ void GLWidget::archAlign()
     for (int idx = 0; idx < lowerArch.teeth.size() && idx < 16; idx++) {
         if (lowerArch.teeth[idx].is_present) {
             pmp::SurfaceMesh tooth = mcg::mesh_extract(lowerJawUnsegmented, lowerArch.teeth[idx].faces);
-            lowerJawMeshes.push_back(new Mesh(tooth, idx + 17)); 
+            lowerJawMeshes.push_back(new Mesh(tooth, idx + 17));
         }
     }
 
