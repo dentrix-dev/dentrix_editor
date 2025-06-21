@@ -31,6 +31,7 @@
      <string>Files</string>
     </property>
     <addaction name="actionSave_Model"/>
+    <addaction name="actionPrefrences"/>
    </widget>
    <addaction name="menuFiles"/>
   </widget>
@@ -43,6 +44,11 @@
   <action name="actionSave_Model">
    <property name="text">
     <string>Save Model</string>
+   </property>
+  </action>
+  <action name="actionPrefrences">
+   <property name="text">
+    <string>Prefrences</string>
    </property>
   </action>
  </widget>
