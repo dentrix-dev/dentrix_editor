@@ -21,6 +21,6 @@ public:
     GizmoComponent(glm::vec3 color, glm::mat4 rotation, ComponentAxis axis);
     void draw();
     void onDrag(float oldMouseX, float oldMouseY, float mouseX, float mouseY, glm::vec3& objectPosition,
-                glm::vec3& cameraPosition, glm::vec3& cameraForward, glm::mat4& view, glm::mat4& projection, glm::ivec4& viewport,
-                glm::mat4& model);
+                glm::vec3& cameraPosition, glm::vec3& cameraForward, glm::mat4& view, glm::mat4& projection,
+                glm::ivec4& viewport, glm::mat4& model);
 };

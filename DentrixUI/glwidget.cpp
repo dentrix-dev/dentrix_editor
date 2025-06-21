@@ -971,7 +971,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Shift && !shiftHeld) {
         shiftHeld = true;
-        if ((MainWindow::toolMode == MainWindow::FreeDeformation)) updateCursor();
+        if (MainWindow::toolMode == MainWindow::FreeDeformation) updateCursor();
     } else if (event->key() == Qt::Key_Control) {
         ctrlHeld = true;
     }

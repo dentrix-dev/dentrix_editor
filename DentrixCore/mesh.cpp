@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "pmp/algorithms/fairing.h"
-#include "pmp/algorithms/hole_filling.h"
 
 bool Mesh::drawBoundingBox = true;
 

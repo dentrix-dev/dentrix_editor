@@ -5,7 +5,8 @@
 
 enum class BrushMode { Add, Remove, Smooth };
 
-class CursorFactory {
+class CursorFactory
+{
 public:
     static QCursor createCursor(int size, BrushMode mode);
 };

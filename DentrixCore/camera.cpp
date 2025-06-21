@@ -11,7 +11,8 @@ glm::mat4 Camera::GetViewMatrix()
     return glm::lookAt(position, target, up);
 }
 
-void Camera::resetPosition() {
+void Camera::resetPosition()
+{
     position = glm::vec3(0.0f, 0.0f, distance);
     front = glm::vec3(0.0f, 0.0f, -1.0f);
     target = glm::vec3(0.0f);

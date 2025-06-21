@@ -1,10 +1,12 @@
 // CursorFactory.cpp
 #include "cursorFactory.h"
-#include <QPainter>
-#include <QPixmap>
-#include <QPen>
 
-QCursor CursorFactory::createCursor(int size, BrushMode mode) {
+#include <QPainter>
+#include <QPen>
+#include <QPixmap>
+
+QCursor CursorFactory::createCursor(int size, BrushMode mode)
+{
     int cursorSize = std::min(64, std::max(8, size * 2));
     QPixmap pixmap(cursorSize, cursorSize);
     pixmap.fill(Qt::transparent);
@@ -13,9 +15,15 @@ QCursor CursorFactory::createCursor(int size, BrushMode mode) {
 
     QColor color;
     switch (mode) {
-        case BrushMode::Add: color = Qt::green; break;
-        case BrushMode::Remove: color = Qt::red; break;
-        case BrushMode::Smooth: color = Qt::blue; break;
+        case BrushMode::Add:
+            color = Qt::green;
+            break;
+        case BrushMode::Remove:
+            color = Qt::red;
+            break;
+        case BrushMode::Smooth:
+            color = Qt::blue;
+            break;
     }
 
     painter.setPen(QPen(color, 2));
