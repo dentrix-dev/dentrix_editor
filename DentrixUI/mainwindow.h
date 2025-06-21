@@ -58,6 +58,6 @@ private slots:
     void loadLowerJaw();
     void alignJaws();
     void on_actionSave_Model_triggered();
-    void on_actionPrefrences_triggered();
+    void on_actionPreferences_triggered();
 };
 #endif  // MAINWINDOW_H

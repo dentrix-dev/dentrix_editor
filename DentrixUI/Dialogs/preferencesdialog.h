@@ -1,5 +1,5 @@
-#ifndef PREFRENCESDIALOG_H
-#define PREFRENCESDIALOG_H
+#ifndef PREFERENCESDIALOG_H
+#define PREFERENCESDIALOG_H
 
 #include <QCheckBox>
 #include <QDialog>
@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QSlider>
 
-struct Prefrences {
+struct Preferences {
     bool showBoundingBox;
     bool showWireframes;
     int cameraSensitivity;
@@ -25,7 +25,7 @@ public:
     void loadSettings();
     void saveSettings();
 
-    static Prefrences getPrefrences();
+    static Preferences getPreferences();
 
 private slots:
     void onSaveClicked();
@@ -45,4 +45,4 @@ private:
     QString settingsFilePath() const;
 };
 
-#endif  // PREFRENCESDIALOG_H
+#endif  // PREFERENCESDIALOG_H

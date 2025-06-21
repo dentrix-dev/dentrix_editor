@@ -1,4 +1,4 @@
-#include "prefrencesdialog.h"
+#include "preferencesdialog.h"
 
 #include <QFile>
 #include <QHBoxLayout>
@@ -150,9 +150,9 @@ void PreferencesDialog::saveSettings()
     file.write(doc.toJson());
 }
 
-Prefrences PreferencesDialog::getPrefrences()
+Preferences PreferencesDialog::getPreferences()
 {
-    Prefrences preferences;
+    Preferences preferences;
 
     QFile file(settingsPath);
     if (!file.open(QIODevice::ReadOnly)) {

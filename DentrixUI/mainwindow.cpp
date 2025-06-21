@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include <Dialogs/prefrencesdialog.h>
+#include <Dialogs/preferencesdialog.h>
 #include <qnamespace.h>
 
 #include <QActionGroup>
@@ -219,7 +219,7 @@ void MainWindow::on_actionSave_Model_triggered()
     QMessageBox::information(this, "Saved", "File would be saved to:\n" + savePath);
 }
 
-void MainWindow::on_actionPrefrences_triggered()
+void MainWindow::on_actionPreferences_triggered()
 {
     PreferencesDialog dialog;
     if (dialog.exec() == QDialog::Accepted) {
