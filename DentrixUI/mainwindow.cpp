@@ -224,5 +224,11 @@ void MainWindow::on_actionPreferences_triggered()
     PreferencesDialog dialog;
     if (dialog.exec() == QDialog::Accepted) {
         std::cout << "preferences were saved" << std::endl;
+        if (glWidget) {
+            Preferences prefs = dialog.getPreferences();
+            glWidget->setCameraSensitivity(prefs.cameraSensitivity);
+            glWidget->setShowBoundingBoxes(prefs.showBoundingBox);
+            glWidget->setWireframeMode(prefs.showWireframes);
+        }
     }
 }

@@ -19,6 +19,7 @@
 #include <glm/trigonometric.hpp>
 #include <iostream>
 
+#include "Dialogs/preferencesdialog.h"
 #include "Gizmo/gizmo.h"
 #include "Gizmo/gizmoComponent.h"
 #include "glm/fwd.hpp"
@@ -547,6 +548,11 @@ void GLWidget::initializeGL()
 
     setMouseTracking(true);
 
+    Preferences prefs = PreferencesDialog::getPreferences();
+    Mesh::drawBoundingBox = prefs.showBoundingBox;
+    setWireframeMode(prefs.showWireframes);
+    camera.setSensitivity(prefs.cameraSensitivity);
+
     // Shaders
     shader = new Shader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
     shader->use();
@@ -1028,11 +1034,32 @@ void GLWidget::onToolChange()
     update();
 }
 
+void GLWidget::setWireframeMode(bool option)
+{
+    makeCurrent();
+    if (option) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
+void GLWidget::setShowBoundingBoxes(bool option)
+{
+    Mesh::drawBoundingBox = option;
+}
+
+void GLWidget::setCameraSensitivity(int sens)
+{
+    camera.setSensitivity(sens);
+}
+
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Shift && !shiftHeld) {
         shiftHeld = true;
-        if (MainWindow::toolMode == MainWindow::FreeDeformation || MainWindow::toolMode == MainWindow::Smoothing) updateCursor();
+        if (MainWindow::toolMode == MainWindow::FreeDeformation || MainWindow::toolMode == MainWindow::Smoothing)
+            updateCursor();
     } else if (event->key() == Qt::Key_Control) {
         ctrlHeld = true;
     }

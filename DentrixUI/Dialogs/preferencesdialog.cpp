@@ -72,9 +72,9 @@ PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent)
 
     QHBoxLayout* sensitivityLayout = new QHBoxLayout;
     cameraSensitivitySlider = new QSlider(Qt::Horizontal);
-    cameraSensitivitySlider->setRange(0, 100);
+    cameraSensitivitySlider->setRange(1, 100);
     cameraSensitivitySlider->setValue(50);
-    sensitivityLabel = new QLabel("Camera Sensitivity: 50%");
+    sensitivityLabel = new QLabel("Camera Sensitivity: 50");
     sensitivityLabel->show();
     connect(cameraSensitivitySlider, &QSlider::valueChanged, this, &PreferencesDialog::updateSensitivityLabel);
     sensitivityLayout->addWidget(sensitivityLabel);

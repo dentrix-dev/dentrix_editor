@@ -49,6 +49,9 @@ public:
     void setSmoothingStrength(int value);
     void updateCursor();
     void onToolChange();
+    void setWireframeMode(bool option);
+    void setShowBoundingBoxes(bool option);
+    void setCameraSensitivity(int sens);
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 

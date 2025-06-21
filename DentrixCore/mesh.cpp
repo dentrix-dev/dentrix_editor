@@ -12,7 +12,7 @@
 
 #include "pmp/algorithms/fairing.h"
 
-bool Mesh::drawBoundingBox = true;
+bool Mesh::drawBoundingBox = false;
 
 Mesh::Mesh(pmp::SurfaceMesh& input_mesh, unsigned int tooth_number)
 {

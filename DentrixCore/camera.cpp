@@ -57,6 +57,11 @@ void Camera::addDistance(float offset)
     position = target + glm::normalize(position - target) * distance;
 }
 
+void Camera::setSensitivity(int percentage)
+{
+    sensitivity = float(percentage) / 100.0f * (max_sensitivity - min_sensitivity);
+}
+
 void Camera::ScreenPosToWorldRay(int mouseX, int mouseY, int screenWidth, int screenHeight, glm::mat4 ViewMatrix,
                                  glm::mat4 ProjectionMatrix, glm::vec3& out_direction)
 {

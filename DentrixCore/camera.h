@@ -8,6 +8,8 @@ class Camera
     float pitch = 0.0f;
     float yaw = 90.0f;
     float sensitivity = 0.2f;
+    float min_sensitivity = 0.05f;
+    float max_sensitivity = 0.4f;
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 public:
@@ -21,6 +23,7 @@ public:
     void processMouse(float xOffset, float yOffset);
     void processMove(float xPan, float yPan);
     void addDistance(float distance);
+    void setSensitivity(int percentage);
 
     static void ScreenPosToWorldRay(
         int mouseX, int mouseY,             // Mouse position, in pixels, from bottom-left corner of the window
