@@ -158,6 +158,8 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
         MainWindow::toolMode = DirectionalScale;
     else if (actionText == ToolBarWidget::ActionTexts::FREE_DEFORM_ACTION_TEXT)
         MainWindow::toolMode = FreeDeformation;
+    else if (actionText == ToolBarWidget::ActionTexts::SMOOTHING_ACTION_TEXT)
+        MainWindow::toolMode = Smoothing;
     else if (actionText == ToolBarWidget::ActionTexts::ROTATE_ACTION_TEXT)
         MainWindow::toolMode = Rotate;
     else if (actionText == ToolBarWidget::ActionTexts::MOVE_TOOTH_ACTION_TEXT)
@@ -172,6 +174,8 @@ void MainWindow::onQActionGroupTriggered(QAction* action)
             rightPanelStack->setCurrentIndex(2);
         else if (MainWindow::toolMode == FreeDeformation)
             rightPanelStack->setCurrentIndex(3);
+        else if (MainWindow::toolMode == Smoothing)
+            rightPanelStack->setCurrentIndex(5);
         else if (MainWindow::toolMode == Rotate)
             rightPanelStack->setCurrentIndex(4);
         else if (MainWindow::toolMode == MoveTooth)

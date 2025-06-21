@@ -6,6 +6,7 @@
 const QString ToolBarWidget::ActionTexts::UNIFORM_SCALE_ACTION_TEXT = "Uniform\nScale";
 const QString ToolBarWidget::ActionTexts::DIRECTIONAL_SCALE_ACTION_TEXT = "Directional\nScale";
 const QString ToolBarWidget::ActionTexts::FREE_DEFORM_ACTION_TEXT = "Free\nDeform";
+const QString ToolBarWidget::ActionTexts::SMOOTHING_ACTION_TEXT = "Smoothing";
 const QString ToolBarWidget::ActionTexts::ROTATE_ACTION_TEXT = "Rotate";
 const QString ToolBarWidget::ActionTexts::MOVE_TOOTH_ACTION_TEXT = "Move\nTooth";
 const QString ToolBarWidget::ActionTexts::MOVE_JAW_ACTION_TEXT = "Move\nJaw";
@@ -32,6 +33,10 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
         new QAction(QIcon(":/DentrixUI/Icons/free-deform.svg"), ActionTexts::FREE_DEFORM_ACTION_TEXT, this);
     freeDeformAction->setCheckable(true);
     actionGroup->addAction(freeDeformAction);
+
+    QAction *smoothingAction = new QAction(QIcon(":/DentrixUI/Icons/smooth.svg"), ActionTexts::SMOOTHING_ACTION_TEXT, this);
+    smoothingAction->setCheckable(true);
+    actionGroup->addAction(smoothingAction);
 
     QAction *rotateAction = new QAction(QIcon(":/DentrixUI/Icons/rotate.svg"), ActionTexts::ROTATE_ACTION_TEXT, this);
     rotateAction->setCheckable(true);
@@ -62,6 +67,7 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     this->addAction(uniformScaleAction);
     this->addAction(directionalScaleAction);
     this->addAction(freeDeformAction);
+    this->addAction(smoothingAction);
     this->addAction(rotateAction);
     this->addAction(moveToothAction);
     this->addAction(moveJawAction);

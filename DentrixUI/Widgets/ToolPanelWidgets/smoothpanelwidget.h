@@ -3,13 +3,18 @@
 
 #include <QWidget>
 
+class GLWidget;
+
 class SmoothPanelWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SmoothPanelWidget(QWidget *parent = nullptr);
+    explicit SmoothPanelWidget(GLWidget* glWidget, QWidget *parent = nullptr);
 
 signals:
+
+private:
+    GLWidget* glWidget;
 };
 
 #endif  // SMOOTHPANELWIDGET_H

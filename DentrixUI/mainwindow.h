@@ -24,7 +24,7 @@ public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
-    enum ToolMode { None, UniformScale, DirectionalScale, FreeDeformation, Rotate, MoveTooth, MoveJaw };
+    enum ToolMode { None, UniformScale, DirectionalScale, FreeDeformation, Smoothing, Rotate, MoveTooth, MoveJaw };
 
     static ToolMode toolMode;
     // toDo: refactor into a separate transformationState class

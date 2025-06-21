@@ -9,5 +9,6 @@
         <file>DentrixUI/Icons/alignment.svg</file>
         <file>DentrixUI/Icons/move.svg</file>
         <file>DentrixUI/Icons/rotate.svg</file>
+        <file>DentrixUI/Icons/smooth.svg</file>
     </qresource>
 </RCC>

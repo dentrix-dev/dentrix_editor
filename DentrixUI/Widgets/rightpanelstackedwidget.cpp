@@ -21,7 +21,7 @@ RightPanelStackedWidget::RightPanelStackedWidget(GLWidget* glWidget) : QStackedW
     rotatePanel = new RotatePanelWidget();
     initRotatePanelSignals();
 
-    smoothPanel = new SmoothPanelWidget();
+    smoothPanel = new SmoothPanelWidget(glWidget);
 
     moveToothPanel = new MoveToothPanelWidget();
 
