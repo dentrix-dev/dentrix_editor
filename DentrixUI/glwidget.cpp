@@ -545,6 +545,8 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
+    setMouseTracking(true);
+
     // Shaders
     shader = new Shader("shaders/vertexShader.vs", "shaders/fragmentShader.fs");
     shader->use();
@@ -601,6 +603,9 @@ void GLWidget::paintGL()
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     std::cout << __func__ << std::endl;
+    if (event->button() == Qt::LeftButton) {
+        mouseButtonDown = true;
+    }
     mousePosX = event->position().x();
     mousePosY = event->position().y();
     isRotating = false;
@@ -649,6 +654,31 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     float newMousePosX = event->position().x();
     float newMousePosY = event->position().y();
+
+    // Check if hovering over gizmo, only when mouse is not clicked
+    if (!mouseButtonDown) {
+        if (isGizmoEnabled) {
+            glm::vec3 rayDirection;
+            Camera::ScreenPosToWorldRay(newMousePosX, newMousePosY, GLWidget::width(), GLWidget::height(), view,
+                                        projection, rayDirection);
+
+            bool gizmoIntersected = false;
+            for (GizmoComponent *c : toothGizmo->components) {
+                // Check individual intersection with each gizmo component
+                glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), toothGizmo->position) * c->rotation;
+                modelMatrix = glm::scale(modelMatrix, glm::vec3(camera.distance / 100.0f));
+
+                float intersection_distance;
+                gizmoIntersected = Utils::doesRayIntersectAABB(c->aabb_min, c->aabb_max, camera.position, rayDirection,
+                                                               modelMatrix, intersection_distance);
+                c->toggleHighlightedColor(gizmoIntersected);
+                // TODO: Only update if state changes
+                update();
+            }
+        }
+        return;
+    }
+
     float offsetX = newMousePosX - mousePosX;
     float offsetY = newMousePosY - mousePosY;
     if (abs(offsetX) > 3 || abs(offsetY) > 3) {
@@ -699,6 +729,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (event->button() == Qt::LeftButton) {
+        mouseButtonDown = false;
+    }
     if (isDraggingGizmo) {
         isDraggingGizmo = false;
         if (MainWindow::toolMode == MainWindow::MoveTooth) {

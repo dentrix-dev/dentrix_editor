@@ -76,6 +76,7 @@ private:
     Camera camera;
     int mousePosX;
     int mousePosY;
+    bool mouseButtonDown = false;
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;

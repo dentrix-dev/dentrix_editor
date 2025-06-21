@@ -16,12 +16,12 @@ GizmoComponent::GizmoComponent(glm::vec3 color, glm::mat4 rotation, ComponentAxi
         // positions
         0.15f, -0.15f, 0.15f,  1.0f, 1.0f, 1.0f,  // Bottom left +Z
         0.15f, 0.15f,  0.15f,  1.0f, 1.0f, 1.0f,  // Top left +Z
-        6.0f, 0.15f,  0.15f,  1.0f, 1.0f, 1.0f,  // Top right +Z
-        6.0f, -0.15f, 0.15f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
+        6.0f,  0.15f,  0.15f,  1.0f, 1.0f, 1.0f,  // Top right +Z
+        6.0f,  -0.15f, 0.15f,  1.0f, 1.0f, 1.0f,  // Bottom right +Z
         0.15f, -0.15f, -0.15f, 1.0f, 1.0f, 1.0f,  // Bottom left -Z
         0.15f, 0.15f,  -0.15f, 1.0f, 1.0f, 1.0f,  // Top left -Z
-        6.0f, 0.15f,  -0.15f, 1.0f, 1.0f, 1.0f,  // Top right -Z
-        6.0f, -0.15f, -0.15f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
+        6.0f,  0.15f,  -0.15f, 1.0f, 1.0f, 1.0f,  // Top right -Z
+        6.0f,  -0.15f, -0.15f, 1.0f, 1.0f, 1.0f,  // Bottom right -Z
     };
 
     const std::vector<unsigned int> indices = {// front face
@@ -114,4 +114,20 @@ void GizmoComponent::onDrag(float oldMouseX, float oldMouseY, float mouseX, floa
 
     // 5. Translate model
     model = glm::translate(model, delta);
+}
+
+void GizmoComponent::toggleHighlightedColor(bool hovered)
+{
+    // TODO: Colors are defined in two places
+    switch (axis) {
+        case X:
+            color = hovered ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.8f, 0.0f, 0.0f);
+            break;
+        case Y:
+            color = hovered ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.8f, 0.0f);
+            break;
+        case Z:
+            color = hovered ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 0.0f, 0.8f);
+            break;
+    }
 }
