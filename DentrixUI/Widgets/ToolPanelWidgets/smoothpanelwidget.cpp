@@ -12,10 +12,34 @@ SmoothPanelWidget::SmoothPanelWidget(GLWidget* glWidget, QWidget* parent)
 {
     QVBoxLayout* smoothingLayout = new QVBoxLayout(this);
     
-    // Title
-    QLabel* titleLabel = new QLabel("Smoothing Tool");
-    titleLabel->setStyleSheet("font-weight: bold; font-size: 14px; margin-bottom: 10px;");
-    smoothingLayout->addWidget(titleLabel);
+    QFrame* hintFrame = new QFrame();
+    hintFrame->setFrameShape(QFrame::NoFrame);
+    hintFrame->setStyleSheet(
+        "QFrame {"
+        "  background-color: #2D2F31;"
+        "  border-radius: 3px;"
+        "  padding: 2px 4px;"
+        "}");
+    QHBoxLayout* hintLayout = new QHBoxLayout(hintFrame);
+    hintLayout->setContentsMargins(0, 0, 0, 0);
+    QLabel* hintIcon = new QLabel();
+    hintIcon->setPixmap(
+        QPixmap(":DentrixUI/Icons/hint.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    QLabel* hintText = new QLabel("Hold shift to activate brush");
+    hintText->setStyleSheet(
+        "QLabel {"
+        "  color: #E8EAED;"
+        "  font-size: 10px;"
+        "  font-weight: 500;"
+        "  margin-right: 0px;"
+        "}");
+    hintText->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    hintText->setMaximumWidth(180);
+    hintLayout->addWidget(hintIcon, 0, Qt::AlignVCenter);
+    hintLayout->addWidget(hintText, 1);
+    smoothingLayout->addWidget(hintFrame);
+    smoothingLayout->addSpacing(8);
 
     // Strength slider
     QLabel* strengthLabel = new QLabel("Strength");
