@@ -152,17 +152,17 @@ void MainWindow::onMovedToMainScene()
 void MainWindow::onQActionGroupTriggered(QAction* action)
 {
     QString actionText = action->text();
-    if (actionText == ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT)
+    if (actionText == ToolBarWidget::ActionTexts::UNIFORM_SCALE_ACTION_TEXT)
         MainWindow::toolMode = UniformScale;
-    else if (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT)
+    else if (actionText == ToolBarWidget::ActionTexts::DIRECTIONAL_SCALE_ACTION_TEXT)
         MainWindow::toolMode = DirectionalScale;
-    else if (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT)
+    else if (actionText == ToolBarWidget::ActionTexts::FREE_DEFORM_ACTION_TEXT)
         MainWindow::toolMode = FreeDeformation;
-    else if (actionText == ToolBarWidget::ROTATE_ACTION_TEXT)
+    else if (actionText == ToolBarWidget::ActionTexts::ROTATE_ACTION_TEXT)
         MainWindow::toolMode = Rotate;
-    else if (actionText == ToolBarWidget::MOVE_TOOTH_ACTION_TEXT)
+    else if (actionText == ToolBarWidget::ActionTexts::MOVE_TOOTH_ACTION_TEXT)
         MainWindow::toolMode = MoveTooth;
-    else if (actionText == ToolBarWidget::MOVE_JAW_ACTION_TEXT)
+    else if (actionText == ToolBarWidget::ActionTexts::MOVE_JAW_ACTION_TEXT)
         MainWindow::toolMode = MoveJaw;
 
     if (rightPanelStack) {

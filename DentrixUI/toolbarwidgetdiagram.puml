@@ -1,0 +1,65 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class ToolBarWidget {
+	+ToolBarWidget()
+	-actionGroup : QActionGroup*
+	+getActionGroup() : QActionGroup* {query}
+	-editButton : QPushButton*
+	+getEditButton() : QPushButton*
+	+getEditButtonActiveStyleSheet() : QString {query}
+	+getEditButtonInactiveStyleSheet() : QString {query}
+	-editButtonActiveStyleSheet : const QString
+	-editButtonInactiveStyleSheet : const QString
+	+set_edit_button_active(bool active) : void
+	+set_edit_button_mode(ButtonMode status) : void
+}
+
+
+enum ToolBarWidget::ButtonMode {
+	Edit_mode
+	Main_mode
+}
+
+
+class ToolBarWidget::ActionTexts {
+	+{static} DIRECTIONAL_SCALE_ACTION_TEXT : static const QString
+	+{static} FREE_DEFORM_ACTION_TEXT : static const QString
+	+{static} MOVE_JAW_ACTION_TEXT : static const QString
+	+{static} MOVE_TOOTH_ACTION_TEXT : static const QString
+	+{static} ROTATE_ACTION_TEXT : static const QString
+	+{static} UNIFORM_SCALE_ACTION_TEXT : static const QString
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+
+
+
+/' Aggregation relationships '/
+
+
+
+
+
+/' Nested objects '/
+
+ToolBarWidget +-- ToolBarWidget::ActionTexts
+
+
+ToolBarWidget +-- ToolBarWidget::ButtonMode
+
+
+
+
+@enduml
+

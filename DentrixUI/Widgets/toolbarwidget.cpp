@@ -3,12 +3,12 @@
 #include <QActionGroup>
 #include <QWidgetAction>
 
-const QString ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT = "Uniform\nScale";
-const QString ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT = "Directional\nScale";
-const QString ToolBarWidget::FREE_DEFORM_ACTION_TEXT = "Free\nDeform";
-const QString ToolBarWidget::ROTATE_ACTION_TEXT = "Rotate";
-const QString ToolBarWidget::MOVE_TOOTH_ACTION_TEXT = "Move\nTooth";
-const QString ToolBarWidget::MOVE_JAW_ACTION_TEXT = "Move\nJaw";
+const QString ToolBarWidget::ActionTexts::UNIFORM_SCALE_ACTION_TEXT = "Uniform\nScale";
+const QString ToolBarWidget::ActionTexts::DIRECTIONAL_SCALE_ACTION_TEXT = "Directional\nScale";
+const QString ToolBarWidget::ActionTexts::FREE_DEFORM_ACTION_TEXT = "Free\nDeform";
+const QString ToolBarWidget::ActionTexts::ROTATE_ACTION_TEXT = "Rotate";
+const QString ToolBarWidget::ActionTexts::MOVE_TOOTH_ACTION_TEXT = "Move\nTooth";
+const QString ToolBarWidget::ActionTexts::MOVE_JAW_ACTION_TEXT = "Move\nJaw";
 
 ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
 {
@@ -18,27 +18,31 @@ ToolBarWidget::ToolBarWidget() : QToolBar("Side Toolbar")
     actionGroup->setExclusive(true);
 
     // Create actions (buttons) to add to the toolbar
-    QAction *uniformScaleAction = new QAction(QIcon(":/DentrixUI/Icons/uniform-scale.svg"), UNIFORM_SCALE_ACTION_TEXT, this);
+    QAction *uniformScaleAction =
+        new QAction(QIcon(":/DentrixUI/Icons/uniform-scale.svg"), ActionTexts::UNIFORM_SCALE_ACTION_TEXT, this);
     uniformScaleAction->setCheckable(true);
     actionGroup->addAction(uniformScaleAction);
 
-    QAction *directionalScaleAction = new QAction(QIcon(":/DentrixUI/Icons/directional-scale.svg"), DIRECTIONAL_SCALE_ACTION_TEXT, this);
+    QAction *directionalScaleAction =
+        new QAction(QIcon(":/DentrixUI/Icons/directional-scale.svg"), ActionTexts::DIRECTIONAL_SCALE_ACTION_TEXT, this);
     directionalScaleAction->setCheckable(true);
     actionGroup->addAction(directionalScaleAction);
 
-    QAction *freeDeformAction = new QAction(QIcon(":/DentrixUI/Icons/free-deform.svg"), FREE_DEFORM_ACTION_TEXT, this);
+    QAction *freeDeformAction =
+        new QAction(QIcon(":/DentrixUI/Icons/free-deform.svg"), ActionTexts::FREE_DEFORM_ACTION_TEXT, this);
     freeDeformAction->setCheckable(true);
     actionGroup->addAction(freeDeformAction);
 
-    QAction *rotateAction = new QAction(QIcon(":/DentrixUI/Icons/rotate.svg"), ROTATE_ACTION_TEXT, this);
+    QAction *rotateAction = new QAction(QIcon(":/DentrixUI/Icons/rotate.svg"), ActionTexts::ROTATE_ACTION_TEXT, this);
     rotateAction->setCheckable(true);
     actionGroup->addAction(rotateAction);
 
-    QAction *moveToothAction = new QAction(QIcon(":/DentrixUI/Icons/move.svg"), MOVE_TOOTH_ACTION_TEXT, this);
+    QAction *moveToothAction =
+        new QAction(QIcon(":/DentrixUI/Icons/move.svg"), ActionTexts::MOVE_TOOTH_ACTION_TEXT, this);
     moveToothAction->setCheckable(true);
     actionGroup->addAction(moveToothAction);
 
-    QAction *moveJawAction = new QAction(QIcon(":/DentrixUI/Icons/move.svg"), MOVE_JAW_ACTION_TEXT, this);
+    QAction *moveJawAction = new QAction(QIcon(":/DentrixUI/Icons/move.svg"), ActionTexts::MOVE_JAW_ACTION_TEXT, this);
     moveJawAction->setCheckable(true);
     actionGroup->addAction(moveJawAction);
 

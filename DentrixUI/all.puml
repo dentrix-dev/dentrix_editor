@@ -1,0 +1,274 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class Brush {
+	+Brush()
+	-kdtree_built : bool
+	-current_mesh_ptr : const pmp::SurfaceMesh*
+	+getRadius() : float
+	-radius : float
+	+getPosition() : glm::vec3
+	-position : glm::vec3
+	+getStrength() : int
+	-strength : int
+	-kdtree : std::unique_ptr<mcg::Mesh_KDTree>
+	+getVerticesInRadius(const pmp::SurfaceMesh& mesh) : std::vector<pmp::Vertex>
+	+setPosition(glm::vec3& pos) : void
+	+setRadius(float r) : void
+	+setStrength(int s) : void
+}
+
+
+class CursorFactory {
+	+{static} createCursor(int size, BrushMode mode) : QCursor
+}
+
+
+class GLWidget {
+	+GLWidget(QWidget* parent, std::string path, int jaw_index)
+	+~GLWidget()
+	-brush : Brush
+	-currentBrushMode : BrushMode
+	-camera : Camera
+	-toothGizmo : Gizmo*
+	-selectedGizmoComponent : GizmoComponent*
+	-selectedMesh : Mesh*
+	#editScene : Scene
+	#mainScene : Scene
+	#currentScene : Scene*
+	-shader : Shader*
+	-areArchesAligned : bool
+	-ctrlHeld : bool
+	-freeDeformAddMode : bool
+	#inMainScene : bool
+	-isDraggingGizmo : bool
+	-isGizmoEnabled : bool
+	-isLowerJawSelected : bool
+	-isRotating : bool
+	-isUpperJawSelected : bool
+	+lowerJawLoaded : bool
+	-mouseButtonDown : bool
+	-shiftHeld : bool
+	+upperJawLoaded : bool
+	-gizmoModelMatrix : glm::mat4
+	-model : glm::mat4
+	-projection : glm::mat4
+	-view : glm::mat4
+	-lowerJawCenter : glm::vec3
+	-upperJawCenter : glm::vec3
+	-jaw_index : int
+	-mousePosX : int
+	-mousePosY : int
+	-lowerArch : mcg::Arch
+	-upperArch : mcg::Arch
+	-lowerJawUnsegmented : pmp::SurfaceMesh
+	-upperJawUnsegmented : pmp::SurfaceMesh
+	-meshSelectedInMainScene() : signals : void
+	-initialFilePath : std::string
+	-lowerJawLabelsPath : std::string
+	-upperJawLabelsPath : std::string
+	+lowerJawMeshes : std::vector<Mesh*>
+	-meshes : std::vector<Mesh*>
+	+upperJawMeshes : std::vector<Mesh*>
+	-lowerRemap : std::vector<pmp::Face>
+	-upperRemap : std::vector<pmp::Face>
+	+applyArchAlignResult(const ArchAlignData& result) : void
+	+applyLowerJawResult(const JawLoadResult& result) : void
+	+applyUpperJawResult(const JawLoadResult& result) : void
+	+archAlign() : void
+	+archAlignAsync() : void
+	#initializeGL() : void
+	+keyPressEvent(QKeyEvent* event) : void
+	+keyReleaseEvent(QKeyEvent* event) : void
+	+loadLowerJaw(const std::string& path) : void
+	+loadLowerJawAsync(const QString& path) : void
+	+loadModel(const std::string& path) : void
+	+loadUpperJaw(const std::string& path) : void
+	+loadUpperJawAsync(const QString& path) : void
+	#mouseMoveEvent(QMouseEvent* event) : void
+	#mousePressEvent(QMouseEvent* event) : void
+	#mouseReleaseEvent(QMouseEvent* event) : void
+	-movedToEditScene() : void
+	-movedToMainScene() : void
+	+onEditSceneClicked() : void
+	+onResetJawClicked() : void
+	+onToolChange() : void
+	#paintGL() : void
+	+rebuildMainScene() : void
+	#resizeGL(int w, int h) : void
+	+rotateMesh() : void
+	-saveEditSceneAndReturnToMainScene() : void
+	+setBrushSize(int value) : void
+	+setDeformationStrength(int value) : void
+	+setFreeDeformAddMode(bool isAdd) : void
+	+setSelectedMeshDirectionalScale(int val, bool xActive, bool yActive, bool zActive) : void
+	+setSelectedMeshRotationAngle(int rotationAngleDegrees) : void
+	+setSelectedMeshScale(int scale) : void
+	+updateCursor() : void
+	+updateMeshScale() : void
+	#wheelEvent(QWheelEvent* event) : void
+}
+
+
+class LoadingToolBar {
+	+LoadingToolBar(QWidget* parent)
+	-alignJawsAction : QAction*
+	-loadLowerAction : QAction*
+	-loadUpperAction : QAction*
+	+loadUpperRequested() : signals : void
+	+{static} ARCHES_ALIGNMENT_ACTION_TEXT : static const QString
+	+{static} LOAD_LOWER_ACTION_TEXT : static const QString
+	+{static} LOAD_UPPER_ACTION_TEXT : static const QString
+	+alignJawsRequested() : void
+	+loadLowerRequested() : void
+	+setAlignEnabled(bool enabled) : void
+}
+
+
+class MainWindow {
+	+MainWindow(QWidget* parent)
+	+~MainWindow()
+	-glWidget : GLWidget*
+	-loadingToolBar : LoadingToolBar*
+	-rightPanelStack : RightPanelStackedWidget*
+	-toolbar : ToolBarWidget*
+	+{static} toolMode : ToolMode
+	-ui : Ui::MainWindow*
+	-lowerLoaded : bool
+	-upperLoaded : bool
+	-alignJaws() : void
+	-createToolBar() : void
+	-loadLowerJaw() : void
+	-loadUpperJaw() : void
+	-onMeshSelectedInMainScene() : void
+	-onMovedToEditScene() : void
+	-onMovedToMainScene() : void
+	-onQActionGroupTriggered(QAction* action) : void
+	-on_actionSave_Model_triggered() : void
+	-saveModel() : void
+	+setupCentralUI(const std::string& modelPath, int loadMode) : void
+}
+
+
+class RightPanelStackedWidget {
+	+RightPanelStackedWidget(GLWidget* glWidget)
+	+deformationPanel : DeformationPanelWidget*
+	+directionalScalePanel : DirectionalScalePanelWidget*
+	-glWidget : GLWidget*
+	+moveJawPanel : MoveJawPanelWidget*
+	+moveToothPanel : MoveToothPanelWidget*
+	+rotatePanel : RotatePanelWidget*
+	+smoothPanel : SmoothPanelWidget*
+	+uniformScalePanel : UniformScalePanelWidget*
+	-initDeformationPanelSignals() : void
+	-initRotatePanelSignals() : void
+}
+
+
+class ToolBarWidget {
+	+ToolBarWidget()
+	-actionGroup : QActionGroup*
+	+getActionGroup() : QActionGroup* {query}
+	-editButton : QPushButton*
+	+getEditButton() : QPushButton*
+	+getEditButtonActiveStyleSheet() : QString {query}
+	+getEditButtonInactiveStyleSheet() : QString {query}
+	-editButtonActiveStyleSheet : const QString
+	-editButtonInactiveStyleSheet : const QString
+	+set_edit_button_active(bool active) : void
+	+set_edit_button_mode(ButtonMode status) : void
+}
+
+
+enum BrushMode {
+	Add
+	Remove
+	Smooth
+}
+
+
+enum MainWindow::ToolMode {
+	DirectionalScale
+	FreeDeformation
+	MoveJaw
+	MoveTooth
+	None
+	Rotate
+	UniformScale
+}
+
+
+enum ToolBarWidget::ButtonMode {
+	Edit_mode
+	Main_mode
+}
+
+
+class ToolBarWidget::ActionTexts {
+	+{static} DIRECTIONAL_SCALE_ACTION_TEXT : static const QString
+	+{static} FREE_DEFORM_ACTION_TEXT : static const QString
+	+{static} MOVE_JAW_ACTION_TEXT : static const QString
+	+{static} MOVE_TOOTH_ACTION_TEXT : static const QString
+	+{static} ROTATE_ACTION_TEXT : static const QString
+	+{static} UNIFORM_SCALE_ACTION_TEXT : static const QString
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+
+
+
+/' Aggregation relationships '/
+
+GLWidget *-- Brush
+
+
+GLWidget *-- BrushMode
+
+
+MainWindow o-- GLWidget
+
+
+MainWindow o-- LoadingToolBar
+
+
+MainWindow o-- MainWindow
+
+
+MainWindow o-- RightPanelStackedWidget
+
+
+MainWindow o-- ToolBarWidget
+
+
+RightPanelStackedWidget o-- GLWidget
+
+
+
+
+
+
+/' Nested objects '/
+
+MainWindow +-- MainWindow::ToolMode
+
+
+ToolBarWidget +-- ToolBarWidget::ActionTexts
+
+
+ToolBarWidget +-- ToolBarWidget::ButtonMode
+
+
+
+
+@enduml
+

@@ -1,0 +1,47 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class RightPanelStackedWidget {
+	+RightPanelStackedWidget()
+	+deformationPanel : DeformationPanelWidget*
+	+directionalScalePanel : DirectionalScalePanelWidget*
+	-glWidget : GLWidget*
+	+moveJawPanel : MoveJawPanelWidget*
+	+moveToothPanel : MoveToothPanelWidget*
+	+rotatePanel : RotatePanelWidget*
+	+smoothPanel : SmoothPanelWidget*
+	+uniformScalePanel : UniformScalePanelWidget*
+	-initDeformationPanelSignals() : void
+	-initRotatePanelSignals() : void
+}
+
+class deformationPanel {
+}
+
+class directionalScalePanel {
+}
+
+
+
+/' Inheritance relationships '/
+
+
+
+
+/' Aggregation relationships '/
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
+
