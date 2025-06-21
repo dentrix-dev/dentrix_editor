@@ -518,6 +518,59 @@ void Mesh::applyFreeDeformation(Brush& brush, bool isAdd)
     updateBuffers();
 }
 
+void Mesh::applySmoothingDeformation(Brush& brush)
+{
+    auto vpos = surfaceMesh.vertex_property<pmp::Point>("v:point");
+    if (!surfaceMesh.has_vertex_property("v:normal")) {
+        pmp::vertex_normals(surfaceMesh);
+    }
+
+    std::vector<pmp::Vertex> vertices = brush.getVerticesInRadius(surfaceMesh);
+    const float strengthMultiplier = 0.1f;
+    float adjustedStrength = brush.getStrength() * strengthMultiplier;
+
+    std::vector<pmp::Point> newPositions;
+    newPositions.reserve(vertices.size());
+
+    for (auto v : vertices) {
+        pmp::Point originalPos = vpos[v];
+        glm::vec3 vertexPos(originalPos[0], originalPos[1], originalPos[2]);
+
+        float distance = glm::distance(vertexPos, brush.getPosition());
+        float falloff = 1.0f - (distance / brush.getRadius());
+        falloff = std::max(0.0f, falloff);
+        falloff = pow(falloff, 2.0f);
+
+        pmp::Point avgPos(0, 0, 0);
+        int neighborCount = 0;
+
+        for (auto neighbor : surfaceMesh.vertices(v)) {
+            avgPos += vpos[neighbor];
+            neighborCount++;
+        }
+
+        if (neighborCount > 0) {
+            avgPos /= static_cast<float>(neighborCount);
+
+            float smoothStrength = adjustedStrength * falloff;
+            smoothStrength = std::min(smoothStrength, 1.0f);
+
+            pmp::Point smoothedPos = originalPos + (avgPos - originalPos) * smoothStrength;
+            newPositions.push_back(smoothedPos);
+        } else {
+            newPositions.push_back(originalPos);
+        }
+    }
+
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        vpos[vertices[i]] = newPositions[i];
+    }
+
+    pmp::vertex_normals(surfaceMesh);
+    pmp::face_normals(surfaceMesh);
+    updateBuffers();
+}
+
 void Mesh::recalculateBoundingBox()
 {
     pmp::BoundingBox aabb = pmp::bounds(surfaceMesh);

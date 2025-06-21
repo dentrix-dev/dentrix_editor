@@ -46,6 +46,7 @@ public:
     void setFreeDeformAddMode(bool isAdd);
     void setDeformationStrength(int value);
     void setBrushSize(int value);
+    void setSmoothingStrength(int value);
     void updateCursor();
     void onToolChange();
     void keyPressEvent(QKeyEvent *event) override;

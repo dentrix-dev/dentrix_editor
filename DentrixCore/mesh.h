@@ -41,6 +41,7 @@ public:
     void updateMeshScale();
     void rotateMesh(glm::vec3 sceneCenter);
     void applyFreeDeformation(Brush& brush, bool isAdd);
+    void applySmoothingDeformation(Brush& brush);
     void recalculateBoundingBox();
 
 private:

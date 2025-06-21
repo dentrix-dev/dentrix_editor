@@ -647,6 +647,10 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         brush.setPosition(intersectionPoint);
         selectedMesh->applyFreeDeformation(brush, freeDeformAddMode);
         update();
+    } else if ((MainWindow::toolMode == MainWindow::Smoothing) && shiftHeld) {
+        brush.setPosition(intersectionPoint);
+        selectedMesh->applySmoothingDeformation(brush);
+        update();
     }
 }
 
@@ -715,6 +719,22 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         if (intersection) {
             brush.setPosition(intersectionPoint);
             selectedMesh->applyFreeDeformation(brush, freeDeformAddMode);
+            update();
+        }
+    } else if ((MainWindow::toolMode == MainWindow::Smoothing) && shiftHeld) {
+        glm::vec3 rayDirection;
+        Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(),
+                                    view, projection, rayDirection);
+
+        Mesh *hitMesh = nullptr;
+        pmp::Vertex dummyVertex;
+        glm::vec3 intersectionPoint;
+        bool intersection = currentScene->IntersectTriangles(camera.position, rayDirection, model, hitMesh, dummyVertex,
+                                                             intersectionPoint);
+
+        if (intersection) {
+            brush.setPosition(intersectionPoint);
+            selectedMesh->applySmoothingDeformation(brush);
             update();
         }
     } else if (ctrlHeld) {
@@ -964,10 +984,18 @@ void GLWidget::setBrushSize(int value)
     updateCursor();
 }
 
+void GLWidget::setSmoothingStrength(int value)
+{
+    brush.setStrength(value);
+    std::cout << "[Smoothing] Strength set to: " << value << std::endl;
+}
+
 void GLWidget::updateCursor()
 {
     if ((MainWindow::toolMode == MainWindow::FreeDeformation) && shiftHeld) {
         setCursor(CursorFactory::createCursor(brush.getRadius(), currentBrushMode));
+    } else if ((MainWindow::toolMode == MainWindow::Smoothing) && shiftHeld) {
+        setCursor(CursorFactory::createCursor(brush.getRadius(), BrushMode::Smooth));
     } else {
         unsetCursor();
     }
@@ -1004,7 +1032,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Shift && !shiftHeld) {
         shiftHeld = true;
-        if (MainWindow::toolMode == MainWindow::FreeDeformation) updateCursor();
+        if (MainWindow::toolMode == MainWindow::FreeDeformation || MainWindow::toolMode == MainWindow::Smoothing) updateCursor();
     } else if (event->key() == Qt::Key_Control) {
         ctrlHeld = true;
     }
