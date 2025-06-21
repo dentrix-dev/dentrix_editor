@@ -179,43 +179,43 @@ void GLWidget::applyUpperJawResult(const JawLoadResult &result)
     for (pmp::Vertex v : gum.vertices()) gum.position(v) -= center;
 
     // Compute connected components (adds v:component property)
-    int num_components = connected_components(gum);
-    std::cout << "Found " << num_components << " connected components\n";
+    // int num_components = connected_components(gum);
+    // std::cout << "Found " << num_components << " connected components\n";
 
     // Access vertex component property
-    auto vcomp = gum.vertex_property<int>("v:component");
+    // auto vcomp = gum.vertex_property<int>("v:component");
 
     // Count number of vertices in each component
-    std::vector<int> component_sizes(num_components, 0);
-    for (auto v : gum.vertices()) {
-        component_sizes[vcomp[v]]++;
-    }
+    // std::vector<int> component_sizes(num_components, 0);
+    // for (auto v : gum.vertices()) {
+    //     component_sizes[vcomp[v]]++;
+    // }
 
     // Find the largest component
-    int largest_component =
-        std::distance(component_sizes.begin(), std::max_element(component_sizes.begin(), component_sizes.end()));
-    std::cout << "largest component: " << largest_component << std::endl;
-    std::cout << "array start" << std::endl;
-    for (int i : component_sizes) std::cout << i << std::endl;
-    std::cout << "array end" << std::endl;
+    // int largest_component =
+    //     std::distance(component_sizes.begin(), std::max_element(component_sizes.begin(), component_sizes.end()));
+    // std::cout << "largest component: " << largest_component << std::endl;
+    // std::cout << "array start" << std::endl;
+    // for (int i : component_sizes) std::cout << i << std::endl;
+    // std::cout << "array end" << std::endl;
 
-    for (pmp::Vertex v : gum.vertices()) {
-        if (vcomp[v] != largest_component) gum.delete_vertex(v);
-    }
-    gum.garbage_collection();
+    // for (pmp::Vertex v : gum.vertices()) {
+    //     if (vcomp[v] != largest_component) gum.delete_vertex(v);
+    // }
+    // gum.garbage_collection();
 
-    std::cout << gum.n_vertices() << std::endl;
-    int bounds = 0;
-    for (pmp::Halfedge h : gum.halfedges()) {
-        if (gum.is_boundary(h)) {
-            bounds++;
-        }
-    }
-    std::cout << "Number of bounds: " << bounds << std::endl;
+    // std::cout << gum.n_vertices() << std::endl;
+    // int bounds = 0;
+    // for (pmp::Halfedge h : gum.halfedges()) {
+    //     if (gum.is_boundary(h)) {
+    //         bounds++;
+    //     }
+    // }
+    // std::cout << "Number of bounds: " << bounds << std::endl;
 
     upperJawMeshes.push_back(new Mesh(gum, 0));
     // Fill gum holes
-    // upperJawMeshes[0]->fillHoles();
+    upperJawMeshes[0]->fillHoles();
 
     // Center teeth
     for (int i = 0; i < result.teeth.size(); i++) {
@@ -286,20 +286,20 @@ void GLWidget::applyLowerJawResult(const JawLoadResult &result)
         if (vcomp[v] != largest_component) gum.delete_vertex(v);
     }
     gum.garbage_collection();
-
-    std::cout << gum.n_vertices() << std::endl;
-    int bounds = 0;
-    for (pmp::Halfedge h : gum.halfedges()) {
-        if (gum.is_boundary(h)) {
-            bounds++;
-        }
-    }
-    std::cout << "Number of bounds: " << bounds << std::endl;
+    //
+    // std::cout << gum.n_vertices() << std::endl;
+    // int bounds = 0;
+    // for (pmp::Halfedge h : gum.halfedges()) {
+    //     if (gum.is_boundary(h)) {
+    //         bounds++;
+    //     }
+    // }
+    // std::cout << "Number of bounds: " << bounds << std::endl;
 
     lowerJawMeshes.push_back(new Mesh(gum, 0));
 
     // Fill gum holes
-    // lowerJawMeshes[0]->fillHoles();
+    lowerJawMeshes[0]->fillHoles();
 
     // Center teeth
     for (int i = 0; i < result.teeth.size(); i++) {
@@ -316,9 +316,9 @@ void GLWidget::applyLowerJawResult(const JawLoadResult &result)
         m->updateBoundingBoxBuffers();
     }
 
-    std::cout << "upper jaw meshes size from applyUpperJawResults" << upperJawMeshes.size() << std::endl;
-    std::cout << "number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
-              << upperJawUnsegmented.n_vertices() << std::endl;
+    // std::cout << "upper jaw meshes size from applyUpperJawResults" << upperJawMeshes.size() << std::endl;
+    // std::cout << "number of faces, vertices" << upperJawUnsegmented.n_faces() << " , "
+    //           << upperJawUnsegmented.n_vertices() << std::endl;
     lowerJawLoaded = true;
     rebuildMainScene();
     update();

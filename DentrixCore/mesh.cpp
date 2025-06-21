@@ -181,68 +181,76 @@ void Mesh::fillHole(pmp::Halfedge h)
     // for (pmp::Vertex v : holeVertices) {
     //     surfaceMesh.position(v) += pmp::Point(0.0f, 0.0f, 5.0f);
     // }
-    // // Find the center of the hole
-    // for (pmp::Vertex v : holeVertices) {
-    //     centerPoint += surfaceMesh.position(v);
-    // }
-    // centerPoint /= (float)holeVertices.size();
-    //
-    // std::cout << "Creating hole center vertex" << std::endl;
-    // std::cout << centerPoint << std::endl;
-    // std::cout << holeVertices.size() << std::endl;
-    // // Create new vertex and connect it to hole boundary vertices
-    // pmp::Vertex centerVertex = surfaceMesh.add_vertex(centerPoint);
-    // for (int i = 0; i < holeVertices.size() - 1; i++) {
-    //     std::vector<pmp::Vertex> face = {centerVertex, holeVertices[i], holeVertices[i + 1]};
-    //     surfaceMesh.add_face(face);
-    // }
-    // std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex, holeVertices[holeVertices.size() - 1]};
-    // surfaceMesh.add_face(face);
-    //
-    // std::cout << "Center vertex added and faces connected" << std::endl;
-    //
-    // // Create a subMesh with only hole vertices and neighbors to speed up smoothing
-    // pmp::SurfaceMesh subMesh = surfaceMesh;
-    // auto vselected = subMesh.get_vertex_property<bool>("v:selected");
-    // auto vkeep = subMesh.add_vertex_property<bool>("v:keep");
-    // // Mapping to keep track of changed vertices, as deleting vertices changes their indices
-    // auto voriginal = subMesh.add_vertex_property<unsigned int>("v:original");
-    //
-    // // Mark hole vertices as selected
-    // // Mark hole vertices and their neighbors as "keep"
-    // for (unsigned int i = 0; i < holeVertices.size(); i++) {
-    //     pmp::Vertex v = holeVertices[i];
-    //     vkeep[v] = true;
-    //     vselected[v] = true;
-    //     voriginal[v] = i + 1;
-    //     for (pmp::Vertex vv : surfaceMesh.vertices(v)) {
-    //         vkeep[vv] = true;
-    //     }
-    // }
-    //
-    // // Delete all unkept vertices along with their faces
-    // for (pmp::Vertex v : subMesh.vertices()) {
-    //     if (!vkeep[v]) subMesh.delete_vertex(v);
-    // }
-    // subMesh.garbage_collection();
-    //
-    // // Smooth the filled hole, defined by vselected
-    // pmp::fair(subMesh, 1);
-    //
-    // // Copy the changed vertices to the original mesh
-    // for (pmp::Vertex v : subMesh.vertices()) {
-    //     if (voriginal[v] != 0) {
-    //         surfaceMesh.position(holeVertices[voriginal[v] - 1]) = subMesh.position(v);
-    //     }
-    // }
-    //
+    // Find the center of the hole
+    for (pmp::Vertex v : holeVertices) {
+        centerPoint += surfaceMesh.position(v);
+    }
+    centerPoint /= (float)holeVertices.size();
+
+    std::cout << "Creating hole center vertex" << std::endl;
+    std::cout << centerPoint << std::endl;
+    std::cout << holeVertices.size() << std::endl;
+    // Create new vertex and connect it to hole boundary vertices
+    pmp::Vertex centerVertex = surfaceMesh.add_vertex(centerPoint);
+    for (int i = 0; i < holeVertices.size() - 1; i++) {
+        std::vector<pmp::Vertex> face = {centerVertex, holeVertices[i], holeVertices[i + 1]};
+        surfaceMesh.add_face(face);
+    }
+    std::vector<pmp::Vertex> face = {holeVertices[0], centerVertex, holeVertices[holeVertices.size() - 1]};
+    surfaceMesh.add_face(face);
+
+    std::cout << "Center vertex added and faces connected" << std::endl;
+
+    // Create a subMesh with only hole vertices and neighbors to speed up smoothing
+    pmp::SurfaceMesh subMesh = surfaceMesh;
+    auto vselected = subMesh.get_vertex_property<bool>("v:selected");
+    auto vkeep = subMesh.add_vertex_property<bool>("v:keep");
+    // Mapping to keep track of changed vertices, as deleting vertices changes their indices
+    auto voriginal = subMesh.add_vertex_property<unsigned int>("v:original");
+
+    // Mark hole vertices as selected
+    // Mark hole vertices and their neighbors as "keep"
+    for (unsigned int i = 0; i < holeVertices.size(); i++) {
+        pmp::Vertex v = holeVertices[i];
+        vkeep[v] = true;
+        vselected[v] = true;
+        voriginal[v] = i + 1;
+        for (pmp::Vertex vv : surfaceMesh.vertices(v)) {
+            vkeep[vv] = true;
+        }
+    }
+
+    // Delete all unkept vertices along with their faces
+    for (pmp::Vertex v : subMesh.vertices()) {
+        if (!vkeep[v]) subMesh.delete_vertex(v);
+    }
+    subMesh.garbage_collection();
+
+    // Smooth the filled hole, defined by vselected
+    pmp::fair(subMesh, 1);
+
+    // Copy the changed vertices to the original mesh
+    for (pmp::Vertex v : subMesh.vertices()) {
+        if (voriginal[v] != 0) {
+            surfaceMesh.position(holeVertices[voriginal[v] - 1]) = subMesh.position(v);
+        }
+    }
+
     pmp::face_normals(surfaceMesh);
-    updateBuffers();
+    // updateBuffers();
 }
 
 // Fill all holes in the mesh
 void Mesh::fillHoles()
 {
+    for (pmp::Vertex v : surfaceMesh.vertices()) {
+        if (!surfaceMesh.is_manifold(v)) {
+            std::cout << "not manifold" << std::endl;
+            surfaceMesh.delete_vertex(v);
+        }
+    }
+    surfaceMesh.garbage_collection();
+
     std::vector<std::vector<pmp::Halfedge>> boundary_loops;
     std::unordered_set<int> visited;
 
@@ -262,17 +270,34 @@ void Mesh::fillHoles()
         }
     }
 
-    std::cout << "Boundary loops: " << boundary_loops.size() << std::endl;
-    int i = 0;
-    for (auto vec : boundary_loops) {
-        if (i == 0) {
-            i = 1;
-            continue;
+    // The hole in the back of the gum cast should not be filled
+    // Since all of its vertices have the most negative Z, find it from the boundary loops
+    pmp::Halfedge farthestBackHalfedge;
+    float z = 10000.0f;
+    for (auto loop : boundary_loops) {
+        pmp::Halfedge firstHalfedge = loop[0];
+        pmp::Vertex halfedgeVertex = surfaceMesh.from_vertex(firstHalfedge);
+        pmp::Point position = surfaceMesh.position(halfedgeVertex);
+        if (position[2] < z) {
+            z = position[2];
+            farthestBackHalfedge = firstHalfedge;
         }
+    }
+
+    // Remove the loop from the vector
+    int indexToRemove = -1;
+    for (int i = 0; i < boundary_loops.size(); i++) {
+        if (boundary_loops[i][0] == farthestBackHalfedge) {
+            indexToRemove = i;
+        }
+    }
+    if (indexToRemove != -1) boundary_loops.erase(boundary_loops.begin() + indexToRemove);
+
+    std::cout << "Boundary loops: " << boundary_loops.size() << std::endl;
+    for (int i = 0; i < boundary_loops.size(); i++) {
         std::cout << "Filling hole" << std::endl;
-        // fillHole(vec[0]);
-        pmp::fill_hole(surfaceMesh, vec[0]);
-        break;
+        fillHole(boundary_loops[i][0]);
+        // pmp::fill_hole(surfaceMesh, vec[0]);
     }
     pmp::face_normals(surfaceMesh);
     updateBuffers();
