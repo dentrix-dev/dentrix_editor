@@ -164,7 +164,7 @@ void Mesh::translate(glm::mat4& translationMatrix)
 // Creates vertex in the middle of the hole, connects it to hole boundary vertices and smooths them
 void Mesh::fillHole(pmp::Halfedge h)
 {
-    pmp::Point centerPoint;
+    pmp::Point centerPoint(0.0f);
     std::vector<pmp::Vertex> holeVertices;
 
     assert(surfaceMesh.is_boundary(h));  // Make sure it's a boundary halfedge
