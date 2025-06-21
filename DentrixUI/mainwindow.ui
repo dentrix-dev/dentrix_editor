@@ -30,7 +30,6 @@
     <property name="title">
      <string>Files</string>
     </property>
-    <addaction name="actionLoad_Model"/>
     <addaction name="actionSave_Model"/>
    </widget>
    <addaction name="menuFiles"/>

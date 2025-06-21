@@ -18,12 +18,13 @@
 #include "filehandler.h"
 #include "utils.h"
 
-bool MainWindow::inUnformScale = false;
-bool MainWindow::inDirectionalScale = false;
-bool MainWindow::inFreeDeformation = false;
-bool MainWindow::inRotate = false;
-bool MainWindow::inMoveTooth = false;
-bool MainWindow::inMoveJaw = false;
+// bool MainWindow::inUnformScale = false;
+// bool MainWindow::inDirectionalScale = false;
+// bool MainWindow::inFreeDeformation = false;
+// bool MainWindow::inRotate = false;
+// bool MainWindow::inMoveTooth = false;
+// bool MainWindow::inMoveJaw = false;
+MainWindow::ToolMode MainWindow::toolMode = MainWindow::None;
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), glWidget(nullptr), upperLoaded(false), lowerLoaded(false)
@@ -31,7 +32,6 @@ MainWindow::MainWindow(QWidget* parent)
     ui->setupUi(this);
     setWindowTitle("Dentrix Editor");
     resize(QApplication::primaryScreen()->geometry().width(), QApplication::primaryScreen()->geometry().height());
-    connect(ui->actionLoad_Model, &QAction::triggered, this, &MainWindow::loadModel);
     createToolBar();
 }
 
@@ -81,21 +81,6 @@ void MainWindow::setupCentralUI(const std::string& modelPath, int loadMode)
 
     centralLayout->addWidget(rightPanelStack);
     setCentralWidget(centralContainer);
-}
-
-void MainWindow::loadModel()
-{
-    QString filePath =
-        QFileDialog::getOpenFileName(this, "Open Model File", "../../models", "Model Files (*.obj *.stl *.ply)");
-    if (filePath.isEmpty()) return;
-
-    if (!glWidget) {
-        setupCentralUI(filePath.toStdString(), 0);
-    } else {
-        glWidget->loadModel(filePath.toStdString());
-        toolbar->set_edit_button_mode(ToolBarWidget::ButtonMode::Main_mode);
-        toolbar->set_edit_button_active(false);
-    }
 }
 
 void MainWindow::saveModel()
@@ -167,25 +152,31 @@ void MainWindow::onMovedToMainScene()
 void MainWindow::onQActionGroupTriggered(QAction* action)
 {
     QString actionText = action->text();
-    inUnformScale = (actionText == ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT);
-    inDirectionalScale = (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT);
-    inFreeDeformation = (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT);
-    inRotate = (actionText == ToolBarWidget::ROTATE_ACTION_TEXT);
-    inMoveTooth = (actionText == ToolBarWidget::MOVE_TOOTH_ACTION_TEXT);
-    inMoveJaw = (actionText == ToolBarWidget::MOVE_JAW_ACTION_TEXT);
+    if (actionText == ToolBarWidget::UNIFORM_SCALE_ACTION_TEXT)
+        MainWindow::toolMode = UniformScale;
+    else if (actionText == ToolBarWidget::DIRECTIONAL_SCALE_ACTION_TEXT)
+        MainWindow::toolMode = DirectionalScale;
+    else if (actionText == ToolBarWidget::FREE_DEFORM_ACTION_TEXT)
+        MainWindow::toolMode = FreeDeformation;
+    else if (actionText == ToolBarWidget::ROTATE_ACTION_TEXT)
+        MainWindow::toolMode = Rotate;
+    else if (actionText == ToolBarWidget::MOVE_TOOTH_ACTION_TEXT)
+        MainWindow::toolMode = MoveTooth;
+    else if (actionText == ToolBarWidget::MOVE_JAW_ACTION_TEXT)
+        MainWindow::toolMode = MoveJaw;
 
     if (rightPanelStack) {
-        if (inUnformScale)
+        if (MainWindow::toolMode == UniformScale)
             rightPanelStack->setCurrentIndex(1);
-        else if (inDirectionalScale)
+        else if (MainWindow::toolMode == DirectionalScale)
             rightPanelStack->setCurrentIndex(2);
-        else if (inFreeDeformation)
+        else if (MainWindow::toolMode == FreeDeformation)
             rightPanelStack->setCurrentIndex(3);
-        else if (inRotate)
+        else if (MainWindow::toolMode == Rotate)
             rightPanelStack->setCurrentIndex(4);
-        else if (inMoveTooth)
+        else if (MainWindow::toolMode == MoveTooth)
             rightPanelStack->setCurrentIndex(6);
-        else if (inMoveJaw)
+        else if (MainWindow::toolMode == MoveJaw)
             rightPanelStack->setCurrentIndex(7);
     }
 

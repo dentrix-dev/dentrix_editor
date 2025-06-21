@@ -638,7 +638,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         std::cout << "Intersection point: " << intersectionPoint.x << " " << intersectionPoint.y << " "
                   << intersectionPoint.z << std::endl;
     }
-    if (MainWindow::inFreeDeformation && shiftHeld) {
+    if ((MainWindow::toolMode == MainWindow::FreeDeformation) && shiftHeld) {
         brush.setPosition(intersectionPoint);
         selectedMesh->applyFreeDeformation(brush, freeDeformAddMode);
         update();
@@ -658,20 +658,20 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         glm::ivec4 viewport = glm::ivec4(0, 0, GLWidget::width(), GLWidget::height());
 
         glm::vec3 objectPosition;
-        if (MainWindow::inMoveTooth) {
+        if (MainWindow::toolMode == MainWindow::MoveTooth) {
             objectPosition = selectedMesh->center;
-        } else if (MainWindow::inMoveJaw) {
+        } else if (MainWindow::toolMode == MainWindow::MoveJaw) {
             objectPosition = isUpperJawSelected ? upperJawCenter : lowerJawCenter;
         }
         selectedGizmoComponent->onDrag(mousePosX, mousePosY, newMousePosX, newMousePosY, objectPosition,
                                        camera.position, camera.front, view, projection, viewport, gizmoModelMatrix);
-        if (MainWindow::inMoveTooth) {
+        if (MainWindow::toolMode == MainWindow::MoveTooth) {
             toothGizmo->position = gizmoModelMatrix * glm::vec4(selectedMesh->center, 1.0f);
-        } else if (MainWindow::inMoveJaw) {
+        } else if (MainWindow::toolMode == MainWindow::MoveJaw) {
             if (isUpperJawSelected) toothGizmo->position = gizmoModelMatrix * glm::vec4(upperJawCenter, 1.0f);
             if (isLowerJawSelected) toothGizmo->position = gizmoModelMatrix * glm::vec4(lowerJawCenter, 1.0f);
         }
-    } else if (MainWindow::inFreeDeformation && shiftHeld) {
+    } else if ((MainWindow::toolMode == MainWindow::FreeDeformation) && shiftHeld) {
         glm::vec3 rayDirection;
         Camera::ScreenPosToWorldRay(event->position().x(), event->position().y(), GLWidget::width(), GLWidget::height(),
                                     view, projection, rayDirection);
@@ -701,9 +701,9 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (isDraggingGizmo) {
         isDraggingGizmo = false;
-        if (MainWindow::inMoveTooth) {
+        if (MainWindow::toolMode == MainWindow::MoveTooth) {
             selectedMesh->translate(gizmoModelMatrix);
-        } else if (MainWindow::inMoveJaw) {
+        } else if (MainWindow::toolMode == MainWindow::MoveJaw) {
             if (isUpperJawSelected) {
                 for (Mesh *m : upperJawMeshes) m->translate(gizmoModelMatrix);
                 upperJawCenter = gizmoModelMatrix * glm::vec4(upperJawCenter, 1.0f);
@@ -722,12 +722,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         Camera::ScreenPosToWorldRay(mouseX, mouseY, GLWidget::width(), GLWidget::height(), view, projection,
                                     rayDirection);
 
-        if (!MainWindow::inMoveJaw) {
+        if (!(MainWindow::toolMode == MainWindow::MoveJaw)) {
             Mesh *intersectedMesh = nullptr;
             bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh, true);
             if (intersection && intersectedMesh != nullptr) {
                 selectedMesh = intersectedMesh;
-                if (MainWindow::inMoveTooth) {
+                if (MainWindow::toolMode == MainWindow::MoveTooth) {
                     isGizmoEnabled = true;
                     toothGizmo->position = intersectedMesh->center;
                 }
@@ -736,7 +736,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
                 std::cout << "nullpointer" << std::endl;
             }
             update();
-        } else if (MainWindow::inMoveJaw) {
+        } else if (MainWindow::toolMode == MainWindow::MoveJaw) {
             Mesh *intersectedMesh = nullptr;
             bool intersection = currentScene->Intersect(camera.position, rayDirection, model, intersectedMesh, false);
             if (intersection) {
@@ -933,7 +933,7 @@ void GLWidget::setBrushSize(int value)
 
 void GLWidget::updateCursor()
 {
-    if (MainWindow::inFreeDeformation && shiftHeld) {
+    if ((MainWindow::toolMode == MainWindow::FreeDeformation) && shiftHeld) {
         setCursor(CursorFactory::createCursor(brush.getRadius(), currentBrushMode));
     } else {
         unsetCursor();
@@ -944,11 +944,11 @@ void GLWidget::onToolChange()
 {
     makeCurrent();
 
-    if (!MainWindow::inMoveJaw && !MainWindow::inMoveTooth) {
+    if (!(MainWindow::toolMode == MainWindow::MoveJaw) && !(MainWindow::toolMode == MainWindow::MoveTooth)) {
         isGizmoEnabled = false;
     }
 
-    if (MainWindow::inMoveTooth) {
+    if (MainWindow::toolMode == MainWindow::MoveTooth) {
         if (selectedMesh != nullptr) {
             isGizmoEnabled = true;
             toothGizmo->position = selectedMesh->center;
@@ -956,7 +956,7 @@ void GLWidget::onToolChange()
             isGizmoEnabled = false;
         }
     }
-    if (MainWindow::inMoveJaw) {
+    if (MainWindow::toolMode == MainWindow::MoveJaw) {
         selectedMesh = nullptr;
         isGizmoEnabled = false;
     } else {
@@ -971,7 +971,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Shift && !shiftHeld) {
         shiftHeld = true;
-        if (MainWindow::inFreeDeformation) updateCursor();
+        if ((MainWindow::toolMode == MainWindow::FreeDeformation)) updateCursor();
     } else if (event->key() == Qt::Key_Control) {
         ctrlHeld = true;
     }

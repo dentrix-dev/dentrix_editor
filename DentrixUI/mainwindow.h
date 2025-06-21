@@ -24,13 +24,16 @@ public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+    enum ToolMode { None, UniformScale, DirectionalScale, FreeDeformation, Rotate, MoveTooth, MoveJaw };
+
+    static ToolMode toolMode;
     // toDo: refactor into a separate transformationState class
-    static bool inUnformScale;
-    static bool inDirectionalScale;
-    static bool inFreeDeformation;
-    static bool inRotate;
-    static bool inMoveTooth;
-    static bool inMoveJaw;
+    // static bool inUnformScale;
+    // static bool inDirectionalScale;
+    // static bool inFreeDeformation;
+    // static bool inRotate;
+    // static bool inMoveTooth;
+    // static bool inMoveJaw;
 
     void setupCentralUI(const std::string& modelPath, int loadMode);
 
@@ -46,7 +49,6 @@ private:
     bool lowerLoaded = false;
 
 private slots:
-    void loadModel();
     void saveModel();
     void onMeshSelectedInMainScene();
     void onMovedToEditScene();
